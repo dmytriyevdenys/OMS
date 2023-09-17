@@ -14,5 +14,11 @@ export const ModelName = {
 export const CalledMethod = {
     getCounterparties:'getCounterparties',
     getCounterpartyContactPersons: 'getCounterpartyContactPersons',
-    
+    getCities: 'getCities',
+    searchSettlements: 'searchSettlements',
+    searchSettlementStreets: 'searchSettlementStreets',
+    save: 'save',
+    delete: 'delete',
+    update: 'update',
+
 }

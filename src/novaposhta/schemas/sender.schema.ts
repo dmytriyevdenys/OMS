@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import mongoose, { Document } from 'mongoose';
+import { SenderContact, } from './sender-contact.schema';
 
 
 @Schema({
@@ -19,7 +20,7 @@ export class Sender extends Document {
   Description: string;
 
   @Prop()
-  Phones: number;
+  Phones: string;
 
   @Prop()
   Email: string;
@@ -32,6 +33,12 @@ export class Sender extends Document {
 
   @Prop()
   MiddleName: string;
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: SenderContact.name})
+  Contact: SenderContact;
+
+  @Prop({ type: mongoose.Schema.Types.Boolean, default: false })
+  isDefault: boolean;
 }
 
 export const SenderSchema = SchemaFactory.createForClass(Sender);
