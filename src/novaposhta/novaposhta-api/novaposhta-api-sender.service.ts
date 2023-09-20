@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CalledMethod, ModelName } from 'src/consts/consts';
 import { ApiNovaposhtaFetchService } from 'src/utils/api-novaposhta-fetch.service';
-import { Document, Model, Schema } from 'mongoose';
+import {  Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Sender } from '../schemas/sender.schema';
 import { SenderContact } from '../schemas/sender-contact.schema';

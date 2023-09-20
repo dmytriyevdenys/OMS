@@ -17,6 +17,7 @@ export const CalledMethod = {
     getCities: 'getCities',
     searchSettlements: 'searchSettlements',
     searchSettlementStreets: 'searchSettlementStreets',
+    getWarehouses:'getWarehouses',
     save: 'save',
     delete: 'delete',
     update: 'update',

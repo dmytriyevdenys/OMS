@@ -1,5 +1,7 @@
 import { IsNotEmpty } from "class-validator";
 import { SenderContact } from "../schemas/sender-contact.schema";
+import { Address } from "../schemas/address.schema";
+
 
 export class SenderInfo { 
     Ref: string;
@@ -25,6 +27,8 @@ export class SenderContactDto {
 
 export class SenderDto extends SenderInfo {
     @IsNotEmpty()
-    apiKey: string; 
+    apiKey: string;
+    id:string; 
     Contact: SenderContact;
+    Address:Address
 }

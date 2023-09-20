@@ -1,7 +1,6 @@
 import {
   Injectable,
   NotFoundException,
-  InternalServerErrorException,
   BadRequestException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -9,6 +8,8 @@ import { Sender } from './schemas/sender.schema';
 import { Model } from 'mongoose';
 import { SenderDto } from './dto/sender.dto';
 import { SenderContact } from './schemas/sender-contact.schema';
+import { AddressService } from './noaposhta-address.service';
+import { log } from 'console';
 
 @Injectable()
 export class SenderService {
@@ -16,6 +17,7 @@ export class SenderService {
     @InjectModel(Sender.name) private senderModel: Model<Sender>,
     @InjectModel(SenderContact.name)
     private senderContactModel: Model<SenderContact>,
+    private addressService: AddressService,
   ) {}
 
   async validateSender(dto: SenderDto) {
@@ -23,139 +25,78 @@ export class SenderService {
     const sender = await this.findSenderByApiKey(apiKey);
 
     if (sender) {
-      throw new BadRequestException('Відправник з таким ключом вже існує!!!');
+      throw new NotFoundException('Відправник з таким ключом вже існує!!!');
     }
+
     return sender;
   }
 
   async createSender(dto: SenderDto): Promise<Sender> {
-    try {
-      const sender = await this.senderModel.create(dto);
-      return sender;
-    } catch (error) {
-      throw new InternalServerErrorException(
-        'Помилка при створенні відправника.',
-      );
-    }
+    const sender = await this.senderModel.create(dto);
+    return sender;
   }
 
   async getAllSender(): Promise<Sender[]> {
-    try {
-      const senders = await this.senderModel.find().exec();
-      return senders;
-    } catch (error) {
-      throw new InternalServerErrorException(
-        'Помилка при отриманні списку відправників.',
-      );
-    }
+    const sender = await this.senderModel
+      .find()
+      .populate('Contact')
+      .populate('Address')
+      .exec();
+    return sender;
   }
 
-  async findSenderById(id: string): Promise<Sender> {
-    try {
-      const sender = await this.senderModel.findById(id);
-      if (!sender) {
-        throw new NotFoundException('Відправник не знайдений.');
-      }
-      const idContact = sender.Contact;
-      const contact = await this.senderContactModel.findById(idContact);
-      sender.Contact = contact;
-      return sender;
-    } catch (error) {
-      throw new InternalServerErrorException(
-        'Помилка при пошуку відправника за ID.',
-      );
-    }
+  async findSenderById(id:string): Promise<Sender> {
+    const sender = await this.senderModel.findById(id)
+      .populate('Contact')
+      .populate('Address')
+      .exec();
+    return sender;
   }
 
   async findSenderByApiKey(apiKey: string): Promise<Sender> {
-    try {
-      const sender = await this.senderModel.findOne({ apiKey }).exec();
-      if (!sender) {
-        throw new NotFoundException('Відправник не знайдений.');
-      }
-      return sender;
-    } catch (error) {
-      throw new InternalServerErrorException(
-        'Помилка при пошуку відправника за API ключем.',
-      );
-    }
+    const sender = await this.senderModel.findOne({ apiKey }).exec();
+
+    return sender;
   }
 
-  async setSender(dto: SenderDto): Promise<Sender | undefined> {
+  async setSender(dto: SenderDto): Promise<Sender> {
     const senderValidate = await this.validateSender(dto);
 
-    if (senderValidate) {
-      try {
-        const contact = await this.createSenderContact(dto);
-        const { id } = contact;
-        dto.Contact = id;
-        const newSender = await this.createSender(dto);
-        newSender.Contact = contact;
-        return newSender;
-      } catch (error) {
-        throw new InternalServerErrorException(
-          'Помилка при створенні відправника та/або контакту.',
-        );
-      }
+    if (!senderValidate) {
+      const address = await this.addressService.setAddress(dto);
+      const contact = await this.createSenderContact(dto);
+      dto.Address = address.id;
+      dto.Contact = contact.id;
+      const newSender = await this.createSender(dto);
+      newSender.Contact = contact;
+      return newSender;
     }
-
-    return undefined;
   }
-
   async findSenderContactByName(name: string): Promise<SenderContact> {
-    try {
-      const contact = await this.senderContactModel.findOne({ name }).exec();
-      if (!contact) {
-        throw new NotFoundException('Контакт не знайдений.');
-      }
-      return contact;
-    } catch (error) {
-      throw new InternalServerErrorException(
-        `Помилка при пошуку контакту за ім'ям.`,
-      );
-    }
+    const contact = await this.senderContactModel.findOne({ name }).exec();
+
+    return contact;
   }
 
   async findContactById(id: string): Promise<SenderContact> {
-    try {
-      const contact = await this.senderContactModel.findById(id);
-      if (!contact) {
-        throw new NotFoundException('Контакт не знайдений.');
-      }
-      return contact;
-    } catch (error) {
-      throw new InternalServerErrorException(
-        'Помилка при пошуку контакту за ID.',
-      );
-    }
+    const contact = await this.senderContactModel.findById(id);
+    return contact;
   }
 
   async createSenderContact(dto: SenderDto): Promise<SenderContact> {
-    try {
-      const { Contact } = dto;
-      const newContact = await this.senderContactModel.create(Contact);
-      return newContact;
-    } catch (error) {
-      throw new InternalServerErrorException('Помилка при створенні контакту.');
-    }
+    const { Contact } = dto;
+    const newContact = await this.senderContactModel.create(Contact);
+
+    return newContact;
   }
 
-  async deleteSender(id: { id: string }): Promise<Sender> {
+  async deleteSender(id: { id: string }) {
     const idSender = id.id;
-    try {
-      const sender = await this.senderModel.findByIdAndDelete(idSender);
-      if (!sender) {
-        throw new NotFoundException('Відправник не знайдений.');
-      }
-      return sender;
-    } catch (error) {
-      throw new InternalServerErrorException(
-        'Помилка при видаленні відправника.',
-      );
-    }
+    const sender = await this.senderModel.findByIdAndDelete(idSender);
+    return sender;
   }
 
-  async setDefaultSender(id: { id: string }): Promise<Sender> {
+  async setDefaultSender(id: { id: string }): Promise<Sender | null> {
     const idSender = id.id;
     const sender = await this.findSenderById(idSender);
 
@@ -163,16 +104,38 @@ export class SenderService {
       await this.senderModel.updateMany({}, { isDefault: false });
       sender.isDefault = true;
       await sender.save();
-
       return sender;
     }
+    return null;
   }
 
   async getDefaultSender() {
     const defaultSender = await this.senderModel.findOne({ isDefault: true });
-    const contact = await this.senderContactModel.findById(defaultSender.Contact);
+    if (!defaultSender) {
+      return null;
+    }
+    const contact = await this.senderContactModel.findById(
+      defaultSender.Contact,
+    );
+    if (!contact) {
+      return null;
+    }
     defaultSender.Contact = contact;
-    
     return defaultSender;
+  }
+
+  async updateSenderAddress(dto: SenderDto):Promise<Sender> {
+    try {   
+      const { id } = dto;
+      const { Address } = dto;
+      const sender = await this.findSenderById(id);
+      sender.Address = Address;
+      await sender.save();
+      return sender;
+    } catch (error) {
+      console.log(error);
+      
+      throw new BadRequestException('Не Вдалось обновити адресу');
+    }
   }
 }

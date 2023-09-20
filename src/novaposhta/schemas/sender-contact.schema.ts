@@ -3,6 +3,7 @@ import { Document } from "mongoose";
 
 @Schema({
     timestamps: true,
+    versionKey: false
 })
 export class SenderContact extends Document { 
 

@@ -11,6 +11,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { OrdersModule } from './orders/orders.module';
 import { NovaposhtaModule } from './novaposhta/novaposhta.module';
+import { RecipientModule } from './novaposhta/recipient/recipient.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -23,7 +24,8 @@ import { NovaposhtaModule } from './novaposhta/novaposhta.module';
     AuthModule,
     UsersModule,
     OrdersModule,
-    NovaposhtaModule
+    NovaposhtaModule,
+    RecipientModule
     ],
   controllers: [AppController],
   providers: [AppService, 
@@ -32,5 +34,6 @@ import { NovaposhtaModule } from './novaposhta/novaposhta.module';
       useClass: JwtAuthGuard,
     }
   ],
+  exports:[]
 })
 export class AppModule {}

@@ -1,10 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 import { SenderContact, } from './sender-contact.schema';
+import { Address } from './address.schema';
 
 
 @Schema({
   timestamps: true,
+  versionKey: false
 })
 export class Sender extends Document {
   @Prop({ unique: [true, 'api ключ вже існує'] })
@@ -36,6 +38,9 @@ export class Sender extends Document {
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: SenderContact.name})
   Contact: SenderContact;
+
+  @Prop({type: mongoose.Schema.Types.ObjectId, ref: Address.name})
+  Address: Address
 
   @Prop({ type: mongoose.Schema.Types.Boolean, default: false })
   isDefault: boolean;

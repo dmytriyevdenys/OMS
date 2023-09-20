@@ -13,14 +13,20 @@ import {
 import { MatchModelService } from 'src/utils/match-model.service';
 import { SenderService } from './novaposhta-sender.service';
 import { ApiAddressService } from './novaposhta-api/novaposhta-api-address.service';
+import { Address, AddressSchema } from './schemas/address.schema';
+import { AddressService } from './noaposhta-address.service';
+import { RecipientModule } from './recipient/recipient.module';
+
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Sender.name, schema: SenderSchema },
       { name: SenderContact.name, schema: SenderContactSchema },
+      {name: Address.name, schema: AddressSchema}
     ]),
     HttpModule,
+
   ],
   controllers: [NovaposhtaController],
   providers: [
@@ -30,6 +36,8 @@ import { ApiAddressService } from './novaposhta-api/novaposhta-api-address.servi
     ApiSenderService,
     MatchModelService,
     SenderService,
+    AddressService
   ],
+  exports:[MongooseModule]
 })
 export class NovaposhtaModule {}

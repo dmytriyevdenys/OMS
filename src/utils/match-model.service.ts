@@ -8,7 +8,7 @@ export class MatchModelService {
     async match<T extends Document>(
         model: Model<T>,
         object: any,
-      ): Promise<T> {
+      ): Promise<T>  {
         const schemaPaths = model.schema.paths;
         const matchingData: any = {};
     
