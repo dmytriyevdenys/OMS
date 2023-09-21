@@ -12,10 +12,11 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { OrdersModule } from './orders/orders.module';
 import { NovaposhtaModule } from './novaposhta/novaposhta.module';
 import { RecipientModule } from './novaposhta/recipient/recipient.module';
-
+import { HttpModule } from '@nestjs/axios';
 @Module({
   imports: [ConfigModule.forRoot({
-    envFilePath: 'development.env',
+
+  envFilePath: 'development.env',
     isGlobal: true
   }),
     MongooseModule.forRoot(process.env.DB_URI),
@@ -25,7 +26,9 @@ import { RecipientModule } from './novaposhta/recipient/recipient.module';
     UsersModule,
     OrdersModule,
     NovaposhtaModule,
-    RecipientModule
+    RecipientModule,
+    ProductsModule,
+    HttpModule
     ],
   controllers: [AppController],
   providers: [AppService, 

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { OrdersApiService } from './orders-api/orders-api.service';
+import { OrdersApiService } from '../orders-api/orders-api.service';
 
 @Injectable()
 export class NewOrderWebHookService{

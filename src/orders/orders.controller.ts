@@ -16,8 +16,33 @@ export class OrdersController {
     }
 
     @Public()
-    @Get(':id')
+    @Get(':id(\\d+)')
     async getOrderById (@Param('id') id: string) {
         return this.ordersApiservice.getOrderById(id)
+    }
+
+    @Get('status')
+    async getStatus () {
+        return this.ordersApiservice.getOrderStatus();
+    }
+
+    @Get('delivery-service')
+    async getDeliveryService () {
+        return this.ordersApiservice.getDeliveryService();
+    }
+
+    @Get('tag')
+    async getTag () {
+        return this.ordersApiservice.getTag();
+    }
+
+    @Get('source')
+    async getSource () {
+        return this.ordersApiservice.getSource();
+    }
+
+    @Get('fields')
+    async getFields () {
+        return this.ordersApiservice.getCustomField();
     }
 }

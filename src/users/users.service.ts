@@ -3,12 +3,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user.schema';
 import { Model } from 'mongoose';
 import { SignUpDto } from 'src/auth/dto/signup.dto';
+import { OrdersApiService } from 'src/orders/orders-api/orders-api.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name)
     private userModel: Model<UserDocument>,
+    private orderApiService: OrdersApiService
+    
   ) {}
 
   async createUser(dto: SignUpDto): Promise<UserDocument> {
@@ -31,6 +34,15 @@ export class UsersService {
   async findUserById(id: string | number): Promise<UserDocument> {
     const user= await this.userModel.findById(id)
     return user
+  }
+
+  async setManager(id: string ) {
+    const manager = await this.orderApiService.getOrderById(id);
+    const response = { 
+      id: manager.manager.id,
+      name: manager.manager.full_name
+    }
+    return response;
   }
 
 

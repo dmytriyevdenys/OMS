@@ -12,7 +12,7 @@ export class NewOrderWebHookController {
     @Post()
     async newOrderWebHook (@Body() data: any) {
        const response =  await this.newOrderWebHookService.newOrderFromWebHook(data)
-       console.log(response);
+
        
        return response
     }

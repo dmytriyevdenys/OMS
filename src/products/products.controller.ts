@@ -1,16 +1,21 @@
 import {
+  Body,
   Controller,
   Get,
   Param,
+  Post,
   Query,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { IProductForFrontend } from 'src/interfaces/product.interface';
 import { Public } from 'src/decorators/public.decorator';
+import { ProductsApiService } from './products-api/products-api.service';
 
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(private readonly productsService: ProductsService,
+    private productApiService: ProductsApiService
+    ) {}
   @Public()
   @Get()
   async getProduct(
@@ -30,4 +35,5 @@ export class ProductsController {
       return await this.productsService.getProductById(id);
    
   }
+
 }

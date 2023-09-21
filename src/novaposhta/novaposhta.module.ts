@@ -15,7 +15,6 @@ import { SenderService } from './novaposhta-sender.service';
 import { ApiAddressService } from './novaposhta-api/novaposhta-api-address.service';
 import { Address, AddressSchema } from './schemas/address.schema';
 import { AddressService } from './noaposhta-address.service';
-import { RecipientModule } from './recipient/recipient.module';
 
 
 @Module({
@@ -27,7 +26,7 @@ import { RecipientModule } from './recipient/recipient.module';
     ]),
     HttpModule,
 
-  ],
+  ], 
   controllers: [NovaposhtaController],
   providers: [
     NovaposhtaService,

@@ -2,14 +2,20 @@ import { Module } from '@nestjs/common';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 import { ApiCrmFetchService } from 'src/utils/api-crm-fetch.service';
-import { HttpModule } from '@nestjs/axios';
+import { HttpModule, HttpService } from '@nestjs/axios';
 import { OrdersApiService } from './orders-api/orders-api.service';
-import { NewOrderWebHookService } from './new-order-webhook.service';
-import { NewOrderWebHookController } from './new-order-webhook.controller';
+import { NewOrderWebHookService } from './webhooks/new-order-webhook.service';
+import { NewOrderWebHookController } from './webhooks/new-order-webhook.controller';
 
 @Module({
-  imports:[HttpModule],
+  imports: [HttpModule],
   controllers: [OrdersController, NewOrderWebHookController],
-  providers: [OrdersService,ApiCrmFetchService,OrdersApiService, NewOrderWebHookService]
+  providers: [
+    OrdersService,
+    ApiCrmFetchService,
+    OrdersApiService,
+    NewOrderWebHookService,
+  ],
+  exports: []
 })
 export class OrdersModule {}
