@@ -13,6 +13,7 @@ import { OrdersModule } from './orders/orders.module';
 import { NovaposhtaModule } from './novaposhta/novaposhta.module';
 import { RecipientModule } from './novaposhta/recipient/recipient.module';
 import { HttpModule } from '@nestjs/axios';
+import { BuyerModule } from './buyer/buyer.module';
 @Module({
   imports: [ConfigModule.forRoot({
 
@@ -28,7 +29,8 @@ import { HttpModule } from '@nestjs/axios';
     NovaposhtaModule,
     RecipientModule,
     ProductsModule,
-    HttpModule
+    HttpModule,
+    BuyerModule
     ],
   controllers: [AppController],
   providers: [AppService, 

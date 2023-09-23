@@ -1,9 +1,10 @@
-import { Controller, Get,Param } from '@nestjs/common';
+import { Controller, Get,Param, Post, Body } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { OrdersApiService } from './orders-api/orders-api.service';
 import { Public } from 'src/decorators/public.decorator';
+import { OrderDto } from './dto/order.dto';
 
-@Controller('orders')
+@Controller('order')
 export class OrdersController {
     constructor (
         private ordersService: OrdersService,
@@ -44,5 +45,15 @@ export class OrdersController {
     @Get('fields')
     async getFields () {
         return this.ordersApiservice.getCustomField();
+    }
+
+    @Get('payment') 
+    async getPayment () {
+        return this.ordersApiservice.getPayment();
+    }
+
+    @Post() 
+    async createOrder (@Body() dto:Partial< OrderDto>) {
+        return this.ordersApiservice.createOrder(dto)
     }
 }

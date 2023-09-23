@@ -1,5 +1,5 @@
 export interface OrderAssociations { 
-    id: string;
+    id: number;
     name: string;
     uuid: string;
 }

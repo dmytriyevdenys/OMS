@@ -66,7 +66,7 @@ export class ApiAddressService {
     return addressData;
   }
 
-  async createAddress(dto: WareHouseDto) {
+  async createAddress(dto: WareHouseDto): Promise<Address> {
     const { apiKey } = await this.senderService.getDefaultSender();
     const modelName = ModelName.Address;
     const calledMethod = CalledMethod.save;
@@ -85,7 +85,7 @@ export class ApiAddressService {
       const data = response.data;
       return data;
     } catch (error) {
-      console.log(error);
+     
     }
   }
 }

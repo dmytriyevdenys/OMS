@@ -9,7 +9,6 @@ import { Model } from 'mongoose';
 import { SenderDto } from './dto/sender.dto';
 import { SenderContact } from './schemas/sender-contact.schema';
 import { AddressService } from './noaposhta-address.service';
-import { log } from 'console';
 
 @Injectable()
 export class SenderService {
@@ -33,6 +32,7 @@ export class SenderService {
 
   async createSender(dto: SenderDto): Promise<Sender> {
     const sender = await this.senderModel.create(dto);
+
     return sender;
   }
 
@@ -45,8 +45,9 @@ export class SenderService {
     return sender;
   }
 
-  async findSenderById(id:string): Promise<Sender> {
-    const sender = await this.senderModel.findById(id)
+  async findSenderById(id: string): Promise<Sender> {
+    const sender = await this.senderModel
+      .findById(id)
       .populate('Contact')
       .populate('Address')
       .exec();
@@ -69,6 +70,8 @@ export class SenderService {
       dto.Contact = contact.id;
       const newSender = await this.createSender(dto);
       newSender.Contact = contact;
+      contact.Sender = newSender.id;
+      await contact.save();
       return newSender;
     }
   }
@@ -109,7 +112,7 @@ export class SenderService {
     return null;
   }
 
-  async getDefaultSender() {
+  async getDefaultSender(): Promise<Sender> {
     const defaultSender = await this.senderModel.findOne({ isDefault: true });
     if (!defaultSender) {
       return null;
@@ -124,8 +127,8 @@ export class SenderService {
     return defaultSender;
   }
 
-  async updateSenderAddress(dto: SenderDto):Promise<Sender> {
-    try {   
+  async updateSenderAddress(dto: SenderDto): Promise<Sender> {
+    try {
       const { id } = dto;
       const { Address } = dto;
       const sender = await this.findSenderById(id);
@@ -133,8 +136,7 @@ export class SenderService {
       await sender.save();
       return sender;
     } catch (error) {
-      console.log(error);
-      
+  
       throw new BadRequestException('Не Вдалось обновити адресу');
     }
   }

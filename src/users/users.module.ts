@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../users/schemas/user.schema';
 import { UsersService } from './users.service';
@@ -12,9 +12,9 @@ import { ApiCrmFetchService } from 'src/utils/api-crm-fetch.service';
 @Module({
   imports: [
 
-
+    forwardRef(() => OrdersModule),
   MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
-  OrdersModule,
+  
   HttpModule
   ],
   providers: [UsersService, OrdersApiService, ApiCrmFetchService],

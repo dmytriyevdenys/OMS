@@ -1,11 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, forwardRef, Inject, BadRequestException } from '@nestjs/common';
 import { ApiCrmFetchService } from 'src/utils/api-crm-fetch.service';
 import { OrderAssociations } from '../interfaces/order-associations.interfaces';
+import { OrderDto } from '../dto/order.dto';
+import { UsersService } from 'src/users/users.service';
+
 
 @Injectable()
 export class OrdersApiService {
   private readonly baseUrl: string;
-  constructor(private apiService: ApiCrmFetchService) {
+  constructor(
+    private apiService: ApiCrmFetchService,
+  @Inject(forwardRef(() => UsersService)) private userService: UsersService
+    ) {
     this.baseUrl = 'order';
   }
 
@@ -42,8 +48,18 @@ export class OrdersApiService {
     return order;
   }
 
-  async createOrder() {
-    
+  async createOrder(dto) {
+
+    try {
+        const newOrder = await this.apiService.post(`${this.baseUrl}`, dto)
+        if(!newOrder) {
+          throw new BadRequestException('Помилка при створенні замовлення')
+        }
+        return newOrder;
+    } catch (error) {
+        throw new BadRequestException('помилка',error.message);
+    }
+
   }
 
   async getOrderStatus(): Promise<OrderAssociations[]>{
@@ -62,13 +78,19 @@ export class OrdersApiService {
     return this.fetchDataAndMap('source', {limit: 50})
   }
 
+ 
+
   async getCustomField (): Promise<OrderAssociations[]> {
     const fields = await this.apiService.get('custom-fields');
     const response = fields.map(field => ({
       id: field.id,
-      name: field.name,
+      value: field.name,
       uuid: field.uuid
     }));
     return response;
+  }
+
+  async getPayment (): Promise<OrderAssociations[]> {
+    return  this.fetchDataAndMap('payment-method');
   }
 }

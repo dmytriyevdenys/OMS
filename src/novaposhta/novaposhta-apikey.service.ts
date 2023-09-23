@@ -1,19 +1,21 @@
-import { Injectable, OnModuleInit } from "@nestjs/common";
-import { SenderService } from "./novaposhta-sender.service";
+import { Injectable } from '@nestjs/common';
+import { SenderService } from './novaposhta-sender.service';
 
 @Injectable()
-export class ApiKeyService  {
+export class ApiKeyService {
   private apiKey: string;
 
-  constructor(private senderService: SenderService) {
+  constructor(private senderService: SenderService) {}
 
-  }
-
-
-
-  getApiKey(): string {
-    if (!this.apiKey) {
-      throw new Error(`ApiKey is not initialized.`);
+  async getApiKey(order: Record<string, any> = {}): Promise<string> {
+    if (!order) {
+      const { apiKey } = await this.senderService.getDefaultSender();
+      this.apiKey = apiKey;
+    }
+    const { idSender } = order;
+    if (idSender) {
+      const sender = await this.senderService.findSenderById(idSender);
+      this.apiKey = sender.apiKey;
     }
     return this.apiKey;
   }
