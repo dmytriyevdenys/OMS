@@ -7,10 +7,10 @@ import { User } from "src/users/schemas/user.schema";
 @Schema()
 export class Order extends Document { 
     @Prop({type: mongoose.Schema.ObjectId, ref: Sender.name})
-    Sender: Sender;
+    sender: Sender;
     
-    @Prop({type: mongoose.Schema.ObjectId, ref: User.name})
-    userId: User
+    @Prop({type: mongoose.Schema.ObjectId, ref:'User'})
+    user: User
 
     @Prop()
     order_id: string
@@ -21,8 +21,8 @@ export class Order extends Document {
     @Prop()
     totalPrice: number
 
-    @Prop({type: mongoose.Types.ObjectId, ref: 'Buyer'})
-    buyer: Buyer
+    @Prop([{type: mongoose.Types.ObjectId, ref: 'Buyer'}])
+    buyer: Buyer[]
 
     @Prop([String])
     notes: string[]

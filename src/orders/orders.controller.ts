@@ -1,8 +1,8 @@
-import { Controller, Get,Param, Post, Body } from '@nestjs/common';
+import { Controller, Get,Param, Post, Body, Req } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { OrdersApiService } from './orders-api/orders-api.service';
 import { Public } from 'src/decorators/public.decorator';
-import { OrderDto } from './dto/order.dto';
+import { NewOrderDto, } from './dto/order.dto';
 
 @Controller('order')
 export class OrdersController {
@@ -13,7 +13,7 @@ export class OrdersController {
     @Public()
     @Get()
     async getOrders () { 
-        return this.ordersApiservice.getOrders()
+        return this.ordersService.getAllOrders()
     }
 
     @Public()
@@ -53,7 +53,7 @@ export class OrdersController {
     }
 
     @Post() 
-    async createOrder (@Body() dto:Partial< OrderDto>) {
-        return this.ordersApiservice.createOrder(dto)
+    async createOrder (@Body() dto:Partial<NewOrderDto>, @Req() req) {
+        return this.ordersService.createOrder(dto, req)
     }
 }

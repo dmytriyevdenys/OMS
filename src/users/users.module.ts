@@ -9,10 +9,10 @@ import { OrdersApiService } from 'src/orders/orders-api/orders-api.service';
 import { ApiCrmFetchService } from 'src/utils/api-crm-fetch.service';
 
 
+
 @Module({
   imports: [
 
-    forwardRef(() => OrdersModule),
   MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   
   HttpModule

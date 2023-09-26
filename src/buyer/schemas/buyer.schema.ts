@@ -13,8 +13,8 @@ export class Buyer extends Document {
     @Prop()
     email: string
 
-    @Prop({type: mongoose.Types.ObjectId, ref: 'Order'})
-    order: Order
+    @Prop([{type: mongoose.Types.ObjectId, ref: 'Order'}])
+    orders: Order[]
 
 }
 

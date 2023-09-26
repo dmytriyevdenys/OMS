@@ -1,8 +1,8 @@
 import { Injectable, forwardRef, Inject, BadRequestException } from '@nestjs/common';
 import { ApiCrmFetchService } from 'src/utils/api-crm-fetch.service';
 import { OrderAssociations } from '../interfaces/order-associations.interfaces';
-import { OrderDto } from '../dto/order.dto';
 import { UsersService } from 'src/users/users.service';
+import { OrderCrmDto } from '../dto/order.dto';
 
 
 @Injectable()
@@ -48,7 +48,7 @@ export class OrdersApiService {
     return order;
   }
 
-  async createOrder(dto) {
+  async createOrder(dto: Partial<OrderCrmDto>) {
 
     try {
         const newOrder = await this.apiService.post(`${this.baseUrl}`, dto)

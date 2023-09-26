@@ -9,12 +9,19 @@ import { NewOrderWebHookService } from './webhooks/new-order-webhook.service';
 import { NewOrderWebHookController } from './webhooks/new-order-webhook.controller';
 import { Order, OrderSchema } from './schemas/order.schema';
 import { UsersModule } from 'src/users/users.module';
+import { BuyerModule } from 'src/buyer/buyer.module';
+import { BuyerService } from 'src/buyer/buyer.service';
+import { UsersService } from 'src/users/users.service';
+
 
 @Module({
   imports: [
-    forwardRef(() => UsersModule),
+
+UsersModule,
   HttpModule,
-    MongooseModule.forFeature([{name: Order.name, schema: OrderSchema}])
+    MongooseModule.forFeature([{name: Order.name, schema: OrderSchema},
+    ]),
+    BuyerModule
   ],
   controllers: [OrdersController, NewOrderWebHookController],
   providers: [
@@ -22,6 +29,8 @@ import { UsersModule } from 'src/users/users.module';
     ApiCrmFetchService,
     OrdersApiService,
     NewOrderWebHookService,
+    BuyerService,
+    UsersService
   ],
   exports: []
 })

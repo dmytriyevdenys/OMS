@@ -17,13 +17,11 @@ export class BuyerService {
   async validateBuyer(dto: BuyerDto) {
     try {
       const phone = dto.phone;
-      const buyer = await this.buyerModel.findOne({ phone: { $in: phone } });
+      const buyer = await this.buyerModel.findOne({ phone });
       if (buyer) {
-        if (buyer.full_name === dto.full_name) {
-          throw new ConflictException('покупець вже існує');
-        }
-        return buyer;
+        throw new ConflictException('покупець вже існує');
       }
+      return buyer;
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -71,12 +69,20 @@ export class BuyerService {
 
   async createBuyer(dto: BuyerDto): Promise<Buyer> {
     try {
-      const buyer = await this.validateBuyer(dto);
+      const existingBuyer = await this.buyerModel.findOne({ phone: dto.phone });
 
-      if (!buyer) {
-        const newBuyer = await this.buyerModel.create(dto);
-        return newBuyer;
+      if (existingBuyer) {
+        throw new ConflictException('Покупець з таким телефоном вже існує');
       }
+
+      const newBuyer = new this.buyerModel(dto);
+      await newBuyer.save();
+
+      if (!newBuyer) {
+        throw new BadRequestException('Не вдалось створити покупця');
+      }
+
+      return newBuyer;
     } catch (error) {
       throw new BadRequestException(
         'Не вдалось створити покупця',

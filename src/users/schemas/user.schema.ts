@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document, HydratedDocument } from "mongoose";
+import mongoose, { Document, HydratedDocument } from "mongoose";
+import { Order } from "src/orders/schemas/order.schema";
+import { Product } from "src/products/schemas/product.schema";
 
 export type UserDocument = HydratedDocument<User>
 
@@ -15,7 +17,7 @@ export class User extends Document {
     manager_id:number
 
     @Prop()
-    managerName: string
+    manager_name: string
 
     @Prop()
     name: string 
@@ -31,6 +33,9 @@ export class User extends Document {
     
     @Prop()
     source_name: string
+
+    @Prop([{type: mongoose.Schema.ObjectId, ref : Order.name}])
+    orders: Order[]
 }
 
 

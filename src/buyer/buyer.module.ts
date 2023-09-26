@@ -10,6 +10,7 @@ import { Buyer, BuyerSchema } from './schemas/buyer.schema';
   MongooseModule.forFeature([{name: Buyer.name, schema: BuyerSchema}]),
   ],
   controllers: [BuyerController],
-  providers: [BuyerService]
+  providers: [BuyerService],
+  exports:[MongooseModule]
 })
 export class BuyerModule {}

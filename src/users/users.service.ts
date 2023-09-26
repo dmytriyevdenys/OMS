@@ -9,6 +9,7 @@ import { Model } from 'mongoose';
 import { SignUpDto } from 'src/auth/dto/signup.dto';
 import { OrdersApiService } from 'src/orders/orders-api/orders-api.service';
 import { OrderAssociations } from 'src/orders/interfaces/order-associations.interfaces';
+import { MatchModelService } from 'src/utils/match-model.service';
 
 @Injectable()
 export class UsersService {
@@ -20,6 +21,13 @@ export class UsersService {
 
   async createUser(dto: SignUpDto): Promise<UserDocument> {
     const user = await this.userModel.create(dto);
+    return user;
+  }
+
+  async updateUser(dto: User) {
+    const user = await this.findUserById(dto._id);
+    const schemaPaths = this.userModel.schema.paths;
+
     return user;
   }
 
@@ -43,9 +51,15 @@ export class UsersService {
   }
 
   async findUserByEmail(email: string): Promise<UserDocument> {
-    const user = this.userModel.findOne({ email }).exec();
-
-    return user;
+    try {
+      const user = this.userModel.findOne({ email }).exec();
+     if(!user) {
+      throw new NotFoundException('Користувач не знайдений')
+     }
+      return user;
+    } catch (error) {
+      throw new BadRequestException('Сталась помилка при пошуку користувача');
+    }
   }
 
   async findUserById(id: string | number): Promise<UserDocument> {
@@ -53,21 +67,21 @@ export class UsersService {
     return user;
   }
 
-  async getManager(id: string): Promise<Partial<OrderAssociations>> {
+  async getManager(id: string): Promise<Partial<User>> {
     const manager = await this.orderApiService.getOrderById(id);
     const response = {
-      id: manager.manager.id,
-      name: manager.manager.full_name,
+      manager_id: manager.manager.id,
+      manager_name: manager.manager.full_name,
     };
     return response;
   }
 
-  async setManager(dto: Partial<OrderAssociations>, user: User): Promise<User> {
+  async setManager(dto: User, user: User): Promise<User> {
     try {
       const userId = user.id;
       const updatedUser = await this.findUserById(userId);
-      updatedUser.manager_id = dto.id;
-      updatedUser.managerName = dto.name;
+      updatedUser.manager_id = dto.manager_id;
+      updatedUser.manager_name = dto.manager_name;
       await updatedUser.save();
       return updatedUser;
     } catch (error) {
@@ -89,5 +103,4 @@ export class UsersService {
   }
 
 
-  
 }

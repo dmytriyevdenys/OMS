@@ -13,8 +13,9 @@ export class AuthController {
     
    @Public()
    @Post('login')
-   signIn (@Body()signInDto:SignInDto){
-   return this.authService.signIn(signInDto) ;
+   signIn (@Body()signInDto:SignInDto): Promise<{access_token: string}>{
+  
+    return this.authService.signIn(signInDto);
 
    }
    @Public()
