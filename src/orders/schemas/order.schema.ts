@@ -10,22 +10,25 @@ export class Order extends Document {
     sender: Sender;
     
     @Prop({type: mongoose.Schema.ObjectId, ref:'User'})
-    user: User
+    user: User;
 
     @Prop()
-    order_id: string
+    order_id: string;
 
     @Prop()
-    additionalnformation: string
+    status_id: string;
 
     @Prop()
-    totalPrice: number
+    additionalnformation: string;
+
+    @Prop()
+    totalPrice: number;
 
     @Prop([{type: mongoose.Types.ObjectId, ref: 'Buyer'}])
-    buyer: Buyer[]
+    buyer: Buyer[];
 
     @Prop([String])
-    notes: string[]
+    notes: string[];
 
 }   
 

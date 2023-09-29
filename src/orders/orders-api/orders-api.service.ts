@@ -1,8 +1,7 @@
-import { Injectable, forwardRef, Inject, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { ApiCrmFetchService } from 'src/utils/api-crm-fetch.service';
 import { OrderAssociations } from '../interfaces/order-associations.interfaces';
-import { UsersService } from 'src/users/users.service';
-import { OrderCrmDto } from '../dto/order.dto';
+import { OrderDto, OrderCrmDto } from '../dto/order.dto';
 
 
 @Injectable()
@@ -10,7 +9,7 @@ export class OrdersApiService {
   private readonly baseUrl: string;
   constructor(
     private apiService: ApiCrmFetchService,
-  @Inject(forwardRef(() => UsersService)) private userService: UsersService
+
     ) {
     this.baseUrl = 'order';
   }
@@ -48,16 +47,45 @@ export class OrdersApiService {
     return order;
   }
 
-  async createOrder(dto: Partial<OrderCrmDto>) {
+  async createOrder(dto: Partial<OrderDto>) {
 
     try {
-        const newOrder = await this.apiService.post(`${this.baseUrl}`, dto)
+
+      const crmDto: OrderCrmDto = {
+        source_id: dto.source_id,
+        manager_id: dto.manager_id,
+        buyer: {
+          full_name: dto.buyer[0].full_name,
+          phone: dto.buyer[0].phone[0],
+        },
+        shipping: {},
+        products: dto.products, 
+        payments: dto.payments.length > 0 ? dto.payments.map((payment) => ({
+          id:'2',
+          payment_method: payment.payment_method,
+          amount: payment.amount,
+          status: 'paid',
+        })): [],
+        custom_fields: [
+          {
+            uuid: "OR_1001", 
+            value: dto.notes.toString(), 
+          },
+          {
+            uuid: "OR_1002",
+            value: dto.additionalnformation, 
+          },
+        ],
+      };
+        const newOrder = await this.apiService.post(`${this.baseUrl}`, crmDto)
         if(!newOrder) {
-          throw new BadRequestException('Помилка при створенні замовлення')
+          throw new BadRequestException('Помилка при створенні замовленняв СРМ')
         }
         return newOrder;
     } catch (error) {
-        throw new BadRequestException('помилка',error.message);
+      
+        throw error;
+      
     }
 
   }

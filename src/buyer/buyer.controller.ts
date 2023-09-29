@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Put } from '@nestjs/common';
+import { Controller, Delete, Get, Put, Param } from '@nestjs/common';
 import { BuyerService } from './buyer.service';
 import { BuyerDto } from './dto/buyer.dto';
 import { Post } from '@nestjs/common';
@@ -16,8 +16,13 @@ export class BuyerController {
         return this.buyerService.getAllBuyer();
     }
 
+    @Get(':id')
+    async getById (@Param('id') id: string) {
+        return this.buyerService.findBuyerById(id);
+    }
+
     @Post()
-    async createBuyer (@Body() dto: BuyerDto): Promise<Buyer> {
+    async createBuyer (@Body() dto: BuyerDto[]): Promise<Buyer[]> {
         return this.buyerService.createBuyer(dto);
     }
 

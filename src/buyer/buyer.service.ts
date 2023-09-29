@@ -9,6 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Buyer } from './schemas/buyer.schema';
 import { Model } from 'mongoose';
 import { BuyerDto } from './dto/buyer.dto';
+import { Order } from 'src/orders/schemas/order.schema';
 
 @Injectable()
 export class BuyerService {
@@ -16,14 +17,16 @@ export class BuyerService {
 
   async validateBuyer(dto: BuyerDto) {
     try {
-      const phone = dto.phone;
-      const buyer = await this.buyerModel.findOne({ phone });
-      if (buyer) {
-        throw new ConflictException('покупець вже існує');
+      const phones = dto.phone;
+      for (const phone of phones) {
+        const buyer = await this.buyerModel.findOne({ phone });
+        if (buyer) {          
+          return buyer; 
+        }
       }
-      return buyer;
+      return null;
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new BadRequestException('помилка ', error.message);
     }
   }
 
@@ -67,29 +70,68 @@ export class BuyerService {
     }
   }
 
-  async createBuyer(dto: BuyerDto): Promise<Buyer> {
+  async createBuyer(dto: BuyerDto[]): Promise<Buyer[]> {
     try {
-      const existingBuyer = await this.buyerModel.findOne({ phone: dto.phone });
-
-      if (existingBuyer) {
-        throw new ConflictException('Покупець з таким телефоном вже існує');
+      if (!dto) {
+        return [];
       }
+    
+      const newBuyers = await Promise.all(
+        dto.map(async (buyer) => {
 
-      const newBuyer = new this.buyerModel(dto);
-      await newBuyer.save();
+          if(buyer.id) {
+           return this.findBuyerById(buyer.id);
+          }
+          const existingBuyer = await this.validateBuyer(buyer);
 
-      if (!newBuyer) {
-        throw new BadRequestException('Не вдалось створити покупця');
-      }
+          if (existingBuyer) {
+            throw new ConflictException('Покупець вже існує');
+          }
 
-      return newBuyer;
+          const newBuyer = await this.buyerModel.create(buyer);
+
+          if (!newBuyer) {
+            throw new BadRequestException('Не вдалось створити покупця');
+          }
+
+          return newBuyer;
+        }),
+      );
+      
+      return newBuyers;
     } catch (error) {
+      if (error instanceof ConflictException) {
+        throw error;
+      }
       throw new BadRequestException(
-        'Не вдалось створити покупця',
+        'Помилка при створенні покупця',
         error.message,
       );
     }
   }
+
+  async assignOrderToBuyers(buyers: Buyer[], order: Order): Promise<Buyer[]> {
+    try {
+      if (!buyers) {
+        return [];
+      }
+      const updatedBuyers: Buyer[] = await Promise.all(
+        buyers.map(async (buyer) => {
+          const newBuyer = await this.findBuyerById(buyer.id);
+          newBuyer.orders.push(order._id)
+          await newBuyer.save();
+          return newBuyer;
+        })
+      );
+               
+      return updatedBuyers;
+    } catch (error) {
+      
+      console.error('Помилка при роботі з базою даних:', error);
+      throw error;
+    }
+  }
+  
 
   async updateBuyer(dto: BuyerDto) {
     try {

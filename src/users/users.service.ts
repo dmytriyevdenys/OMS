@@ -9,7 +9,8 @@ import { Model } from 'mongoose';
 import { SignUpDto } from 'src/auth/dto/signup.dto';
 import { OrdersApiService } from 'src/orders/orders-api/orders-api.service';
 import { OrderAssociations } from 'src/orders/interfaces/order-associations.interfaces';
-import { MatchModelService } from 'src/utils/match-model.service';
+import { Order } from 'src/orders/schemas/order.schema';
+
 
 @Injectable()
 export class UsersService {
@@ -102,5 +103,17 @@ export class UsersService {
     }
   }
 
+  async assignOrderToUser (user : User, order: Order): Promise<User> {
+   try {
+    const updatedUser = await this.findUserById(user.id) ;
+    updatedUser.orders = [...updatedUser.orders, order.id];
+    await updatedUser.save();
+    return updatedUser;
+   }
+   catch (error) {
+    console.error ('Помилка при роботі з базою даних:', error);
+    throw error;
+   }
+  }
 
 }

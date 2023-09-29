@@ -2,7 +2,7 @@ import { Controller, Get,Param, Post, Body, Req } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { OrdersApiService } from './orders-api/orders-api.service';
 import { Public } from 'src/decorators/public.decorator';
-import { NewOrderDto, } from './dto/order.dto';
+import { OrderDto, } from './dto/order.dto';
 
 @Controller('order')
 export class OrdersController {
@@ -53,7 +53,12 @@ export class OrdersController {
     }
 
     @Post() 
-    async createOrder (@Body() dto:Partial<NewOrderDto>, @Req() req) {
+    async createOrder (@Body() dto:Partial<OrderDto>, @Req() req) {
         return this.ordersService.createOrder(dto, req)
+    }
+    
+    @Post('crm')
+    async createOrderCrm (@Body () dto: Partial<OrderDto>) {
+        return this.ordersApiservice.createOrder(dto);
     }
 }
