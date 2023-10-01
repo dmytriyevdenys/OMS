@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { Document } from "mongoose";
 import { Buyer } from "src/buyer/schemas/buyer.schema";
 import { Sender } from "src/novaposhta/schemas/sender.schema";
+import { Product } from "src/products/schemas/product.schema";
 import { User } from "src/users/schemas/user.schema";
 
 @Schema()
@@ -11,6 +12,9 @@ export class Order extends Document {
     
     @Prop({type: mongoose.Schema.ObjectId, ref:'User'})
     user: User;
+
+    @Prop()
+    manager_id: string;
 
     @Prop()
     order_id: string;
@@ -30,6 +34,8 @@ export class Order extends Document {
     @Prop([String])
     notes: string[];
 
+    @Prop ([])
+    products: Product[]
 }   
 
 export const OrderSchema = SchemaFactory.createForClass(Order)

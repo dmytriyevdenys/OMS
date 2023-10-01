@@ -20,8 +20,8 @@ export class BuyerService {
       const phones = dto.phone;
       for (const phone of phones) {
         const buyer = await this.buyerModel.findOne({ phone });
-        if (buyer) {          
-          return buyer; 
+        if (buyer) {
+          return buyer;
         }
       }
       return null;
@@ -75,12 +75,11 @@ export class BuyerService {
       if (!dto) {
         return [];
       }
-    
+
       const newBuyers = await Promise.all(
         dto.map(async (buyer) => {
-
-          if(buyer.id) {
-           return this.findBuyerById(buyer.id);
+          if (buyer.id) {
+            return this.findBuyerById(buyer.id);
           }
           const existingBuyer = await this.validateBuyer(buyer);
 
@@ -97,7 +96,7 @@ export class BuyerService {
           return newBuyer;
         }),
       );
-      
+
       return newBuyers;
     } catch (error) {
       if (error instanceof ConflictException) {
@@ -115,23 +114,39 @@ export class BuyerService {
       if (!buyers) {
         return [];
       }
+
       const updatedBuyers: Buyer[] = await Promise.all(
         buyers.map(async (buyer) => {
+          if (order.buyer.length > 0) {
+            const previusBuyers = order.buyer.filter(
+              (orderBuyer) => orderBuyer.id !== buyer.id,
+            );
+                  console.log(previusBuyers);
+                  
+            if (previusBuyers.length > 0) {
+              await Promise.all(
+                previusBuyers.map(async (previuseBuyer) => {
+                  await this.buyerModel.updateOne(
+                    { _id: previuseBuyer.id },
+                    { $unset: { orders: order.id } },
+                  );
+                }),
+              );
+            }
+          }
           const newBuyer = await this.findBuyerById(buyer.id);
-          newBuyer.orders.push(order._id)
+          newBuyer.orders.push(order._id);
           await newBuyer.save();
           return newBuyer;
-        })
+        }),
       );
-               
+
       return updatedBuyers;
     } catch (error) {
-      
       console.error('Помилка при роботі з базою даних:', error);
       throw error;
     }
   }
-  
 
   async updateBuyer(dto: BuyerDto) {
     try {

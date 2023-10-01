@@ -1,5 +1,4 @@
 import { BuyerDto } from "src/buyer/dto/buyer.dto";
-import { Buyer } from "src/buyer/schemas/buyer.schema";
 import { Sender } from "src/novaposhta/schemas/sender.schema";
 import { Product } from "src/products/schemas/product.schema";
 

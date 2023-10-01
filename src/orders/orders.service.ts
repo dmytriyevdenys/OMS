@@ -6,7 +6,6 @@ import { Order } from './schemas/order.schema';
 import { OrderDto } from './dto/order.dto';
 import { BuyerService } from 'src/buyer/buyer.service';
 import { UsersService } from 'src/users/users.service';
-import { error } from 'console';
 
 @Injectable()
 export class OrdersService {
@@ -17,17 +16,20 @@ export class OrdersService {
     @InjectModel(Order.name) private orderModel: Model<Order>,
   ) {}
 
-  async createOrder(dto: Partial<OrderDto>, req): Promise<Order> {
+  async createOrder(dto: Partial<OrderDto>, req) {
     try {
       const newOrder = await this.newOrder(dto, req);
       if (!newOrder) {
         throw new BadRequestException('помилка при створенні замовлення');
       }
-      const newOrderCrm = await this.ordersApiService.createOrder(dto);
-      newOrder.order_id = newOrderCrm.id;
-      newOrder.status_id = newOrderCrm.status_id;
-      await newOrder.save();
-      return newOrder;
+      //   const newOrderCrm: OrderCrm = await this.ordersApiService.createOrder(dto);
+
+      //  newOrder.order_id = newOrderCrm.id;
+      //  newOrder.status_id = newOrderCrm.status_id;
+      //  await newOrder.save()
+
+      const orderResponse = await this.findOrderById(newOrder.id);
+      return orderResponse;
     } catch (error) {
       throw new BadRequestException(
         'помилка при створенні замовлення',
@@ -38,23 +40,14 @@ export class OrdersService {
 
   async newOrder(dto: Partial<OrderDto>, req): Promise<Order> {
     try {
-      const newBuyers = await this.buyerService.createBuyer(dto.buyer);
-
       dto.user = req.user.id;
-
       const newOrder = await this.orderModel.create(dto);
       if (!newOrder) {
         throw new BadRequestException(
           'сталась помилка при створенні замовлення',
         );
       }
-      const updateBuyers = await this.buyerService.assignOrderToBuyers(
-        newBuyers,
-        newOrder,
-      );
-      await this.userService.assignOrderToUser(req.user, newOrder);
-
-      newOrder.buyer = updateBuyers.map((buyer) => buyer.id);
+      await this.assingOrderToBuersAndUser(newOrder, dto, req);
       await newOrder.save();
       return newOrder;
     } catch (error) {
@@ -62,15 +55,33 @@ export class OrdersService {
     }
   }
 
-  async updateOrder(dto: OrderDto, req) {
+  private async assingOrderToBuersAndUser(order, dto, req) {
+    const newBuyers = await this.buyerService.createBuyer(dto.buyer);
+    const updateBuyers = await this.buyerService.assignOrderToBuyers(
+      newBuyers,
+      order,
+    );
+    await this.userService.assignOrderToUser(req.user, order);
+
+    order.buyer = updateBuyers.map((buyer) => buyer.id);
+
+    return order;
+  }
+
+  async updateOrder(orderId: string, dto: OrderDto, req): Promise<Order> {
     try {
-      if (!dto.id) {
-        throw new BadRequestException(`Поле id обов'язкове`)
+      if (!orderId) {
+        throw new BadRequestException(`Поле id обов'язкове`);
       }
-      const order = await this.findOrderById(dto.id);
-      
-    } 
-    catch(error) {
+      const updateOrder = await this.orderModel.findByIdAndUpdate(
+        { _id: orderId },
+        dto,
+        { new: true },
+      );
+      await this.assingOrderToBuersAndUser(updateOrder, dto, req);
+      await updateOrder.save();
+      return updateOrder;
+    } catch (error) {
       throw error;
     }
   }
@@ -82,14 +93,24 @@ export class OrdersService {
 
   async findOrderById(id: string) {
     try {
-      const order = await this.orderModel.findById(id);
+      const order = await this.orderModel
+        .findById(id)
+        .populate({
+          path: 'buyer',
+          model: 'Buyer',
+          select: '-orders',
+        })
+        .populate({
+          path: 'user',
+          select: '-orders',
+        })
+        .exec();
       if (!order) {
         throw new BadRequestException('сталась помилка при пошуку замовлення');
       }
-      return order ;
-    }
-    catch(error) {
-      throw error
+      return order;
+    } catch (error) {
+      throw error;
     }
   }
 }
