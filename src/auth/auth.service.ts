@@ -10,6 +10,7 @@ import { UsersService } from 'src/users/users.service';
 import { SignUpDto } from 'src/auth/dto/signup.dto';
 import { SignInDto } from './dto/signin.dto';
 import { AuthResponse } from 'src/interfaces/auth-response.interface';
+import { UserEntity } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -33,12 +34,12 @@ export class AuthService {
 
   async signUp(singUpDto: SignUpDto): Promise<AuthResponse> {
     const { password, email } = singUpDto;
-    const user = await this.userService.findUserByEmail(email);
+  /*  const user = await this.userService.findUserByEmail(email);
 
     if (user) {
       throw new BadRequestException('Користувач з таким email вже існує');
     }
-
+*/
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await this.userService.createUser({
@@ -53,7 +54,7 @@ export class AuthService {
     return this.generateToken(user);
   }
 
-  private async generateToken(user: UserDocument): Promise<AuthResponse> {
+  private async generateToken(user): Promise<AuthResponse> {
     const access_token = this.jwtService.sign({ id: user._id });
 
     return { access_token, user };

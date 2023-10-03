@@ -12,6 +12,8 @@ import { UsersModule } from 'src/users/users.module';
 import { BuyerModule } from 'src/buyer/buyer.module';
 import { BuyerService } from 'src/buyer/buyer.service';
 import { UsersService } from 'src/users/users.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { OrderEntity } from './entities/order.entity';
 
 
 @Module({
@@ -19,8 +21,9 @@ import { UsersService } from 'src/users/users.service';
 
 UsersModule,
   HttpModule,
-    MongooseModule.forFeature([{name: Order.name, schema: OrderSchema},
+    MongooseModule.forFeature([{name: Order.name, schema: OrderSchema}
     ]),
+    TypeOrmModule.forFeature([OrderEntity]),
     BuyerModule
   ],
   controllers: [OrdersController, NewOrderWebHookController],

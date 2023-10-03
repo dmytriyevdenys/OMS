@@ -20,7 +20,7 @@ export class ProductUpdaterService implements OnModuleInit {
   }
 
   @Cron('0 0 1 * *')
-  async updateProducts() {
+  async updateProducts() { 
     try {
       this.logger.log('Перевірка бази даних та вигрузка товарів...');
 

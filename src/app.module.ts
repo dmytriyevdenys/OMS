@@ -5,7 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ProductsModule } from './products/products.module';
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
@@ -14,6 +14,7 @@ import { NovaposhtaModule } from './novaposhta/novaposhta.module';
 import { RecipientModule } from './novaposhta/recipient/recipient.module';
 import { HttpModule } from '@nestjs/axios';
 import { BuyerModule } from './buyer/buyer.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
 @Module({
   imports: [ConfigModule.forRoot({
 
@@ -21,7 +22,22 @@ import { BuyerModule } from './buyer/buyer.module';
     isGlobal: true
   }),
     MongooseModule.forRoot(process.env.DB_URI),
-    ScheduleModule.forRoot(), 
+    ScheduleModule.forRoot(),
+    TypeOrmModule.forRootAsync({ 
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get('POSTGRES_HOST'),
+        port: configService.get('DB_PORT'),
+        username: configService.get('POSTGRES_USER'),
+        password: configService.get('POSTGRES_PASSWORD'),
+        database: configService.get('POSTGRES_NAME'),
+        entities: [],
+        synchronize: true,
+        autoLoadEntities: true
+      }),
+      inject: [ConfigService],
+    }),
     ProductsModule,
     AuthModule,
     UsersModule,

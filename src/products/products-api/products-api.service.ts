@@ -23,7 +23,7 @@ export class ProductsApiService {
       Authorization: process.env.API_KEY_CRM,
     };
 
-    let products: IProduct[] = [];
+    let products: IProduct[] = []; 
     let currentPage = 1;
     let responseData: IProductApiResponse;
 

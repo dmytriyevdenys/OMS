@@ -120,8 +120,7 @@ export class BuyerService {
           if (order.buyer.length > 0) {
             const previusBuyers = order.buyer.filter(
               (orderBuyer) => orderBuyer.id !== buyer.id,
-            );
-                  console.log(previusBuyers);
+            )
                   
             if (previusBuyers.length > 0) {
               await Promise.all(

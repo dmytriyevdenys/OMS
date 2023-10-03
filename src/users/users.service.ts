@@ -10,6 +10,9 @@ import { SignUpDto } from 'src/auth/dto/signup.dto';
 import { OrdersApiService } from 'src/orders/orders-api/orders-api.service';
 import { OrderAssociations } from 'src/orders/interfaces/order-associations.interfaces';
 import { Order } from 'src/orders/schemas/order.schema';
+import { EntityManager, Repository } from 'typeorm';
+import { UserEntity } from './entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 
 @Injectable()
@@ -18,18 +21,39 @@ export class UsersService {
     @InjectModel(User.name)
     private userModel: Model<UserDocument>,
     private orderApiService: OrdersApiService,
+    private readonly entityManager: EntityManager,
+    @InjectRepository(UserEntity)
+    private readonly usersRepository: Repository<UserEntity>
   ) {}
 
-  async createUser(dto: SignUpDto): Promise<UserDocument> {
-    const user = await this.userModel.create(dto);
-    return user;
+  async createUser(dto: SignUpDto): Promise<UserEntity> {
+
+    try {
+      const user = new UserEntity(dto);
+      const newUser = await this.entityManager.save(user);
+      if (!newUser) {
+        throw new BadRequestException('помилка при реєстрації')
+      }
+      return newUser;
+    }
+    catch(error) {
+      throw error;
+    }
   }
 
-  async updateUser(dto: User) {
-    const user = await this.findUserById(dto._id);
-    const schemaPaths = this.userModel.schema.paths;
-
-    return user;
+  async updateUser(id: number, name: {name: string}) {
+  try {
+    const user = await this.usersRepository.findOneBy({id})
+      if (!user) {
+        throw new BadRequestException('не вдалось оновити користувача');
+      }
+    user.name = name.name ;
+    await this.entityManager.save(user);
+      return user;
+  }  
+  catch(error) {
+    throw error
+  }
   }
 
   async removeUser(id: { id: string }): Promise<User> {
@@ -45,10 +69,16 @@ export class UsersService {
     }
   }
 
-  async getAllUsers(): Promise<User[]> {
-    const users = await this.userModel.find().exec();
-
-    return users;
+  async getAllUsers(): Promise<UserEntity[]> {
+   try { 
+    const users = await this.usersRepository.find();
+    if (!users) {
+      throw new BadRequestException('Не вдалось завантажити користивачів')
+    }
+    return users 
+   } catch (error) {
+    throw error;
+   }
   }
 
   async findUserByEmail(email: string): Promise<UserDocument> {
