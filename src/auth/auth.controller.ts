@@ -4,6 +4,7 @@ import { SignUpDto } from 'src/auth/dto/signup.dto';
 import { SignInDto } from './dto/signin.dto';
 import { Public } from 'src/decorators/public.decorator';
 import { User } from 'src/users/schemas/user.schema';
+import { UserEntity } from 'src/users/entities/user.entity';
 
 
 
@@ -25,7 +26,7 @@ export class AuthController {
    }
 
    @Get('me')
-   async me (@Req() req): Promise<User> {
+   async me (@Req() req): Promise<UserEntity> {
     return req.user 
    }
    

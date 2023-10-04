@@ -1,9 +1,9 @@
 import { OrderEntity } from "src/orders/entities/order.entity";
-import { BaseEntity } from "src/utils/base-entity";
+import { AbstractEntity } from "src/utils/abstract-entity";
 import { Column, Entity, OneToMany } from "typeorm";
 
 @Entity()
-export class UserEntity extends BaseEntity { 
+export class UserEntity extends AbstractEntity<UserEntity> { 
 
     @Column()
     email:string;
@@ -29,8 +29,5 @@ export class UserEntity extends BaseEntity {
     @OneToMany(() => OrderEntity, order => order.user)
     orders: OrderEntity[];
 
-    constructor (user: Partial<UserEntity>) {
-        super ()
-        Object.assign(this, user);
-    }
+
 }

@@ -81,9 +81,9 @@ export class UsersService {
    }
   }
 
-  async findUserByEmail(email: string): Promise<UserDocument> {
+  async findUserByEmail(email: string): Promise<UserEntity>{
     try {
-      const user = this.userModel.findOne({ email }).exec();
+      const user = await this.usersRepository.findOneBy({ email });
      if(!user) {
       throw new NotFoundException('Користувач не знайдений')
      }
@@ -93,9 +93,9 @@ export class UsersService {
     }
   }
 
-  async findUserById(id: string | number): Promise<UserDocument> {
-    const user = await this.userModel.findById(id);
-    return user;
+  async findUserById(id:  number){
+   const user = await this.usersRepository.findOneBy({id});
+   return user;
   }
 
   async getManager(id: string): Promise<Partial<User>> {
@@ -107,38 +107,38 @@ export class UsersService {
     return response;
   }
 
-  async setManager(dto: User, user: User): Promise<User> {
+  async setManager() {
     try {
-      const userId = user.id;
+    /*  const userId = user.id;
       const updatedUser = await this.findUserById(userId);
       updatedUser.manager_id = dto.manager_id;
       updatedUser.manager_name = dto.manager_name;
       await updatedUser.save();
-      return updatedUser;
+      return updatedUser;8*/
     } catch (error) {
       throw new Error();
     }
   }
 
-  async setSource(dto: Partial<OrderAssociations>, user: User): Promise<User> {
+  async setSource() {
     try {
-      const userId = user.id;
+      /*const userId = user.id;
       const updatedUser = await this.findUserById(userId);
       updatedUser.source_id = dto.id;
       updatedUser.source_name = dto.name;
       await updatedUser.save();
-      return updatedUser;
+      return updatedUser;*/
     } catch (error) {
       throw new Error();
     }
   }
 
-  async assignOrderToUser (user : User, order: Order): Promise<User> {
+  async assignOrderToUser (user : User, order: Order) {
    try {
-    const updatedUser = await this.findUserById(user.id) ;
+   /* const updatedUser = await this.findUserById(user.id) ;
     updatedUser.orders = [...updatedUser.orders, order.id];
     await updatedUser.save();
-    return updatedUser;
+    return updatedUser;*/
    }
    catch (error) {
     console.error ('Помилка при роботі з базою даних:', error);

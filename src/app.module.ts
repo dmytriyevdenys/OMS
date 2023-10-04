@@ -18,7 +18,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 @Module({
   imports: [ConfigModule.forRoot({
 
-  envFilePath: 'development.env',
+  envFilePath: 'development.env', 
     isGlobal: true
   }),
     MongooseModule.forRoot(process.env.DB_URI),

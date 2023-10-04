@@ -15,22 +15,27 @@ import { SignUpDto } from 'src/auth/dto/signup.dto';
 import { OrderAssociations } from 'src/orders/interfaces/order-associations.interfaces';
 import { Document } from 'mongoose';
 import { UserEntity } from './entities/user.entity';
+import { Public } from 'src/decorators/public.decorator';
 
 @Controller('user')
 export class UsersController {
   constructor(private userService: UsersService) {}
   @Post()
-  createUser(@Body() userDto: SignUpDto): Promise<UserEntity> {
+  async createUser(@Body() userDto: SignUpDto): Promise<UserEntity> {
     return this.userService.createUser(userDto);
   }
 
   @Put(':id')
-  updateUser(@Param('id') id: number,@Body() name: {name: string}) {
+ async updateUser(@Param('id') id: number,@Body() name: {name: string}) {
     return this.userService.updateUser(id,name);
   }
 
+  @Get(':id')
+
+
+  @Public()
   @Get()
-  getAll(): Promise<UserEntity[]> {
+  async getAll(): Promise<UserEntity[]> {
     return this.userService.getAllUsers();
   }
 
@@ -48,16 +53,16 @@ export class UsersController {
   async setManager(
     @Body() dto: Extract<Document, User>,
     @Req() req,
-  ): Promise<User> {
-    return this.userService.setManager(dto, req.user);
+  ){
+    //return this.userService.setManager(dto, req.user);
   }
 
   @Post('source')
   async setSource(
     @Body() dto: Partial<OrderAssociations>,
     @Req() req,
-  ): Promise<User> {
-    return this.userService.setSource(dto, req.user);
+  ) {
+   // return this.userService.setSource(dto, req.user);
   }
 
  

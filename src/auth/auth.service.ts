@@ -19,7 +19,7 @@ export class AuthService {
     private userService: UsersService,
   ) {}
 
-  async validateUser(signInDto: SignInDto): Promise<UserDocument> {
+  async validateUser(signInDto: SignInDto): Promise<UserEntity> {
     const { email, password } = signInDto;
     const user = await this.userService.findUserByEmail(email);
     if (!user) {
@@ -34,12 +34,12 @@ export class AuthService {
 
   async signUp(singUpDto: SignUpDto): Promise<AuthResponse> {
     const { password, email } = singUpDto;
-  /*  const user = await this.userService.findUserByEmail(email);
+  const user = await this.userService.findUserByEmail(email);
 
     if (user) {
       throw new BadRequestException('Користувач з таким email вже існує');
     }
-*/
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await this.userService.createUser({
@@ -49,14 +49,14 @@ export class AuthService {
     return this.generateToken(newUser);
   }
 
-  async signIn(signInDto: SignInDto): Promise<AuthResponse> {
+  async signIn(signInDto: SignInDto): Promise<{access_token: string}> {
     const user = await this.validateUser(signInDto);
     return this.generateToken(user);
   }
 
-  private async generateToken(user): Promise<AuthResponse> {
-    const access_token = this.jwtService.sign({ id: user._id });
+  private async generateToken(user: UserEntity): Promise<{access_token: string}> {
+    const access_token = this.jwtService.sign({ id: user.id });
 
-    return { access_token, user };
+    return { access_token };
   }
 }

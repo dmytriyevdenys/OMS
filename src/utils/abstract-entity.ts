@@ -1,6 +1,6 @@
 import { CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
-export abstract class BaseEntity {
+export abstract class AbstractEntity<T> {
     @PrimaryGeneratedColumn()
     id: number
 
@@ -9,4 +9,8 @@ export abstract class BaseEntity {
 
     @UpdateDateColumn({ name: 'updated_at'})
     updatedAt: Date
+
+    constructor (entity: Partial<T>) {
+        Object.assign(this, entity);
+    }
 }

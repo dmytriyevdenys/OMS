@@ -1,9 +1,9 @@
 import { UserEntity } from "src/users/entities/user.entity";
-import { BaseEntity } from "src/utils/base-entity";
-import { Column, Entity, ManyToOne } from "typeorm";
+import { AbstractEntity } from "src/utils/abstract-entity";
+import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
 
 @Entity()
-export class OrderEntity extends BaseEntity {
+export class OrderEntity extends AbstractEntity<OrderEntity> {
     
     @Column()
     orderCrm_id: string;
@@ -20,11 +20,9 @@ export class OrderEntity extends BaseEntity {
     @Column()
     notes: string;
 
-    @ManyToOne(() => UserEntity, user => user.orders)
+    @ManyToOne(() => UserEntity, user => user.orders, {cascade: true})
+    @JoinColumn({name: 'user_id'})
     user: UserEntity
  
-    constructor(order: Partial<OrderEntity>) {
-        super()
-        Object.assign(this, order)
-    }
+
 }
