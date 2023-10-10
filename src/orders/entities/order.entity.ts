@@ -1,3 +1,4 @@
+import { BuyerEntity } from "src/buyer/entities/buyer.entity";
 import { UserEntity } from "src/users/entities/user.entity";
 import { AbstractEntity } from "src/utils/abstract-entity";
 import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
@@ -23,6 +24,9 @@ export class OrderEntity extends AbstractEntity<OrderEntity> {
     @ManyToOne(() => UserEntity, user => user.orders, {cascade: true})
     @JoinColumn({name: 'user_id'})
     user: UserEntity
- 
+
+    @ManyToOne(() => BuyerEntity, buyer => buyer.orders)
+    @JoinColumn({name: 'buyer_id'})
+    buyer: BuyerEntity;
 
 }

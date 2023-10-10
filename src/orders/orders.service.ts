@@ -47,7 +47,6 @@ export class OrdersService {
           'сталась помилка при створенні замовлення',
         );
       }
-      await this.assingOrderToBuersAndUser(newOrder, dto, req);
       await newOrder.save();
       return newOrder;
     } catch (error) {
@@ -55,18 +54,7 @@ export class OrdersService {
     }
   }
 
-  private async assingOrderToBuersAndUser(order, dto, req) {
-    const newBuyers = await this.buyerService.createBuyer(dto.buyer);
-    const updateBuyers = await this.buyerService.assignOrderToBuyers(
-      newBuyers,
-      order,
-    );
-    await this.userService.assignOrderToUser(req.user, order);
 
-    order.buyer = updateBuyers.map((buyer) => buyer.id);
-
-    return order;
-  }
 
   async updateOrder(orderId: string, dto: OrderDto, req): Promise<Order> {
     try {
@@ -78,7 +66,6 @@ export class OrdersService {
         dto,
         { new: true },
       );
-      await this.assingOrderToBuersAndUser(updateOrder, dto, req);
       await updateOrder.save();
       return updateOrder;
     } catch (error) {

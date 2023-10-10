@@ -1,14 +1,16 @@
-import {  IsEmail, IsOptional } from "class-validator";
+import { Type } from "class-transformer";
+import {  IsArray, IsEmail, IsOptional, IsString,  } from "class-validator";
 
 export class BuyerDto {
-    
-    @IsOptional()
-    id?: string;
-
+    @IsString()
     full_name: string;
-    phone: string[];
+    phones?: string[];
+  
     @IsOptional()
     @IsEmail()
     email: string;
+  }
 
-}
+  export class PhoneDto { 
+    phone: string
+  }

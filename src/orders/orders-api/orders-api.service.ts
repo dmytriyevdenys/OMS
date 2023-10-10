@@ -51,7 +51,7 @@ export class OrdersApiService {
 
     try {
 
-      const crmDto: OrderCrmDto = {
+   /*   const crmDto: OrderCrmDto = {
         source_id: dto.source_id,
         manager_id: dto.manager_id,
         buyer: {
@@ -81,7 +81,7 @@ export class OrdersApiService {
         if(!newOrder) {
           throw new BadRequestException('Помилка при створенні замовленняв СРМ')
         }
-        return newOrder;
+        return newOrder;*/
     } catch (error) {
       
         throw error;
@@ -103,7 +103,7 @@ export class OrdersApiService {
   }
 
   async getSource (): Promise<OrderAssociations[]> {
-    return this.fetchDataAndMap('source', {limit: 50})
+    return await this.fetchDataAndMap('source', {limit: 50})
   }
 
  

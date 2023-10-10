@@ -1,38 +1,38 @@
-import { Controller, Delete, Get, Put, Param } from '@nestjs/common';
+import { Controller, Delete, Get, Put, Param, Query } from '@nestjs/common';
 import { BuyerService } from './buyer.service';
 import { BuyerDto } from './dto/buyer.dto';
 import { Post } from '@nestjs/common';
 import { Body } from '@nestjs/common';
-import { Buyer } from './schemas/buyer.schema';
+import { BuyerEntity } from './entities/buyer.entity';
 
 @Controller('buyer')
 export class BuyerController {
-    constructor(
-        private buyerService: BuyerService
-    ){}
+  constructor(private buyerService: BuyerService) {}
 
-    @Get()
-    async getAll (): Promise<Buyer[]> {
-        return this.buyerService.getAllBuyer();
-    }
+  @Get()
+  async findBuyer(@Query('buyer') buyer: string): Promise<BuyerEntity[]> {
+    if (buyer) return await this.buyerService.findBuyer(buyer);
 
-    @Get(':id')
-    async getById (@Param('id') id: string) {
-        return this.buyerService.findBuyerById(id);
-    }
+    return await this.buyerService.getAllBuyer();
+  }
 
-    @Post()
-    async createBuyer (@Body() dto: BuyerDto[]): Promise<Buyer[]> {
-        return this.buyerService.createBuyer(dto);
-    }
+  @Get(':id')
+  async getById(@Param('id') id: number): Promise<BuyerEntity> {
+    return await this.buyerService.findBuyerById(id);
+  }
 
-    @Put()
-    async updateBuyer (@Body() dto: BuyerDto): Promise<Buyer> {
-        return this.buyerService.updateBuyer(dto);
-    }
+  @Put(':id')
+  async updateBuyer(@Param('id') id: number, @Body() dto: BuyerDto): Promise<BuyerDto> {
+    return await this.buyerService.updateBuyer(id, dto);
+  }
 
-    @Delete()
-    async removeBuyer (@Body() id: {id: string}) {
-        return this.buyerService.removeBuer(id)
-    }
+  @Post()
+  async createBuyer(@Body() dto: BuyerDto): Promise<BuyerEntity> {
+    return await this.buyerService.createBuyer(dto);
+  }
+
+  @Delete(':id')
+  async removeBuyer(@Param('id') id: number) {
+     return this.buyerService.removeBuyer(id)
+  }
 }

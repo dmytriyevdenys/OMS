@@ -1,6 +1,7 @@
 import { OrderEntity } from "src/orders/entities/order.entity";
 import { AbstractEntity } from "src/utils/abstract-entity";
-import { Column, Entity, OneToMany } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne } from "typeorm";
+import { ProfileEntity } from "./profile.entity";
 
 @Entity()
 export class UserEntity extends AbstractEntity<UserEntity> { 
@@ -14,17 +15,9 @@ export class UserEntity extends AbstractEntity<UserEntity> {
     @Column()
     name: string;
 
-    @Column({ nullable: true })
-    manager_id:number;
-
-    @Column({ nullable: true })
-    manager_name: string;
-
-    @Column({ nullable: true })
-    source_id: number;
-
-    @Column({ nullable: true })
-    source_name: string
+    @OneToOne (() => ProfileEntity, profile => profile.user)
+    @JoinColumn()
+    profile: ProfileEntity
 
     @OneToMany(() => OrderEntity, order => order.user)
     orders: OrderEntity[];

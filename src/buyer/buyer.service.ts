@@ -5,34 +5,39 @@ import {
   ConflictException,
   HttpStatus,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Buyer } from './schemas/buyer.schema';
-import { Model } from 'mongoose';
 import { BuyerDto } from './dto/buyer.dto';
-import { Order } from 'src/orders/schemas/order.schema';
+import { InjectRepository } from '@nestjs/typeorm';
+import { BuyerEntity } from './entities/buyer.entity';
+import { EntityManager, ILike, Repository } from 'typeorm';
 
 @Injectable()
 export class BuyerService {
-  constructor(@InjectModel(Buyer.name) private buyerModel: Model<Buyer>) {}
+  constructor(
+    @InjectRepository(BuyerEntity)
+    private readonly buyerRepository: Repository<BuyerEntity>,
+    private readonly entityManager: EntityManager,
+  ) {}
 
-  async validateBuyer(dto: BuyerDto) {
+  async validateBuyer(phoneNumbers: string[]): Promise<BuyerEntity> {
     try {
-      const phones = dto.phone;
-      for (const phone of phones) {
-        const buyer = await this.buyerModel.findOne({ phone });
-        if (buyer) {
-          return buyer;
-        }
-      }
-      return null;
+      const buyers = await Promise.all(
+        phoneNumbers.map(async (phone) => {
+          return await this.buyerRepository
+            .createQueryBuilder('buyer')
+            .where('buyer.phones = :phone', { phone })
+            .getOne();
+        }),
+      );
+      const buyer = buyers.filter(buyer => buyer !== null)              
+      return buyer[0];
     } catch (error) {
-      throw new BadRequestException('помилка ', error.message);
+      throw new BadRequestException('Помилка: ' + error.message);
     }
   }
 
-  async getAllBuyer(): Promise<Buyer[]> {
+  async getAllBuyer(): Promise<BuyerEntity[]> {
     try {
-      const buyers = await this.buyerModel.find().exec();
+      const buyers = await this.buyerRepository.find();
 
       if (!buyers) {
         throw new NotFoundException('Не вдалось знайти покупців');
@@ -46,9 +51,11 @@ export class BuyerService {
     }
   }
 
-  async findBuyerById(id: string): Promise<Buyer> {
+  async findBuyerById(id: number): Promise<BuyerEntity> {
     try {
-      const buyer = await this.buyerModel.findById(id);
+      const buyer = await this.buyerRepository.findOne({
+        where: { id },
+      });
       if (!buyer) {
         throw new NotFoundException('покупець не існує');
       }
@@ -58,128 +65,75 @@ export class BuyerService {
     }
   }
 
-  async findBayerbyName(name: string): Promise<Buyer> {
+  async findBuyer(findBuyer: string) {
     try {
-      const buyer = await this.buyerModel.findOne({ name });
-      if (!buyer) {
-        throw new NotFoundException('покупець не знайдений');
+      const isPhoneNumber = /\d{10}/.test(findBuyer);
+
+      if (isPhoneNumber) {
+        const buyersByPhone = await this.buyerRepository
+          .createQueryBuilder('buyer')
+          .where('buyer.phones::text ILIKE :phone', { phone: `%${findBuyer}%` })
+          .getMany();
+
+        if (buyersByPhone.length > 0) {
+          return buyersByPhone;
+        }
       }
-      return buyer;
+      const buyersByName = await this.buyerRepository.find({
+        where: {
+          full_name: ILike(`%${findBuyer}%`),
+        },
+      });
+
+      if (buyersByName.length > 0) {
+        return buyersByName;
+      }
+      throw new NotFoundException('Покупці не знайдені');
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
 
-  async createBuyer(dto: BuyerDto[]): Promise<Buyer[]> {
+  async createBuyer(dto: BuyerDto): Promise<BuyerEntity> {
     try {
-      if (!dto) {
-        return [];
+      const existingBuyers = await this.validateBuyer(dto.phones);
+      
+      if (existingBuyers) {
+        throw new ConflictException('Покупець з таким номером вже існує');
       }
 
-      const newBuyers = await Promise.all(
-        dto.map(async (buyer) => {
-          if (buyer.id) {
-            return this.findBuyerById(buyer.id);
-          }
-          const existingBuyer = await this.validateBuyer(buyer);
+      const buyer = new BuyerEntity(dto);
+      const newBuyer = await this.entityManager.save(buyer);
 
-          if (existingBuyer) {
-            throw new ConflictException('Покупець вже існує');
-          }
-
-          const newBuyer = await this.buyerModel.create(buyer);
-
-          if (!newBuyer) {
-            throw new BadRequestException('Не вдалось створити покупця');
-          }
-
-          return newBuyer;
-        }),
-      );
-
-      return newBuyers;
+      if (!newBuyer) {
+        throw new BadRequestException('Не вдалось створити покупця');
+      }
+      return newBuyer;
     } catch (error) {
-      if (error instanceof ConflictException) {
-        throw error;
-      }
-      throw new BadRequestException(
-        'Помилка при створенні покупця',
-        error.message,
-      );
-    }
-  }
-
-  async assignOrderToBuyers(buyers: Buyer[], order: Order): Promise<Buyer[]> {
-    try {
-      if (!buyers) {
-        return [];
-      }
-
-      const updatedBuyers: Buyer[] = await Promise.all(
-        buyers.map(async (buyer) => {
-          if (order.buyer.length > 0) {
-            const previusBuyers = order.buyer.filter(
-              (orderBuyer) => orderBuyer.id !== buyer.id,
-            )
-                  
-            if (previusBuyers.length > 0) {
-              await Promise.all(
-                previusBuyers.map(async (previuseBuyer) => {
-                  await this.buyerModel.updateOne(
-                    { _id: previuseBuyer.id },
-                    { $unset: { orders: order.id } },
-                  );
-                }),
-              );
-            }
-          }
-          const newBuyer = await this.findBuyerById(buyer.id);
-          newBuyer.orders.push(order._id);
-          await newBuyer.save();
-          return newBuyer;
-        }),
-      );
-
-      return updatedBuyers;
-    } catch (error) {
-      console.error('Помилка при роботі з базою даних:', error);
       throw error;
     }
   }
 
-  async updateBuyer(dto: BuyerDto) {
-    try {
-      if (!dto.id) {
-        throw new BadRequestException(`поле id обов'язкове`);
-      }
-      const buyer = await this.findBuyerById(dto.id);
-
-      if (!buyer) {
-        return null;
-      }
-
-      const updatedBuyer = await this.buyerModel.findOneAndUpdate(
-        { _id: buyer._id },
-        { ...dto },
-        { new: true },
-      );
-
-      return updatedBuyer;
-    } catch (error) {
-      throw new BadRequestException(
-        'Не вдалось оновити покупця',
-        error.message,
-      );
+  async updateBuyer(id: number, dto: BuyerDto) {
+    const buyer = await this.findBuyerById(id);
+    const existingBuyers = await this.validateBuyer(dto.phones);
+        
+    if (existingBuyers && existingBuyers.id !== buyer.id ) {
+      throw new ConflictException('Покупець з таким номером вже існує');
     }
+
+    Object.assign(buyer, dto);
+    const updatedBuyer = await this.entityManager.save(buyer);
+    return updatedBuyer;
   }
 
-  async removeBuer(id: { id: string }) {
+  async removeBuyer(id: number) {
     try {
       if (!id) {
         throw new BadRequestException(`поле id обов'язкове`);
       }
-      const idBuyer = id.id;
-      await this.buyerModel.findByIdAndRemove(idBuyer);
+      const removedBuyer = await this.findBuyerById(id);
+      await this.entityManager.remove(removedBuyer);
       return HttpStatus.ACCEPTED;
     } catch (error) {
       throw new BadRequestException(
