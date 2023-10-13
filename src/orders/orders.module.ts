@@ -14,6 +14,7 @@ import { BuyerService } from 'src/buyer/buyer.service';
 import { UsersService } from 'src/users/users.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { OrderEntity } from './entities/order.entity';
+import { ResponseService } from 'src/utils/response.service';
 
 
 @Module({
@@ -33,7 +34,8 @@ UsersModule,
     OrdersApiService,
     NewOrderWebHookService,
     BuyerService,
-    UsersService
+    UsersService,
+    ResponseService
   ],
   exports: []
 })

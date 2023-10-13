@@ -6,6 +6,7 @@ import { Buyer, BuyerSchema } from './schemas/buyer.schema';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BuyerEntity } from './entities/buyer.entity';
 import { PhoneEntity } from './entities/phone.entity';
+import { ResponseService } from 'src/utils/response.service';
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { PhoneEntity } from './entities/phone.entity';
   TypeOrmModule.forFeature([BuyerEntity,PhoneEntity])
   ],
   controllers: [BuyerController],
-  providers: [BuyerService],
+  providers: [BuyerService, ResponseService],
   exports:[MongooseModule, TypeOrmModule]
 })
 export class BuyerModule {}

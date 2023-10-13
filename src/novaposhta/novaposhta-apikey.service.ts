@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { SenderService } from './novaposhta-sender.service';
+import { SenderService } from './sender/sender.service';
 
 @Injectable()
 export class ApiKeyService {

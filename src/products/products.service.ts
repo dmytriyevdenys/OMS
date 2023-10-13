@@ -1,63 +1,63 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Product, ProductDocument } from './schemas/product.schema';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ProductEntity } from './entities/product.entity';
+import { EntityManager, Repository } from 'typeorm';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectModel(Product.name)
     private readonly productModel: Model<ProductDocument>,
+    @InjectRepository(ProductEntity)
+    private readonly productRepository: Repository<ProductEntity>,
+    private readonly entityManager: EntityManager,
   ) {}
 
-  async getAllProducts(): Promise<ProductDocument[]> {
+  async getAllProducts(): Promise<ProductEntity[]> {
     try {
-      const response = await this.productModel.find().exec();
-      return response;
+      const products = await this.productRepository.find();
+      if (!products)
+        throw new BadRequestException('Помилка при завантаженні товарів');
+      return products;
     } catch (error) {
-      throw new Error('Не вдалося отримати дані з API');
+      throw error;
     }
   }
 
-  async getProductById(id: string): Promise<ProductDocument[] | string> {
-    const products = await this.productModel.find({ id: id }).exec();
-
-    if (products.length === 0) {
-      return 'Товар не знайдено';
+  async getProductById(id: number): Promise<ProductEntity> {
+    try {
+      if (!id) throw new BadRequestException(`Поле id обов'язкове`);
+      const product = await this.productRepository.findOneBy({ id });
+      if (!product) throw new NotFoundException('Товар з таким id не існує');
+      return product;
+    } catch (error) {
+      throw error;
     }
-
-    return products;
   }
 
-  async getProductBySkuOrName(
-    searchQuery: string,
-  ): Promise<ProductDocument[] | string> {
+  async getProductBySkuOrName(query: string): Promise<ProductEntity[]> {
     try {
-      const sanitizedQuery = searchQuery.replace(
-        /[^a-zA-Z0-9а-яА-Я\s/\\-]/g,
-        '',
-      );
+      const searchWords = query.split(' ').map(word => `(${word})`);
+      const searchExpression = searchWords.join('.*');
 
-      const regexQuery = new RegExp(
-        sanitizedQuery.split('').join('[\\s/\\-]*'),
-        'i',
-      );
+      const products = await this.entityManager
+        .createQueryBuilder(ProductEntity, 'product')
+        .where(`LOWER(product.name) ~* :query OR LOWER(product.sku) ~* :query`, { query: searchExpression })
+        .orderBy('product.price', 'DESC') 
+        .getMany();
 
-      const productsByName = await this.productModel.find({
-        name: {
-          $regex: regexQuery,
-        },
-      });
+      if (!products.length) throw new NotFoundException('Товари не знайдені');
 
-      const productsBySku = await this.productModel.find({
-        sku: searchQuery,
-      });
-
-      const combinedResults = [...productsByName, ...productsBySku];
-
-      return combinedResults;
+      return products;
     } catch (error) {
-      throw new Error('Не вдалося отримати дані з API');
+      throw error
     }
   }
 }

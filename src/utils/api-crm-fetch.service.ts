@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { apiUrlCrm } from 'src/consts/consts';
 
@@ -9,7 +9,7 @@ export class ApiCrmFetchService {
   async get(endpoint: string, query: Record<string, any> = {}) {
     const apiUrl = `${apiUrlCrm}${endpoint}`;
     const headers = {
-      'Content-Type': 'application/json',
+      Accept: 'application/json',
       Authorization: process.env.API_KEY_CRM,
     };
     try {
@@ -17,10 +17,13 @@ export class ApiCrmFetchService {
         headers,
         params: query
       });
+      if (!response) throw new BadRequestException('помилка блять ')
       return response.data;
     } catch (error) {
+      console.error('Помилка при виконанні запиту:', error);
       throw error;
     }
+    
   }
   async post(endpoint: string, data: any) {
     const apiUrl = `${apiUrlCrm}${endpoint}`;

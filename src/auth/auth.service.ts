@@ -2,6 +2,7 @@ import {
   Injectable,
   UnauthorizedException,
   BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserDocument } from '../users/schemas/user.schema';
@@ -9,8 +10,9 @@ import * as bcrypt from 'bcryptjs';
 import { UsersService } from 'src/users/users.service';
 import { SignUpDto } from 'src/auth/dto/signup.dto';
 import { SignInDto } from './dto/signin.dto';
-import { AuthResponse } from 'src/interfaces/auth-response.interface';
+import { AuthResponse } from 'src/products/interfaces/auth-response.interface';
 import { UserEntity } from 'src/users/entities/user.entity';
+import { error } from 'console';
 
 @Injectable()
 export class AuthService {
@@ -50,8 +52,13 @@ export class AuthService {
   }
 
   async signIn(signInDto: SignInDto): Promise<{access_token: string}> {
+   try {
     const user = await this.validateUser(signInDto);
     return this.generateToken(user);
+   } 
+   catch (error) { 
+    throw error
+   }
   }
 
   private async generateToken(user: UserEntity): Promise<{access_token: string}> {

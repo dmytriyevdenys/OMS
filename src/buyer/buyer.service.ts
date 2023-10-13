@@ -9,6 +9,8 @@ import { BuyerDto } from './dto/buyer.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BuyerEntity } from './entities/buyer.entity';
 import { EntityManager, ILike, Repository } from 'typeorm';
+import { ResponseService } from 'src/utils/response.service';
+import { error } from 'console';
 
 @Injectable()
 export class BuyerService {
@@ -16,6 +18,7 @@ export class BuyerService {
     @InjectRepository(BuyerEntity)
     private readonly buyerRepository: Repository<BuyerEntity>,
     private readonly entityManager: EntityManager,
+    private readonly responseService: ResponseService
   ) {}
 
   async validateBuyer(phoneNumbers: string[]): Promise<BuyerEntity> {
@@ -28,7 +31,7 @@ export class BuyerService {
             .getOne();
         }),
       );
-      const buyer = buyers.filter(buyer => buyer !== null)              
+      const buyer = buyers.filter((buyer) => buyer !== null);
       return buyer[0];
     } catch (error) {
       throw new BadRequestException('Помилка: ' + error.message);
@@ -40,7 +43,7 @@ export class BuyerService {
       const buyers = await this.buyerRepository.find();
 
       if (!buyers) {
-        throw new NotFoundException('Не вдалось знайти покупців');
+        this.responseService.notFoundResponse('Не вдалось знайти покупців');
       }
       return buyers;
     } catch (error) {
@@ -53,9 +56,7 @@ export class BuyerService {
 
   async findBuyerById(id: number): Promise<BuyerEntity> {
     try {
-      const buyer = await this.buyerRepository.findOne({
-        where: { id },
-      });
+      const buyer = await this.buyerRepository.findOneBy({ id });
       if (!buyer) {
         throw new NotFoundException('покупець не існує');
       }
@@ -65,9 +66,9 @@ export class BuyerService {
     }
   }
 
-  async findBuyer(findBuyer: string) {
+  async findBuyer(findBuyer: string): Promise<BuyerEntity[]> {
     try {
-      const isPhoneNumber = /\d{10}/.test(findBuyer);
+      const isPhoneNumber = /\d{8}/.test(findBuyer);
 
       if (isPhoneNumber) {
         const buyersByPhone = await this.buyerRepository
@@ -75,9 +76,7 @@ export class BuyerService {
           .where('buyer.phones::text ILIKE :phone', { phone: `%${findBuyer}%` })
           .getMany();
 
-        if (buyersByPhone.length > 0) {
-          return buyersByPhone;
-        }
+       if( buyersByPhone.length > 0)  return buyersByPhone;
       }
       const buyersByName = await this.buyerRepository.find({
         where: {
@@ -85,9 +84,8 @@ export class BuyerService {
         },
       });
 
-      if (buyersByName.length > 0) {
-        return buyersByName;
-      }
+      if (buyersByName.length > 0) return buyersByName;
+
       throw new NotFoundException('Покупці не знайдені');
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -97,7 +95,7 @@ export class BuyerService {
   async createBuyer(dto: BuyerDto): Promise<BuyerEntity> {
     try {
       const existingBuyers = await this.validateBuyer(dto.phones);
-      
+
       if (existingBuyers) {
         throw new ConflictException('Покупець з таким номером вже існує');
       }
@@ -114,11 +112,11 @@ export class BuyerService {
     }
   }
 
-  async updateBuyer(id: number, dto: BuyerDto) {
+  async updateBuyer(id: number, dto: BuyerDto): Promise<BuyerEntity> {
     const buyer = await this.findBuyerById(id);
     const existingBuyers = await this.validateBuyer(dto.phones);
-        
-    if (existingBuyers && existingBuyers.id !== buyer.id ) {
+
+    if (existingBuyers && existingBuyers.id !== buyer.id) {
       throw new ConflictException('Покупець з таким номером вже існує');
     }
 

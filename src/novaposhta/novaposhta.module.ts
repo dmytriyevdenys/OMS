@@ -10,11 +10,12 @@ import {
   SenderContact,
   SenderContactSchema,
 } from './schemas/sender-contact.schema';
-import { MatchModelService } from 'src/utils/match-model.service';
-import { SenderService } from './novaposhta-sender.service';
+import { MatchService } from 'src/utils/match-model.service';
+import { SenderService } from './sender/sender.service';
 import { ApiAddressService } from './novaposhta-api/novaposhta-api-address.service';
 import { Address, AddressSchema } from './schemas/address.schema';
 import { AddressService } from './noaposhta-address.service';
+import { SenderModule } from './sender/sender.module';
 
 
 @Module({
@@ -25,15 +26,13 @@ import { AddressService } from './noaposhta-address.service';
       {name: Address.name, schema: AddressSchema}
     ]),
     HttpModule,
-
+    SenderModule,
   ], 
   controllers: [NovaposhtaController],
   providers: [
-    NovaposhtaService,
-    ApiNovaposhtaFetchService,
     ApiAddressService,
-    ApiSenderService,
-    MatchModelService,
+    ApiNovaposhtaFetchService,
+    MatchService,
     SenderService,
     AddressService
   ],

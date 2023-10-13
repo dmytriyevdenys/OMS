@@ -1,58 +1,42 @@
-import {  Injectable } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
-import {
-  IProduct,
-  IProductApiResponse,
-  IProductForFrontend,
-} from 'src/interfaces/product.interface';
-import { apiUrlCrm } from 'src/consts/consts';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ApiCrmFetchService } from 'src/utils/api-crm-fetch.service';
+import { MatchService } from 'src/utils/match-model.service';
+import { ProductEntity } from '../entities/product.entity';
 
 
 @Injectable()
 export class ProductsApiService {
   constructor(
-    private readonly httpService: HttpService,
     private apiService: ApiCrmFetchService,
+    private readonly matchService: MatchService,
   ) {}
 
-  async getAll(): Promise<IProductForFrontend[]> {
-    const apiUrl = `${apiUrlCrm}product`;
-    const headers = {
-      'Content-Type': 'application/json',
-      Authorization: process.env.API_KEY_CRM,
-    };
-
-    let products: IProduct[] = []; 
-    let currentPage = 1;
-    let responseData: IProductApiResponse;
-
-    do {
-      const response = await this.httpService.axiosRef.get(apiUrl, {
-        params: {
+  async getAll(): Promise<ProductEntity[]> {
+    try {
+      const endpoint = 'products';
+      const products = [];
+      let responseData;
+      let currentPage = 1;
+      do {
+        responseData = await this.apiService.get(endpoint, {
+          limit: 50,
           page: currentPage,
-        },
-        headers,
-      });
-
-      responseData = response.data;
-      products = [...products, ...responseData.data];
-      currentPage++;
-    } while (currentPage <= responseData.last_page);
-
-    const productsForFrontend: IProductForFrontend[] = products.map(
-      (product) => ({
-        id: product.id,
-        name: product.name,
-        quantity: product.quantity,
-        weight: product.weight,
-        sku: product.sku,
-        price: product.price,
-      }),
-    );
-
-    return productsForFrontend;
+        });
+        for (const product of responseData.data) {
+          const mappedProduct = await this.matchService.mapToEntity(
+            ProductEntity,
+            product,
+          );
+          if (!mappedProduct) {
+            throw new BadRequestException('Помилка, ну як без неї');
+          }
+          products.push(mappedProduct);
+        }
+        currentPage++;
+      } while (currentPage <= responseData.last_page);
+      return products;
+    } catch (error) {
+      throw error;
+    }
   }
-
- 
 }

@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ApiNovaposhtaFetchService } from 'src/utils/api-novaposhta-fetch.service';
-import { MatchModelService } from 'src/utils/match-model.service';
+import { MatchService } from 'src/utils/match-model.service';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { SenderService } from '../novaposhta-sender.service';
+import { SenderService } from '../sender/sender.service';
 import { CalledMethod, ModelName } from 'src/consts/consts';
 import { WareHouseDto } from '../dto/warehouse.dto';
 import { Address } from '../schemas/address.schema';
@@ -12,7 +12,7 @@ import { Address } from '../schemas/address.schema';
 export class ApiAddressService {
   constructor(
     private apiService: ApiNovaposhtaFetchService,
-    private matchSercive: MatchModelService,
+    private matchSercive: MatchService,
     private senderService: SenderService,
     @InjectModel(Address.name) private readonly addressModel: Model<Address>,
   ) {}

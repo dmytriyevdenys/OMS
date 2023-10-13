@@ -78,7 +78,7 @@ export class UsersService {
       }
       return user;
     } catch (error) {
-      throw new BadRequestException('Сталась помилка при пошуку користувача');
+      throw error;
     }
   }
 

@@ -14,6 +14,7 @@ import { SignUpDto } from 'src/auth/dto/signup.dto';
 import { OrderAssociations } from 'src/orders/interfaces/order-associations.interfaces';
 import { UserEntity } from './entities/user.entity';
 import { ManagerDto } from './dto/manager.dto';
+import { Public } from 'src/decorators/public.decorator';
 
 @Controller('user')
 export class UsersController {
@@ -23,7 +24,7 @@ export class UsersController {
     return this.userService.createUser(userDto);
   }
 
-
+  @Public()
   @Get()
   async getAll(): Promise<UserEntity[]> {
     return this.userService.getAllUsers();

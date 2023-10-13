@@ -1,9 +1,11 @@
-import { AbstractEntity } from "src/utils/abstract-entity";
-import { Column, Entity, OneToOne } from "typeorm";
+import { Column, Entity, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { UserEntity } from "./user.entity";
 
 @Entity()
-export class ProfileEntity extends AbstractEntity<ProfileEntity> { 
+export class ProfileEntity  { 
+    @PrimaryGeneratedColumn()
+    id: number
+
     @Column({ nullable: true })
     phone: number;
    
@@ -21,4 +23,8 @@ export class ProfileEntity extends AbstractEntity<ProfileEntity> {
 
     @OneToOne(() => UserEntity, user => user.profile)
     user: UserEntity
+
+    constructor(profile: Partial<ProfileEntity>){
+        Object.assign(this, profile);
+    }
 }
