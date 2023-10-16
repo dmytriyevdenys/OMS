@@ -55,7 +55,7 @@ export class BuyerService {
 
   async findBuyerById(id: number): Promise<BuyerEntity> {
     try {
-      const buyer = await this.buyerRepository.findOneBy({ id });
+      const buyer = await this.buyerRepository.findOne({ where: {id}, relations: {orders: true} });
       if (!buyer) {
         throw new NotFoundException('покупець не існує');
       }

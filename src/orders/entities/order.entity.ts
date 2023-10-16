@@ -3,25 +3,25 @@ import { SenderEntity } from "src/novaposhta/sender/entities/sender.entity";
 import { ProductEntity } from "src/products/entities/product.entity";
 import { UserEntity } from "src/users/entities/user.entity";
 import { AbstractEntity } from "src/utils/abstract-entity";
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne,  } from "typeorm";
 
 @Entity()
 export class OrderEntity extends AbstractEntity<OrderEntity> {
     
-    @Column()
+    @Column({nullable: true})
     orderCrm_id: string;
 
-    @Column()
+    @Column({nullable: true})
     status_id: string;
 
-    @Column()
+    @Column({nullable: true})
     additionalnformation: string;
 
-    @Column()
+    @Column({nullable: true})
     totalPrice: number;
 
-    @Column()
-    notes: string;
+    @Column({type: "simple-array", nullable: true})
+    notes: string[];
 
     @ManyToOne(() => UserEntity, user => user.orders, {cascade: true})
     @JoinColumn({name: 'user_id'})

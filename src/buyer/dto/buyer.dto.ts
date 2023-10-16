@@ -1,5 +1,4 @@
-import { Type } from "class-transformer";
-import {  IsArray, IsEmail, IsOptional, IsString,  } from "class-validator";
+import { IsEmail, IsOptional, IsString,  } from "class-validator";
 
 export class BuyerDto {
     @IsString()
@@ -11,6 +10,4 @@ export class BuyerDto {
     email: string;
   }
 
-  export class PhoneDto { 
-    phone: string
-  }
+  

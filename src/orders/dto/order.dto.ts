@@ -1,6 +1,7 @@
 import { BuyerDto } from "src/buyer/dto/buyer.dto";
-import { Sender } from "src/novaposhta/schemas/sender.schema";
-import { Product } from "src/products/schemas/product.schema";
+import { BuyerEntity } from "src/buyer/entities/buyer.entity";
+import { SenderEntity } from "src/novaposhta/sender/entities/sender.entity";
+import { ProductEntity } from "src/products/entities/product.entity";
 
 
 export class OrderCrmDto {
@@ -12,7 +13,7 @@ export class OrderCrmDto {
         phone: string
     };
     shipping: {};
-    products: Product[];
+    products: [];
     payments: Payments[];
     custom_fields: CustomField[];
   }
@@ -31,17 +32,16 @@ export class OrderCrmDto {
   }
 
 export class OrderDto {
-    id: string; 
+    id: number; 
     order_id?:string;
-    sender: Sender;
-    user: string;
+    sender: SenderEntity;
     shipping:{};
     source_id: number;
     manager_id: number;
-    products:Product[];
+    products:ProductEntity[];
     totalPrice: number;
     additionalnformation: string;
     payments:Payments[];
-    buyer: BuyerDto[];
+    buyer: BuyerEntity;
     notes:string[];
 }

@@ -12,14 +12,20 @@ export class OrdersController {
   ) {}
   @Public()
   @Get()
-  async getOrders() {
-    return this.ordersService.getAllOrders();
+  async getAll() {
+    return await this.ordersService.getAllOrders();
+  }
+
+  
+  @Post()
+  async createOrder(@Body() dto: Partial<OrderDto>, @Req() req) {
+    return this.ordersService.createOrder(dto, req.user);
   }
 
   @Public()
   @Get(':id(\\d+)')
-  async getOrderById(@Param('id') id: string) {
-    return this.ordersApiservice.getOrderById(id);
+  async getOrderById(@Param('id') id: number) {
+    return this.ordersService.findOrderById(id);
   }
 
   @Get('status')
@@ -52,10 +58,6 @@ export class OrdersController {
     return this.ordersApiservice.getPayment();
   }
 
-  @Post()
-  async createOrder(@Body() dto: Partial<OrderDto>, @Req() req) {
-    return this.ordersService.createOrder(dto, req);
-  }
 
   @Put(':id')
   async updateOrder(

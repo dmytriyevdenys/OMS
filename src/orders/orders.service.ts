@@ -1,35 +1,33 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { OrdersApiService } from './orders-api/orders-api.service';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Order } from './schemas/order.schema';
 import { OrderDto } from './dto/order.dto';
 import { BuyerService } from 'src/buyer/buyer.service';
-import { UsersService } from 'src/users/users.service';
+import { OrderEntity } from './entities/order.entity';
+import { EntityManager, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class OrdersService {
   constructor(
     private ordersApiService: OrdersApiService,
     private buyerService: BuyerService,
-    private userService: UsersService,
-    @InjectModel(Order.name) private orderModel: Model<Order>,
+    private readonly entityManager: EntityManager,
+    @InjectRepository(OrderEntity)
+    private readonly orderRepository: Repository<OrderEntity>,
   ) {}
 
-  async createOrder(dto: Partial<OrderDto>, req) {
+  async createOrder(dto: Partial<OrderDto>, user) {
     try {
-      const newOrder = await this.newOrder(dto, req);
-      if (!newOrder) {
-        throw new BadRequestException('помилка при створенні замовлення');
+      const order = new OrderEntity(dto);
+      order.user = user;
+      if (dto.buyer && !dto.buyer.id) {
+        const buyer = await this.buyerService.createBuyer(dto.buyer);
+        order.buyer = buyer;
       }
-      //   const newOrderCrm: OrderCrm = await this.ordersApiService.createOrder(dto);
-
-      //  newOrder.order_id = newOrderCrm.id;
-      //  newOrder.status_id = newOrderCrm.status_id;
-      //  await newOrder.save()
-
-      const orderResponse = await this.findOrderById(newOrder.id);
-      return orderResponse;
+      const newOrder = await this.entityManager.save(order);
+      if (!newOrder)
+        throw new BadRequestException('Не вдалось створити замовлення');
+      return newOrder;
     } catch (error) {
       throw new BadRequestException(
         'помилка при створенні замовлення',
@@ -38,63 +36,34 @@ export class OrdersService {
     }
   }
 
-  async newOrder(dto: Partial<OrderDto>, req): Promise<Order> {
+  async updateOrder(orderId: string, dto: OrderDto, req) {
     try {
-      dto.user = req.user.id;
-      const newOrder = await this.orderModel.create(dto);
-      if (!newOrder) {
-        throw new BadRequestException(
-          'сталась помилка при створенні замовлення',
-        );
-      }
-      await newOrder.save();
-      return newOrder;
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
-
-
-  async updateOrder(orderId: string, dto: OrderDto, req): Promise<Order> {
-    try {
-      if (!orderId) {
-        throw new BadRequestException(`Поле id обов'язкове`);
-      }
-      const updateOrder = await this.orderModel.findByIdAndUpdate(
-        { _id: orderId },
-        dto,
-        { new: true },
-      );
-      await updateOrder.save();
-      return updateOrder;
     } catch (error) {
       throw error;
     }
   }
 
   async getAllOrders() {
-    const orders = await this.orderModel.find().exec();
-    return orders;
+    try {
+      const orders = await this.orderRepository.find();
+      if (!orders) throw new BadRequestException('Не інсує жодного замовлення');
+
+      return orders;
+    } catch (error) {
+      throw error;
+    }
   }
 
-  async findOrderById(id: string) {
+  async findOrderById(id: number) {
     try {
-      const order = await this.orderModel
-        .findById(id)
-        .populate({
-          path: 'buyer',
-          model: 'Buyer',
-          select: '-orders',
-        })
-        .populate({
-          path: 'user',
-          select: '-orders',
-        })
-        .exec();
-      if (!order) {
-        throw new BadRequestException('сталась помилка при пошуку замовлення');
-      }
+      const order = await this.orderRepository.findOne({
+        where: { id },
+        relations: {
+          user: true,
+          products: true,
+          buyer: true,
+        },
+      });
       return order;
     } catch (error) {
       throw error;

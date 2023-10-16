@@ -15,7 +15,7 @@ export class UserEntity extends AbstractEntity<UserEntity> {
     @Column()
     name: string;
 
-    @OneToOne (() => ProfileEntity, profile => profile.user)
+    @OneToOne (() => ProfileEntity, profile => profile.user, {cascade: true, eager: true})
     @JoinColumn()
     profile: ProfileEntity
 

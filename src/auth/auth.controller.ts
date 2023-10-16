@@ -3,7 +3,6 @@ import { AuthService } from './auth.service';
 import { SignUpDto } from 'src/auth/dto/signup.dto';
 import { SignInDto } from './dto/signin.dto';
 import { Public } from 'src/decorators/public.decorator';
-import { User } from 'src/users/schemas/user.schema';
 import { UserEntity } from 'src/users/entities/user.entity';
 
 
@@ -19,7 +18,7 @@ export class AuthController {
     return this.authService.signIn(signInDto);
 
    }
-   @Public()
+   @Public() 
    @Post('registration')
    signUp(@Body() singUpDto: SignUpDto): Promise<{access_token: string}> {
     return this.authService.signUp(singUpDto)
