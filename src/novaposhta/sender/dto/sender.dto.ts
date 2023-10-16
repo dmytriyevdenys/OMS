@@ -26,5 +26,6 @@ export class SenderContactDto {
 export class SenderDto extends SenderInfo {
     @IsNotEmpty()
     apiKey: string;
+    nickName: string;
     Contact: ContractPersonEntity
 }

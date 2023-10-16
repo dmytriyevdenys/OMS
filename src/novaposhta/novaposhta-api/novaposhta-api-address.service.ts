@@ -1,25 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { ApiNovaposhtaFetchService } from 'src/utils/api-novaposhta-fetch.service';
-import { MatchService } from 'src/utils/match-model.service';
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
-import { SenderService } from '../sender/sender.service';
 import { CalledMethod, ModelName } from 'src/consts/consts';
-import { WareHouseDto } from '../dto/warehouse.dto';
-import { Address } from '../schemas/address.schema';
+import { WareHouseDto } from '../address/dto/warehouse.dto';
+import { MatchService } from 'src/utils/match-model.service';
+import { AddressEntity } from '../address/entities/address.entity';
+import { ApiKeyService } from '../novaposhta-apikey.service';
 
 @Injectable()
 export class ApiAddressService {
   constructor(
     private apiService: ApiNovaposhtaFetchService,
-    private matchSercive: MatchService,
-    private senderService: SenderService,
-    @InjectModel(Address.name) private readonly addressModel: Model<Address>,
+    private matchService: MatchService,
+    private readonly apiKeyService: ApiKeyService
   ) {}
 
   async getCities(city: string): Promise<WareHouseDto> {
     try {
-      const { apiKey } = await this.senderService.getDefaultSender();
+      const  apiKey  = await this.apiKeyService.getApiKey();
       const modelName = ModelName.Address;
       const calledMethod = CalledMethod.getCities;
       const methodProperties = {
@@ -43,13 +40,14 @@ export class ApiAddressService {
     }
   }
 
-  async getWarehouse(dto: WareHouseDto): Promise<Address[]> {
-    const { apiKey } = await this.senderService.getDefaultSender();
+  async getWarehouse(ref: string, id: string){
+    
+    const  apiKey  = await this.apiKeyService.getApiKey();
     const modelName = ModelName.Address;
     const calledMethod = CalledMethod.getWarehouses;
     const methodProperties = {
-      CityRef: dto.CityRef,
-      WarehouseId: dto.WarehouseId,
+      CityRef: ref,
+      WarehouseId: id,
     };
     const response = await this.apiService.sendPostRequest(
       apiKey,
@@ -58,34 +56,29 @@ export class ApiAddressService {
       methodProperties,
     );
     const data = response.data;
-    const addressData = await Promise.all(
-      data.map((addressData: any) => {
-        return this.matchSercive.match(this.addressModel, addressData);
-      }),
-    );
-    return addressData;
+    const warehouse = await this.matchService.mapToEntity(AddressEntity, data);
+    return warehouse;
   }
 
-  async createAddress(dto: WareHouseDto): Promise<Address> {
-    const { apiKey } = await this.senderService.getDefaultSender();
+  async createAddress(cityRef: string, ref: string){
+    const  apiKey  = await this.apiKeyService.getApiKey();
     const modelName = ModelName.Address;
     const calledMethod = CalledMethod.save;
     const methodProperties = {
-      CityRef: dto.CityRef,
-      WarehouseRef: dto.WarehouseRef,
+      CityRef: cityRef,
+      WarehouseRef: ref,
     };
-
+    console.log(methodProperties);
+    
     try {
       const response = await this.apiService.sendPostRequest(
         apiKey,
         modelName,
         calledMethod,
         methodProperties,
-      );
+      );      
       const data = response.data;
       return data;
-    } catch (error) {
-     
-    }
+    } catch (error) {}
   }
 }

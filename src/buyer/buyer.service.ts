@@ -10,7 +10,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BuyerEntity } from './entities/buyer.entity';
 import { EntityManager, ILike, Repository } from 'typeorm';
 import { ResponseService } from 'src/utils/response.service';
-import { error } from 'console';
 
 @Injectable()
 export class BuyerService {

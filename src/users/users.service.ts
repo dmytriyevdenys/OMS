@@ -3,15 +3,18 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { User, UserDocument } from './schemas/user.schema';
 import { SignUpDto } from 'src/auth/dto/signup.dto';
 import { OrdersApiService } from 'src/orders/orders-api/orders-api.service';
 import { OrderAssociations } from 'src/orders/interfaces/order-associations.interfaces';
 import { Order } from 'src/orders/schemas/order.schema';
-import { EntityManager, RelationId, Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ManagerDto } from './dto/manager.dto';
+import { CreateProfileDto } from './dto/create-profile.dto';
+import { ProfileEntity } from './entities/profile.entity';
+import { log } from 'console';
+import { UpdateProdileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class UsersService {
@@ -109,47 +112,31 @@ export class UsersService {
     return response;
   }
 
-  async setManager(dto: ManagerDto, userId: number) {
+  async createProfile (dto: Partial<CreateProfileDto>, id: number): Promise<UserEntity> { 
     try {
-    
-   /*   const user = await this.findUserById(userId);
-      user.manager_id = dto.manager_id;
-      user.manager_name = dto.manager_name;
-     const updatedUser = await this.entityManager.save(user);
-     if(!updatedUser) { 
-      throw  new BadRequestException('Не вдалось оновити користувача');
-     }
-     return updatedUser;*/
-
-    } catch (error) {
-      throw error;
+      
+     const user = await this.findUserById(id);
+     const profile = new ProfileEntity({
+      phone: dto.phone
+     });    
+     user.profile = profile;
+     await this.entityManager.save(user);
+     return user
+    }   
+    catch(error) { 
+     throw error;
     }
-  }
+   }
 
-  async setSource(dto: Partial<OrderAssociations>, userId: number) {
-    try {
-    /*  const user = await this.findUserById(userId);
-      user.source_id = dto.id;
-      user.source_name = dto.name;
-      const updatedUser = await this.entityManager.save(user);
-      if (!updatedUser) {
-        throw new BadRequestException('Не вдалось оновивити данні користувача');
-      }
-      return updatedUser;*/
-    } catch (error) {
-      throw error;
-    }
-  }
+   async updateProfile (dto: UpdateProdileDto, id: number) {
+      const user = await this.findUserById(id);
+      console.log(user);
+      
+      Object.assign(user.profile, dto); 
+      await this.entityManager.save(user);
+      return user;
 
-  async assignOrderToUser(user: User, order: Order) {
-    try {
-      /* const updatedUser = await this.findUserById(user.id) ;
-    updatedUser.orders = [...updatedUser.orders, order.id];
-    await updatedUser.save();
-    return updatedUser;*/
-    } catch (error) {
-      console.error('Помилка при роботі з базою даних:', error);
-      throw error;
-    }
-  }
+   }
+
+  
 }

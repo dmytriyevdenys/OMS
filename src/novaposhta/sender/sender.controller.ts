@@ -1,7 +1,6 @@
-import { Body, Controller, Delete, Get, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiSenderService } from '../novaposhta-api/novaposhta-api-sender.service';
 import { SenderService } from './sender.service';
-import { Sender } from '../schemas/sender.schema';
 import { SenderDto } from './dto/sender.dto';
 import { SenderEntity } from './entities/sender.entity';
 
@@ -21,28 +20,29 @@ export class SenderController {
     return await this.senderService.createSender(dto);
   }
 
-  @Put()
-  async updateSenderAddress(@Body() dto: SenderDto) {
-    return await this.senderService.updateSenderAddress(dto);
-  }
 
   @Get()
   async getAll(): Promise<SenderEntity[]> {
     return this.senderService.getAllSender();
   }
 
-  @Delete()
-  async delete(@Body() id: { id: string }): Promise<Sender> {
+  @Get(':id')
+  async getById (@Param('id') id: number): Promise<SenderEntity> {
+    return await this.senderService.findSenderById(id);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: number){
     return this.senderService.deleteSender(id);
   }
 
-  @Post('default')
-  async setDefault(@Body() id: { id: string }): Promise<Sender> {
+  @Post('default/:id')
+  async setDefault(@Param('id') id: number): Promise<SenderEntity>{
     return this.senderService.setDefaultSender(id);
   }
 
   @Get('default')
-  async getDefault(): Promise<Sender> {
+  async getDefault(): Promise<SenderEntity> {
     return this.senderService.getDefaultSender();
   }
 }

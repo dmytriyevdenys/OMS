@@ -1,11 +1,16 @@
 import { AbstractEntity } from "src/utils/abstract-entity";
-import { Column, Entity, JoinColumn, OneToOne, Unique } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, Unique } from "typeorm";
 import { ContractPersonEntity } from "./contact-person.entity";
+import { OrderEntity } from "src/orders/entities/order.entity";
+import { AddressEntity } from "src/novaposhta/address/entities/address.entity";
 
 @Entity()
 @Unique(['apiKey'])
 export class SenderEntity extends AbstractEntity<SenderEntity> {
-    
+
+    @Column({nullable: true})
+    nickName: string;
+
     @Column({name: 'api_key'})
     apiKey: string;
 
@@ -33,7 +38,16 @@ export class SenderEntity extends AbstractEntity<SenderEntity> {
     @Column({nullable: true})
     MiddleName: string;
 
+    @Column({ default: false }) 
+    isDefault: boolean;
+
     @OneToOne(() => ContractPersonEntity, {cascade: true})
     @JoinColumn()
     Contact: ContractPersonEntity
+
+    @OneToMany(() => AddressEntity, address => address.sender)
+    address: AddressEntity
+    
+    @OneToMany(() => OrderEntity, order => order.sender)
+    orders: OrderEntity[]
 }

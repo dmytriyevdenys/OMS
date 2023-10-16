@@ -15,6 +15,8 @@ import { OrderAssociations } from 'src/orders/interfaces/order-associations.inte
 import { UserEntity } from './entities/user.entity';
 import { ManagerDto } from './dto/manager.dto';
 import { Public } from 'src/decorators/public.decorator';
+import { CreateProfileDto } from './dto/create-profile.dto';
+import { UpdateProdileDto } from './dto/update-profile.dto';
 
 @Controller('user')
 export class UsersController {
@@ -50,21 +52,15 @@ export class UsersController {
     //return this.userService.getManager(id);
   }
 
-  @Post('manager')
-  async setManager(
-    @Body() dto: ManagerDto,
-    @Req() req,
-  ){
-    return this.userService.setManager(dto, req.user.id);
+  @Post('profile')
+  async createProfile (@Body() dto: CreateProfileDto, @Req() req: Partial<UserEntity>) { 
+  console.log(dto);
+  
+      return await this.userService.createProfile(dto, req.id);
   }
 
-  @Post('source')
-  async setSource(
-    @Body() dto: Partial<OrderAssociations>,
-    @Req() req,
-  ) {
-   return this.userService.setSource(dto, req.user.id);
+  @Put('profile')
+  async updateProfile(@Body() dto: UpdateProdileDto, @Req() req){ 
+    return await this.userService.updateProfile(dto, req.id) ;
   }
-
- 
 }

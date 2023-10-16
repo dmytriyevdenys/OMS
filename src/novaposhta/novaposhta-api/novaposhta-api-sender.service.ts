@@ -1,10 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CalledMethod, ModelName } from 'src/consts/consts';
 import { ApiNovaposhtaFetchService } from 'src/utils/api-novaposhta-fetch.service';
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
-import { Sender } from '../schemas/sender.schema';
-import { SenderContact } from '../schemas/sender-contact.schema';
 import { MatchService } from 'src/utils/match-model.service';
 import { SenderEntity } from '../sender/entities/sender.entity';
 
@@ -13,7 +9,6 @@ export class ApiSenderService {
   constructor(
     private apiService: ApiNovaposhtaFetchService,
     private matchSercive: MatchService,
-    @InjectModel(Sender.name) private readonly senderModel: Model<Sender>,
   ) {}
 
   async getCounterparties(apiKey: { apiKey: string }) {
@@ -41,7 +36,7 @@ export class ApiSenderService {
   async getCounterpartyContactPersons(
     apiKey: { apiKey: string },
     ref: string,
-  ): Promise<SenderContact> {
+  ){
     try {
       const key = apiKey.apiKey;
       const modelName = ModelName.Counterparty;

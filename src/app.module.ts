@@ -16,6 +16,7 @@ import { HttpModule } from '@nestjs/axios';
 import { BuyerModule } from './buyer/buyer.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SenderModule } from './novaposhta/sender/sender.module';
+import { AddressModule } from './novaposhta/address/address.module';
 @Module({
   imports: [ConfigModule.forRoot({
 
@@ -48,7 +49,8 @@ import { SenderModule } from './novaposhta/sender/sender.module';
     ProductsModule,
     HttpModule,
     BuyerModule,
-    SenderModule
+    SenderModule,
+    AddressModule
     ],
   controllers: [AppController],
   providers: [AppService, 

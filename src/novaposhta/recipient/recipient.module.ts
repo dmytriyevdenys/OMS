@@ -5,20 +5,19 @@ import { MatchService } from 'src/utils/match-model.service';
 import { ApiNovaposhtaFetchService } from 'src/utils/api-novaposhta-fetch.service';
 import { SenderService } from '../sender/sender.service';
 import { HttpModule } from '@nestjs/axios';
-import { AddressService } from '../noaposhta-address.service';
 import { SenderModule } from '../sender/sender.module';
+import { AddressModule } from '../address/address.module';
 
 
 @Module({
-  imports: [HttpModule, SenderModule],
+  imports: [HttpModule, SenderModule, AddressModule],
   controllers: [RecipientController],
   providers: [
     RecipientService,
     MatchService,
     ApiNovaposhtaFetchService,
     SenderService,
-    AddressService
-  ],
+      ],
   exports: [RecipientModule],
 })
 export class RecipientModule {}

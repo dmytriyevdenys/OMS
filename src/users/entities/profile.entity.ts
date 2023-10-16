@@ -7,7 +7,7 @@ export class ProfileEntity  {
     id: number
 
     @Column({ nullable: true })
-    phone: number;
+    phone: string;
    
     @Column({ nullable: true })
     manager_id:number;
