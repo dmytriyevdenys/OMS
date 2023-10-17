@@ -13,7 +13,7 @@ export class OrderCrmDto {
         phone: string
     };
     shipping: {};
-    products: [];
+    products: ProductEntity[];
     payments: Payments[];
     custom_fields: CustomField[];
   }
@@ -33,6 +33,7 @@ export class OrderCrmDto {
 
 export class OrderDto {
     id: number; 
+    orderCrm_id: string;
     order_id?:string;
     sender: SenderEntity;
     shipping:{};

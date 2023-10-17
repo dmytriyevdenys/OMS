@@ -3,6 +3,7 @@ import { OrdersService } from './orders.service';
 import { OrdersApiService } from './orders-api/orders-api.service';
 import { Public } from 'src/decorators/public.decorator';
 import { OrderDto } from './dto/order.dto';
+import { UpdateOrderDto } from './dto/update-order.dto';
 
 @Controller('order')
 export class OrdersController {
@@ -26,6 +27,11 @@ export class OrdersController {
   @Get(':id(\\d+)')
   async getOrderById(@Param('id') id: number) {
     return this.ordersService.findOrderById(id);
+  }
+
+  @Put(':id')
+  async update (@Param('id') id: number,@Body() dto: UpdateOrderDto) { 
+    return await this.ordersService.updateOrder(id, dto);
   }
 
   @Get('status')
@@ -56,16 +62,6 @@ export class OrdersController {
   @Get('payment')
   async getPayment() {
     return this.ordersApiservice.getPayment();
-  }
-
-
-  @Put(':id')
-  async updateOrder(
-    @Param('id') id: string,
-    @Body() dto: OrderDto,
-    @Req() req,
-  ) {
-    return this.ordersService.updateOrder(id, dto, req);
   }
 
   @Post('crm')

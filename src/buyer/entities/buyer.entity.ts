@@ -8,7 +8,7 @@ import { AddressEntity } from "src/novaposhta/address/entities/address.entity";
 @Entity()
 export class BuyerEntity extends AbstractEntity<BuyerEntity> {
 
-    @Column()
+    @Column({nullable: true})
     full_name: string;
 
     @Column('simple-array', { nullable: true })

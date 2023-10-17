@@ -5,6 +5,8 @@ import { BuyerService } from 'src/buyer/buyer.service';
 import { OrderEntity } from './entities/order.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UpdateOrderDto } from './dto/update-order.dto';
+import { Index } from 'typeorm';
 
 @Injectable()
 export class OrdersService {
@@ -24,9 +26,12 @@ export class OrdersService {
         const buyer = await this.buyerService.createBuyer(dto.buyer);
         order.buyer = buyer;
       }
+      const crmOrder = await this.ordersApiService.createOrder(dto);
+        order.orderCrm_id = crmOrder.id;
       const newOrder = await this.entityManager.save(order);
       if (!newOrder)
         throw new BadRequestException('Не вдалось створити замовлення');
+      
       return newOrder;
     } catch (error) {
       throw new BadRequestException(
@@ -36,8 +41,13 @@ export class OrdersService {
     }
   }
 
-  async updateOrder(orderId: string, dto: OrderDto, req) {
+  async updateOrder(orderId: number, dto: UpdateOrderDto) {
     try {
+      const order = await this.findOrderById(orderId);
+     const updateOrder =  Object.assign(order, dto);
+     await this.ordersApiService.updateOrder(dto);
+      await this.entityManager.save(updateOrder);
+      return order;
     } catch (error) {
       throw error;
     }
