@@ -45,8 +45,5 @@ export class AddressController {
     return await this.apiAddressService.getStreets(ref, name);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string) {}
-
  
 }

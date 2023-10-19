@@ -71,6 +71,40 @@ export class OrdersApiService {
     return dataOrders;
   }
 
+  async getAll () { 
+    try {
+      const endpoint ='order';
+      const orders = [];
+      let responseData;
+      let currentPage = 1;
+      const delayBetweenRequests = 1500;
+      let requestCount = 0; 
+      do {
+        responseData = await new Promise(resolve => {
+          setTimeout(async () => {
+            requestCount++;
+          console.log(`Запит ${requestCount}: Виконано`);
+
+            const data = await this.apiService.get(endpoint, {
+              limit: 50,
+              page: currentPage,
+            });
+            resolve(data);
+          }, delayBetweenRequests);
+        });
+        orders.push(responseData);
+        currentPage++ ;
+
+
+      } while (currentPage <= responseData.last_page)
+      
+      return orders;
+    }
+    catch (error) { 
+      throw error
+    }
+  }
+
   async getOrderById(id: string) {
     const order = await this.apiService.get(
       `order/${id}?include=shipping.deliveryService,products.offer,manager`,
