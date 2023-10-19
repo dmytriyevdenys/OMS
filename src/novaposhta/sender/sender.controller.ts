@@ -19,6 +19,15 @@ export class SenderController {
   async createNewSender(@Body() dto: SenderDto): Promise<SenderEntity>{
     return await this.senderService.createSender(dto);
   }
+  @Post('default/:id')
+  async setDefault(@Param('id') id: number): Promise<SenderEntity>{
+    return this.senderService.setDefaultSender(id);
+  }
+
+  @Get('default')
+  async getDefault(): Promise<SenderEntity> {
+    return this.senderService.getDefaultSender();
+  }
 
 
   @Get()
@@ -36,13 +45,5 @@ export class SenderController {
     return this.senderService.deleteSender(id);
   }
 
-  @Post('default/:id')
-  async setDefault(@Param('id') id: number): Promise<SenderEntity>{
-    return this.senderService.setDefaultSender(id);
-  }
 
-  @Get('default')
-  async getDefault(): Promise<SenderEntity> {
-    return this.senderService.getDefaultSender();
-  }
 }

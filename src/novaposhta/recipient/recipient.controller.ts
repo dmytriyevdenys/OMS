@@ -2,7 +2,7 @@ import { Body, Controller, Post } from "@nestjs/common";
 import { RecipientDto } from "./dto/recipient.dto";
 import { RecipientService } from "./recipient.service";
 
-@Controller('novaposhta')
+@Controller()
 export class RecipientController {
     constructor(
         private recipientService: RecipientService

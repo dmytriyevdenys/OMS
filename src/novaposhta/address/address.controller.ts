@@ -11,6 +11,7 @@ import {
 import { AddressService } from './address.service';
 import { AddressDto } from './dto/address.dto';
 import { ApiAddressService } from '../novaposhta-api/novaposhta-api-address.service';
+import { WareHouseDto } from './dto/warehouse.dto';
 
 @Controller('address')
 export class AddressController {
@@ -20,8 +21,8 @@ export class AddressController {
   ) {}
 
   @Post('create')
-  create(@Query('cityRef') citRef: string, @Query('ref') ref: string) {
-    return this.apiAddressService.createAddress(citRef, ref);
+ async create(@Body()dto: WareHouseDto ) {
+    return await this.apiAddressService.createAddress(dto);
   }
 
   @Get('city')
@@ -33,12 +34,19 @@ export class AddressController {
   async getWarehouse(@Query('ref') ref: string, @Query('id') id: string) {
     return await this.apiAddressService.getWarehouse(ref, id);
   }
+  
+  @Get('settlement')
+  async getSettlements(@Query('name') name: string) {
+    return await this.apiAddressService.getSettlements(name);
+  }
+
+  @Get('street')
+  async getStreet(@Query('ref') ref: string, @Query('name') name: string) {
+    return await this.apiAddressService.getStreets(ref, name);
+  }
 
   @Patch(':id')
   update(@Param('id') id: string) {}
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.addressService.remove(+id);
-  }
+ 
 }

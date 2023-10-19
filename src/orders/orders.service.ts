@@ -6,7 +6,6 @@ import { OrderEntity } from './entities/order.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { Index } from 'typeorm';
 
 @Injectable()
 export class OrdersService {
@@ -45,7 +44,7 @@ export class OrdersService {
     try {
       const order = await this.findOrderById(orderId);
      const updateOrder =  Object.assign(order, dto);
-     await this.ordersApiService.updateOrder(dto);
+     await this.ordersApiService.updateOrder(order.orderCrm_id, dto);
       await this.entityManager.save(updateOrder);
       return order;
     } catch (error) {
@@ -79,4 +78,5 @@ export class OrdersService {
       throw error;
     }
   }
+
 }

@@ -8,6 +8,7 @@ export class ApiKeyService {
   constructor(private senderService: SenderService) {}
 
   async getApiKey(order: Record<string, any> = {}): Promise<string> {
+    
     if (!order) {
       const { apiKey } = await this.senderService.getDefaultSender();
       this.apiKey = apiKey;
@@ -17,6 +18,8 @@ export class ApiKeyService {
       const sender = await this.senderService.findSenderById(idSender);
       this.apiKey = sender.apiKey;
     }
+
     return this.apiKey;
+    
   }
 }

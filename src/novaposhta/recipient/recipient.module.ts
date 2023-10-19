@@ -7,6 +7,7 @@ import { SenderService } from '../sender/sender.service';
 import { HttpModule } from '@nestjs/axios';
 import { SenderModule } from '../sender/sender.module';
 import { AddressModule } from '../address/address.module';
+import { ApiKeyService } from '../novaposhta-apikey.service';
 
 
 @Module({
@@ -17,6 +18,7 @@ import { AddressModule } from '../address/address.module';
     MatchService,
     ApiNovaposhtaFetchService,
     SenderService,
+    ApiKeyService
       ],
   exports: [RecipientModule],
 })

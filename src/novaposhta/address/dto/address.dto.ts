@@ -1,10 +1,10 @@
 
 export class AddressDto { 
-    Description: string;
-    Ref: string;
-    Number: number; 
-    CityRef: string;
-    CityDescription: string;
-    SettlementRef: string;
-    SettlementDescription: string;
+    readonly   Description: string;
+    readonly  Ref: string;
+    readonly  Number: number; 
+    readonly  CityRef: string;
+    readonly  CityDescription: string;
+    readonly  SettlementRef: string;
+    readonly  SettlementDescription: string;
 }

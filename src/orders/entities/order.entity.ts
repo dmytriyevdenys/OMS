@@ -11,8 +11,8 @@ export class OrderEntity extends AbstractEntity<OrderEntity> {
     @Column({nullable: true})
     orderCrm_id: string;
 
-    @Column({nullable: true})
-    status_id: string;
+    @Column({default: 1, nullable: true})
+    status_id: number;
 
     @Column({nullable: true})
     additionalnformation: string;

@@ -5,13 +5,15 @@ import { WareHouseDto } from '../address/dto/warehouse.dto';
 import { MatchService } from 'src/utils/match-model.service';
 import { AddressEntity } from '../address/entities/address.entity';
 import { ApiKeyService } from '../novaposhta-apikey.service';
+import { SenderService } from '../sender/sender.service';
 
 @Injectable()
 export class ApiAddressService {
   constructor(
     private apiService: ApiNovaposhtaFetchService,
     private matchService: MatchService,
-    private readonly apiKeyService: ApiKeyService
+    private readonly apiKeyService: ApiKeyService,
+    private readonly senderService: SenderService
   ) {}
 
   async getCities(city: string): Promise<WareHouseDto> {
@@ -32,6 +34,7 @@ export class ApiAddressService {
       const citysData = data.map((city: any) => ({
         Description: `${city.SettlementTypeDescription} ${city.Description} ${city.AreaDescription} обл`,
         Ref: city.Ref,
+        SettlementRef: city.SettlementRef
       }));
 
       return citysData;
@@ -60,25 +63,62 @@ export class ApiAddressService {
     return warehouse;
   }
 
-  async createAddress(cityRef: string, ref: string){
+  async getSettlements (cityName: string) { 
     const  apiKey  = await this.apiKeyService.getApiKey();
+    const modelName = ModelName.Address;
+    const calledMethod = CalledMethod.searchSettlements
+    const methodProperties = { 
+      CityName: cityName
+    }
+
+    const response = await this.apiService.sendPostRequest(
+      apiKey,
+      modelName,
+      calledMethod,
+      methodProperties
+    )
+
+    return response.data;
+  }
+
+  async getStreets (settlementRef: string, streetName: string) { 
+    const  apiKey  = await this.apiKeyService.getApiKey();
+    const modelName = ModelName.Address;
+    const calledMethod = CalledMethod.searchSettlementStreets
+    const methodProperties = {
+      SettlementRef: settlementRef,
+      StreetName: streetName
+    }
+
+    const response = await this.apiService.sendPostRequest(
+      apiKey,
+      modelName,
+      calledMethod,
+      methodProperties
+    );
+    const data = response.data;
+    return data;
+  }
+  async createAddress(dto: WareHouseDto){
+    const { apiKey } = await this.senderService.getDefaultSender();
     const modelName = ModelName.Address;
     const calledMethod = CalledMethod.save;
     const methodProperties = {
-      CityRef: cityRef,
-      WarehouseRef: ref,
+      CounterpartyRef: dto.CityRef,
+      WarehouseRef: dto.WarehouseRef,
     };
-    console.log(methodProperties);
-    
+
     try {
       const response = await this.apiService.sendPostRequest(
         apiKey,
         modelName,
         calledMethod,
         methodProperties,
-      );      
+      );
       const data = response.data;
       return data;
-    } catch (error) {}
+    } catch (error) {
+     
+    }
   }
 }

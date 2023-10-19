@@ -8,7 +8,8 @@ export const ModelName = {
     ContactPerson: 'ContactPerson',
     AdditionalService: 'AdditionalService',
     InternetDocument: 'InternetDocument',
-    TrackingDocument: 'TrackingDocument'
+    TrackingDocument: 'TrackingDocument',
+    
 }
 
 export const CalledMethod = {

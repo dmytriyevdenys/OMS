@@ -7,6 +7,7 @@ import { ProductEntity } from "src/products/entities/product.entity";
 export class OrderCrmDto {
     source_id: number;
     manager_id: number;
+    status_id: number;
     manager_comment?: string;
     buyer: {
         full_name:string
@@ -33,6 +34,7 @@ export class OrderCrmDto {
 
 export class OrderDto {
     id: number; 
+    status_id: number;
     orderCrm_id: string;
     order_id?:string;
     sender: SenderEntity;

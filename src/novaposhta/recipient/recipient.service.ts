@@ -4,6 +4,7 @@ import { MatchService } from 'src/utils/match-model.service';
 import { RecipientDto } from './dto/recipient.dto';
 import { CalledMethod, ModelName } from 'src/consts/consts';
 import { SenderService } from '../sender/sender.service';
+import { ApiKeyService } from '../novaposhta-apikey.service';
 
 @Injectable()
 export class RecipientService {
@@ -11,11 +12,13 @@ export class RecipientService {
     private apiService: ApiNovaposhtaFetchService,
     private matchService: MatchService,
     private senderService: SenderService,
+    private readonly apiKeyService: ApiKeyService
   ) {}
 
   async createRecipient(dto: RecipientDto) {
     try {
-      const { apiKey } = await this.senderService.getDefaultSender();
+      const  { apiKey }  = await this.senderService.getDefaultSender();
+            
       const modelName = ModelName.Counterparty;
       const calledMethod = CalledMethod.save;
       const methodProperties = dto;
@@ -26,7 +29,7 @@ export class RecipientService {
         calledMethod,
         methodProperties,
       );
-
+        
       const data = response.data;
       return data;
 
