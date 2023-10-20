@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { AddressService } from './address.service';
 import { AddressDto } from './dto/address.dto';
-import { ApiAddressService } from '../novaposhta-api/novaposhta-api-address.service';
+import { ApiAddressService } from './api-service/novaposhta-api-address.service';
 import { WareHouseDto } from './dto/warehouse.dto';
 
 @Controller('address')
@@ -31,7 +31,7 @@ export class AddressController {
   }
 
   @Get('warehouse')
-  async getWarehouse(@Query('ref') ref: string, @Query('id') id: string) {
+  async getWarehouse(@Query('ref') ref: string, @Query('number') id: string) {
     return await this.apiAddressService.getWarehouse(ref, id);
   }
   

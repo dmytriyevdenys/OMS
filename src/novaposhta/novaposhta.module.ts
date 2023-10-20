@@ -6,7 +6,7 @@ import { ApiNovaposhtaFetchService } from 'src/utils/api-novaposhta-fetch.servic
 import { HttpModule } from '@nestjs/axios';
 import { MatchService } from 'src/utils/match-model.service';
 import { SenderService } from './sender/sender.service';
-import { ApiAddressService } from './novaposhta-api/novaposhta-api-address.service';
+import { ApiAddressService } from './address/api-service/novaposhta-api-address.service';
 import { SenderModule } from './sender/sender.module';
 import { AddressModule } from './address/address.module';
 

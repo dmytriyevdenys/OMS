@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CalledMethod, ModelName } from 'src/consts/consts';
 import { ApiNovaposhtaFetchService } from 'src/utils/api-novaposhta-fetch.service';
 import { MatchService } from 'src/utils/match-model.service';
-import { SenderEntity } from '../sender/entities/sender.entity';
+import { SenderEntity } from '../entities/sender.entity';
 
 @Injectable()
 export class ApiSenderService {

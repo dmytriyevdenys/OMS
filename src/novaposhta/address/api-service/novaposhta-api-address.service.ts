@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { ApiNovaposhtaFetchService } from 'src/utils/api-novaposhta-fetch.service';
 import { CalledMethod, ModelName } from 'src/consts/consts';
-import { WareHouseDto } from '../address/dto/warehouse.dto';
+import { WareHouseDto } from '../dto/warehouse.dto';
 import { MatchService } from 'src/utils/match-model.service';
-import { AddressEntity } from '../address/entities/address.entity';
-import { ApiKeyService } from '../novaposhta-apikey.service';
-import { SenderService } from '../sender/sender.service';
+import { AddressEntity } from '../entities/address.entity';
+import { ApiKeyService } from '../../novaposhta-apikey.service';
+import { SenderService } from '../../sender/sender.service';
 
 @Injectable()
 export class ApiAddressService {

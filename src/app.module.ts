@@ -17,6 +17,7 @@ import { BuyerModule } from './buyer/buyer.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SenderModule } from './novaposhta/sender/sender.module';
 import { AddressModule } from './novaposhta/address/address.module';
+import { InternetDocumentModule } from './novaposhta/internet-document/internet-document.module';
 @Module({
   imports: [ConfigModule.forRoot({
 
@@ -50,7 +51,8 @@ import { AddressModule } from './novaposhta/address/address.module';
     HttpModule,
     BuyerModule,
     SenderModule,
-    AddressModule
+    AddressModule,
+    InternetDocumentModule
     ],
   controllers: [AppController],
   providers: [AppService, 

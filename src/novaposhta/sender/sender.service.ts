@@ -8,6 +8,11 @@ import { SenderDto } from './dto/sender.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SenderEntity } from './entities/sender.entity';
 import { EntityManager, Repository } from 'typeorm';
+import { WareHouseDto } from '../address/dto/warehouse.dto';
+import { AddressEntity } from '../address/entities/address.entity';
+import { error } from 'console';
+import { AddressDto } from '../address/dto/address.dto';
+import { UpdateAddressDto } from '../address/dto/update-address.dto';
 
 @Injectable()
 export class SenderService {
@@ -56,10 +61,7 @@ export class SenderService {
 
   async findSenderById(id: number) {
     try {
-      const sender = await this.senderRepository.findOne({ 
-        where: {id},
-        relations: {Contact: true}
-       });
+      const sender = await this.senderRepository.findOneBy({ id });
       if (!sender)
         throw new BadRequestException('Користувач з таким id не існує');
       return sender;
@@ -106,14 +108,12 @@ export class SenderService {
 
   async setDefaultSender(id: number) {
     try {
-     await this.resetDefaultSender();
+      await this.resetDefaultSender();
 
       const sender = await this.findSenderById(id);
       sender.isDefault = true;
       await this.entityManager.save(sender);
       return sender;
-    
-      
     } catch (error) {
       throw error;
     }
@@ -136,7 +136,9 @@ export class SenderService {
 
   private async resetDefaultSender() {
     try {
-      const defaultSender = await this.senderRepository.findOne({ where: { isDefault: true } });
+      const defaultSender = await this.senderRepository.findOne({
+        where: { isDefault: true },
+      });
       if (defaultSender) {
         defaultSender.isDefault = false;
         await this.entityManager.save(defaultSender);
@@ -146,7 +148,44 @@ export class SenderService {
     }
   }
 
-  async addAddress () { 
-    
+  async addAddress(id: number, dto: AddressDto): Promise<SenderEntity> {
+    try {
+      const sender = await this.findSenderById(id);
+      const address = new AddressEntity(dto);
+      sender.address.push(address);
+      await this.entityManager.save(sender);
+      return sender;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateAddress(idSender: number, dto: UpdateAddressDto) {
+    try {
+      const sender = await this.findSenderById(idSender);
+      const address = sender.address.find((address) => dto.id === address.id);
+      
+      if (!address) throw new NotFoundException('Такої адреси не існує');
+
+      Object.assign(address, dto);
+      sender.address.push(address);
+      await this.entityManager.save(sender);
+      return sender;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async removeAddress (idSender: number, idAddress: number) {
+    try { 
+      const sender = await this.findSenderById(idSender);
+      const address = sender.address.filter( (address) => address.id !== idAddress);
+      sender.address = address;
+      await this.entityManager.save(sender);
+      return sender
+    }
+    catch(error) { 
+      throw error;
+    }
   }
 }

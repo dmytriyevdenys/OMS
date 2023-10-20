@@ -24,8 +24,8 @@ export class AddressEntity extends AbstractEntity<AddressEntity> {
     @Column()
     Ref: string;
 
-    @Column()
-    Number: string;
+    @Column({nullable: true})
+    Number: number;
 
     @ManyToOne(() => SenderEntity)
     sender: SenderEntity

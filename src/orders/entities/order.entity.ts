@@ -23,6 +23,7 @@ export class OrderEntity extends AbstractEntity<OrderEntity> {
     @Column({type: "simple-array", nullable: true})
     notes: string[];
 
+
     @ManyToOne(() => UserEntity, user => user.orders, {cascade: true})
     @JoinColumn({name: 'user_id'})
     user: UserEntity

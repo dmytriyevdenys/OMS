@@ -4,7 +4,7 @@ import { AddressController } from './address.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AddressEntity } from './entities/address.entity';
-import { ApiAddressService } from '../novaposhta-api/novaposhta-api-address.service';
+import { ApiAddressService } from './api-service/novaposhta-api-address.service';
 import { ApiNovaposhtaFetchService } from 'src/utils/api-novaposhta-fetch.service';
 import { SenderService } from '../sender/sender.service';
 import { MatchService } from 'src/utils/match-model.service';

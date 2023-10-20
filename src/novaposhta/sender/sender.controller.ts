@@ -1,8 +1,10 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
-import { ApiSenderService } from '../novaposhta-api/novaposhta-api-sender.service';
+import { ApiSenderService } from './api-service/novaposhta-api-sender.service';
 import { SenderService } from './sender.service';
 import { SenderDto } from './dto/sender.dto';
 import { SenderEntity } from './entities/sender.entity';
+import { AddressDto } from '../address/dto/address.dto';
+import { UpdateAddressDto } from '../address/dto/update-address.dto';
 
 @Controller('sender')
 export class SenderController {
@@ -38,6 +40,21 @@ export class SenderController {
   @Get(':id')
   async getById (@Param('id') id: number): Promise<SenderEntity> {
     return await this.senderService.findSenderById(id);
+  }
+
+  @Post(':id/address')
+  async addAddress (@Param('id') id: number, @Body() dto: AddressDto): Promise<SenderEntity> { 
+    return await this.senderService.addAddress(id, dto);
+  }
+
+  @Put(':id/address')
+  async updateAddress(@Param('id') id: number, @Body() dto: UpdateAddressDto){
+    return await this.senderService.updateAddress(id, dto);
+  }
+
+  @Delete(':id/address')
+  async removeAddress(@Param('id') id: number, @Body() idAdress: {id: number} ){
+    return await this.senderService.removeAddress(id, idAdress.id);
   }
 
   @Delete(':id')

@@ -15,7 +15,7 @@ interface OrderCrm {
     shipping_price: null | number;
     taxes: null | number;
     register_id: null | number;
-    fiscal_result: any[]; // Ваш тип даних для цього поля
+    fiscal_result: any[]; 
     fiscal_status: null | string;
     shipping_type_id: null | number;
     status_group_id: number;
