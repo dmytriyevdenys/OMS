@@ -1,10 +1,15 @@
 import { IsIn, IsString } from 'class-validator';
+import { BuyerEntity } from 'src/buyer/entities/buyer.entity';
 import { RecipientDto } from 'src/novaposhta/recipient/dto/recipient.dto';
 import { SenderEntity } from 'src/novaposhta/sender/entities/sender.entity';
 
 export class IntDocDto {
   sender: SenderEntity;
-  recipient: RecipientDto;
+  buyer: BuyerEntity;
+  @IsString()
+  city_ref: string;
+  @IsString()
+  address_ref: string;
   @IsString()
   @IsIn(['Sender', 'Recipient'])
   PayerType: string;
@@ -12,7 +17,7 @@ export class IntDocDto {
   @IsIn(['Cash', 'NonCash'])
   PaymentMethod: string;
   @IsString()
-  @IsIn(['Cargo'])
+  @IsIn(['Cargo', 'Parcel'])
   CargoType: string;
   @IsString()
   Weight: string;
@@ -29,6 +34,9 @@ export class IntDocDto {
   @IsString()
   Description: string;
   @IsString()
+  AdditionalInformation: string;
+  @IsString()
   Cost: string;
-
+  @IsString()
+  InfoRegClientBarcodes: string
 }

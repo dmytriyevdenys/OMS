@@ -5,6 +5,7 @@ import { RecipientDto } from './dto/recipient.dto';
 import { CalledMethod, ModelName } from 'src/consts/consts';
 import { SenderService } from '../sender/sender.service';
 import { ApiKeyService } from '../novaposhta-apikey.service';
+import { RecipientInterface } from './interfaces/recipient.interface';
 
 @Injectable()
 export class RecipientService {
@@ -15,13 +16,17 @@ export class RecipientService {
     private readonly apiKeyService: ApiKeyService
   ) {}
 
-  async createRecipient(dto: RecipientDto) {
+  async createRecipient(dto: RecipientDto): Promise<RecipientInterface> {
     try {
       const  { apiKey }  = await this.senderService.getDefaultSender();
             
       const modelName = ModelName.Counterparty;
       const calledMethod = CalledMethod.save;
-      const methodProperties = dto;
+      const methodProperties = {
+        ...dto,
+        CounterpartyType: 'PrivatePerson',
+        CounterpartyProperty: 'Recipient'
+      };
 
       const response = await this.apiService.sendPostRequest(
         apiKey,
@@ -30,8 +35,8 @@ export class RecipientService {
         methodProperties,
       );
         
-      const data = response.data;
-      return data;
+      const data: RecipientInterface = response.data;
+      return data[0];
 
     } catch (error) {}
   }

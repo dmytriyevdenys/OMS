@@ -1,17 +1,17 @@
 export interface ApiIntDoc { 
 
- SenderWarehouseIndex: string;
-  RecipientWarehouseIndex: string;
+ SenderWarehouseIndex?: string;
+  RecipientWarehouseIndex?: string;
   PayerType: string;
   PaymentMethod: string;
   DateTime: string;
   CargoType: string;
   VolumeGeneral: number;
-  Weight: number;
+  Weight: string;
   ServiceType: string;
-  SeatsAmount: number;
+  SeatsAmount: string;
   Description: string;
-  Cost: number;
+  Cost: string;
   CitySender: string;
   Sender: string;
   SenderAddress: string;

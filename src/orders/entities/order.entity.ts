@@ -1,4 +1,5 @@
 import { BuyerEntity } from "src/buyer/entities/buyer.entity";
+import { InternetDocumnetEntity } from "src/novaposhta/internet-document/entities/internet-document.entity";
 import { SenderEntity } from "src/novaposhta/sender/entities/sender.entity";
 import { ProductEntity } from "src/products/entities/product.entity";
 import { UserEntity } from "src/users/entities/user.entity";
@@ -39,5 +40,6 @@ export class OrderEntity extends AbstractEntity<OrderEntity> {
     @ManyToOne(() => SenderEntity, sender => sender.orders, {onDelete: 'SET NULL', onUpdate: 'SET NULL'})
     @JoinColumn({name: 'sender_id'})
     sender: SenderEntity
+    
 
 }

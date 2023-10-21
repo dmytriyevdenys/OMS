@@ -6,14 +6,17 @@ import { SenderService } from '../sender/sender.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { InternetDocumnetEntity } from './entities/internet-document.entity';
 import { ApiNovaposhtaFetchService } from 'src/utils/api-novaposhta-fetch.service';
-import { HttpModule } from '@nestjs/axios'; // Оновлено імпорт
+import { HttpModule } from '@nestjs/axios'; 
 import { ApiIntDocService } from './api-service/api-int-doc.service';
+import { RecipientService } from '../recipient/recipient.service';
+import { MatchService } from 'src/utils/match-model.service';
+import { ApiKeyService } from '../novaposhta-apikey.service';
 
 @Module({
   imports: [
     SenderModule,
     TypeOrmModule.forFeature([InternetDocumnetEntity]),
-    HttpModule, // Оновлено імпорт
+    HttpModule, 
   ],
   controllers: [InternetDocumentController],
   providers: [
@@ -21,7 +24,10 @@ import { ApiIntDocService } from './api-service/api-int-doc.service';
     SenderService,
     ApiNovaposhtaFetchService,
     ApiIntDocService,
+    RecipientService,
+    ApiKeyService,
+    MatchService
   ],
-  exports: [InternetDocumentModule],
+  exports: [TypeOrmModule, InternetDocumentModule],
 })
 export class InternetDocumentModule {}

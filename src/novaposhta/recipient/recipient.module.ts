@@ -8,10 +8,13 @@ import { HttpModule } from '@nestjs/axios';
 import { SenderModule } from '../sender/sender.module';
 import { AddressModule } from '../address/address.module';
 import { ApiKeyService } from '../novaposhta-apikey.service';
+import { TypeORMError } from 'typeorm';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { RecipientEntity } from './entities/recipient.entity';
 
 
 @Module({
-  imports: [HttpModule, SenderModule, AddressModule],
+  imports: [HttpModule, SenderModule, AddressModule, TypeOrmModule.forFeature([RecipientEntity])],
   controllers: [RecipientController],
   providers: [
     RecipientService,

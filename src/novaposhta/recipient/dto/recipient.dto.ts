@@ -2,7 +2,7 @@ export class RecipientDto {
     FirstName: string;
     MiddleName: string;
     LastName: string;
-    Phone: number;
+    Phone: string;
     Email: string;
     CounterpartyType: string;
     CounterpartyProperty: string;

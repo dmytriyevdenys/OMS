@@ -6,6 +6,7 @@ import { OrderEntity } from './entities/order.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { IntDocDto } from 'src/novaposhta/internet-document/dto/int-doc.dto';
 
 @Injectable()
 export class OrdersService {
@@ -77,6 +78,10 @@ export class OrdersService {
     } catch (error) {
       throw error;
     }
+  }
+
+  async createIntDoc (orderId: number, dto: IntDocDto) {
+    
   }
 
 }

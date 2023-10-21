@@ -13,6 +13,10 @@ import { UsersService } from 'src/users/users.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { OrderEntity } from './entities/order.entity';
 import { ResponseService } from 'src/utils/response.service';
+import { InternetDocumentService } from 'src/novaposhta/internet-document/internet-document.service';
+import { InternetDocumentModule } from 'src/novaposhta/internet-document/internet-document.module';
+import { SenderService } from 'src/novaposhta/sender/sender.service';
+import { SenderModule } from 'src/novaposhta/sender/sender.module';
 
 
 @Module({
@@ -21,7 +25,9 @@ import { ResponseService } from 'src/utils/response.service';
 UsersModule,
   HttpModule,
     TypeOrmModule.forFeature([OrderEntity]),
-    BuyerModule
+    BuyerModule,
+    InternetDocumentModule,
+    SenderModule
   ],
   controllers: [OrdersController, NewOrderWebHookController],
   providers: [
@@ -31,7 +37,9 @@ UsersModule,
     NewOrderWebHookService,
     BuyerService,
     UsersService,
-    ResponseService
+    ResponseService,
+    InternetDocumentService,
+    SenderService
   ],
   exports: []
 })
