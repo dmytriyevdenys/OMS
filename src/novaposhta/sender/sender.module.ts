@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { SenderController } from './sender.controller';
 import { SenderService } from './sender.service';
-import { ApiKeyService } from '../novaposhta-apikey.service';
+import { ApiKeyService } from '../api-service/novaposhta-apikey.service';
 import { HttpModule } from '@nestjs/axios';
 import { ApiSenderService } from './api-service/novaposhta-api-sender.service';
 import { MatchService } from 'src/utils/match-model.service';

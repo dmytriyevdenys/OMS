@@ -1,6 +1,6 @@
-import { IsIn, IsString } from 'class-validator';
+import { Optional } from '@nestjs/common';
+import { IsIn, IsOptional, IsString } from 'class-validator';
 import { BuyerEntity } from 'src/buyer/entities/buyer.entity';
-import { RecipientDto } from 'src/novaposhta/recipient/dto/recipient.dto';
 import { SenderEntity } from 'src/novaposhta/sender/entities/sender.entity';
 
 export class IntDocDto {
@@ -38,5 +38,18 @@ export class IntDocDto {
   @IsString()
   Cost: string;
   @IsString()
-  InfoRegClientBarcodes: string
+  InfoRegClientBarcodes: string;
+  
+  BackwardDeliveryData?:BackwardDeliveryData;
+}
+
+export class BackwardDeliveryData  { 
+  @IsString()
+  @IsIn(['Sender', 'Recipient'])
+  PayerType: string;
+  @IsString()
+  @IsIn(['Money'])
+  CargoType: string;
+  @IsString()
+  RedeliveryString: string
 }

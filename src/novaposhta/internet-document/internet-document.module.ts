@@ -10,7 +10,8 @@ import { HttpModule } from '@nestjs/axios';
 import { ApiIntDocService } from './api-service/api-int-doc.service';
 import { RecipientService } from '../recipient/recipient.service';
 import { MatchService } from 'src/utils/match-model.service';
-import { ApiKeyService } from '../novaposhta-apikey.service';
+import { ApiKeyService } from '../api-service/novaposhta-apikey.service';
+import { RecipientApiService } from '../recipient/api-service/recipient-api.service';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { ApiKeyService } from '../novaposhta-apikey.service';
     ApiIntDocService,
     RecipientService,
     ApiKeyService,
-    MatchService
+    MatchService,
+    RecipientApiService
   ],
   exports: [TypeOrmModule, InternetDocumentModule],
 })

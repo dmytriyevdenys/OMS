@@ -7,9 +7,12 @@ export class RecipientEntity {
     id: number;
 
     @Column()
-    FirstName: string;
+    Ref: string;
 
     @Column()
+    FirstName: string;
+
+    @Column({nullable: true})
     MiddleName: string;
 
     @Column()
@@ -18,14 +21,17 @@ export class RecipientEntity {
     @Column()
     Phone: string;
 
-    @Column()
+    @Column({nullable: true})
     Email: string;
 
     @Column()
     CounterpartyType: string;
 
-    @Column()
+    @Column({nullable: true})
     CounterpartyProperty: string;
+
+    @Column()
+    ContactRef: string;
 
     @OneToOne(() => InternetDocumnetEntity)
     en: InternetDocumnetEntity;

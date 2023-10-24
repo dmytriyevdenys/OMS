@@ -4,7 +4,7 @@ import { CalledMethod, ModelName } from 'src/consts/consts';
 import { WareHouseDto } from '../dto/warehouse.dto';
 import { MatchService } from 'src/utils/match-model.service';
 import { AddressEntity } from '../entities/address.entity';
-import { ApiKeyService } from '../../novaposhta-apikey.service';
+import { ApiKeyService } from '../../api-service/novaposhta-apikey.service';
 import { SenderService } from '../../sender/sender.service';
 
 @Injectable()
@@ -100,7 +100,7 @@ export class ApiAddressService {
     return data;
   }
   async createAddress(dto: WareHouseDto){
-    const { apiKey } = await this.senderService.getDefaultSender();
+    const  apiKey  = await this.apiKeyService.getApiKey();
     const modelName = ModelName.Address;
     const calledMethod = CalledMethod.save;
     const methodProperties = {

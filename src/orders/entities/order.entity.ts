@@ -4,7 +4,7 @@ import { SenderEntity } from "src/novaposhta/sender/entities/sender.entity";
 import { ProductEntity } from "src/products/entities/product.entity";
 import { UserEntity } from "src/users/entities/user.entity";
 import { AbstractEntity } from "src/utils/abstract-entity";
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne,  } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToOne,  } from "typeorm";
 
 @Entity()
 export class OrderEntity extends AbstractEntity<OrderEntity> {
@@ -40,6 +40,9 @@ export class OrderEntity extends AbstractEntity<OrderEntity> {
     @ManyToOne(() => SenderEntity, sender => sender.orders, {onDelete: 'SET NULL', onUpdate: 'SET NULL'})
     @JoinColumn({name: 'sender_id'})
     sender: SenderEntity
-    
+
+    @OneToOne(() => InternetDocumnetEntity, {eager: true, cascade: true, onDelete: 'SET NULL', onUpdate: 'SET NULL'})
+    @JoinColumn()
+    shipping: InternetDocumnetEntity
 
 }

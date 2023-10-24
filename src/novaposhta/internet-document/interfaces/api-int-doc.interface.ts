@@ -22,4 +22,12 @@ export interface ApiIntDoc {
   RecipientAddress: string;
   ContactRecipient: string;
   RecipientsPhone: string;
+  AdditionalInformation: string;
+  BackwardDeliveryData: [
+    {
+      PayerType: string;
+      CargoType: string;
+      RedeliveryString: string;
+    }
+  ]
 }

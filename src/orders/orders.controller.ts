@@ -1,9 +1,19 @@
-import { Controller, Get, Param, Post, Body, Req, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Body,
+  Req,
+  Put,
+  Delete,
+} from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { OrdersApiService } from './orders-api/orders-api.service';
 import { Public } from 'src/decorators/public.decorator';
 import { OrderDto } from './dto/order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { IntDocDto } from 'src/novaposhta/internet-document/dto/int-doc.dto';
 
 @Controller('order')
 export class OrdersController {
@@ -18,12 +28,35 @@ export class OrdersController {
   }
 
   @Get('crm')
-  async getAllFromCrm () { 
-   return await this.ordersApiservice.getAll();
+  async getAllFromCrm() {
+    return await this.ordersApiservice.getAll();
   }
   @Post()
   async createOrder(@Body() dto: Partial<OrderDto>, @Req() req) {
     return this.ordersService.createOrder(dto, req.user);
+  }
+
+  @Post(':id/internet-document')
+  async createIntDoc(@Param('id') id: number, @Body() dto: IntDocDto) {
+    return await this.ordersService.createIntDoc(id, dto);
+  }
+
+  @Delete(':id/internet-document')
+  async deletIntDoc(@Param('id') id: number) {
+    return await this.ordersService.removeIntDoc(id);
+  }
+
+  @Post(':id/internet-document/add')
+  async addIntDoc(
+    @Param('id') id: number,
+    @Body() IntDocNumber: { intDocNumber: string },
+  ) {
+    return await this.ordersService.addIntDoc(id, IntDocNumber.intDocNumber);
+  }
+
+  @Post(':id/internet-document/detach')
+  async detach(@Param('id') id: number) {
+    return await this.ordersService.detachIntDoc(id);
   }
 
   @Public()
@@ -33,7 +66,7 @@ export class OrdersController {
   }
 
   @Put(':id')
-  async update (@Param('id') id: number,@Body() dto: UpdateOrderDto) { 
+  async update(@Param('id') id: number, @Body() dto: UpdateOrderDto) {
     return await this.ordersService.updateOrder(id, dto);
   }
 

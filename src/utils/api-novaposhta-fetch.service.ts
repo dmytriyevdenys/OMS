@@ -26,7 +26,6 @@ export class ApiNovaposhtaFetchService {
         apiUrl,
         requestData,
       );    
-      console.log(response.data.errors);
           
       if (response.data.success) { 
         return response.data;

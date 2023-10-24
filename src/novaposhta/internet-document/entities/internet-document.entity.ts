@@ -1,4 +1,5 @@
 import { RecipientEntity } from "src/novaposhta/recipient/entities/recipient.entity";
+import { OrderEntity } from "src/orders/entities/order.entity";
 import { AbstractEntity } from "src/utils/abstract-entity";
 import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
 
@@ -6,20 +7,22 @@ import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
 @Entity()
 export class InternetDocumnetEntity extends AbstractEntity<InternetDocumnetEntity> {
 
-    @Column()
-    IntDocNumber: number;
+    @Column({nullable: true})
+    IntDocNumber: string;
 
-    @Column()
+    @Column({nullable: true})
     Ref: string;
 
-    @Column()
-    CostOnSite: number;
+    @Column({nullable: true})
+    CostOnSite: string;
 
-    @Column()
+    @Column({nullable: true})
     EstimatedDeliveryDate: string;
 
     @OneToOne(() => RecipientEntity, {cascade: true})
     @JoinColumn()
     recipient: RecipientEntity
 
+    @OneToOne(() => OrderEntity, order => order.shipping)
+    order: OrderEntity
 }

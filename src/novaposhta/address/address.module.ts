@@ -11,7 +11,7 @@ import { MatchService } from 'src/utils/match-model.service';
 import { NovaposhtaModule } from '../novaposhta.module';
 import { HttpModule } from '@nestjs/axios';
 import { SenderModule } from '../sender/sender.module';
-import { ApiKeyService } from '../novaposhta-apikey.service';
+import { ApiKeyService } from '../api-service/novaposhta-apikey.service';
 
 @Module({
   imports: [

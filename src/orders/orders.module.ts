@@ -17,6 +17,11 @@ import { InternetDocumentService } from 'src/novaposhta/internet-document/intern
 import { InternetDocumentModule } from 'src/novaposhta/internet-document/internet-document.module';
 import { SenderService } from 'src/novaposhta/sender/sender.service';
 import { SenderModule } from 'src/novaposhta/sender/sender.module';
+import { ApiIntDocService } from 'src/novaposhta/internet-document/api-service/api-int-doc.service';
+import { ApiNovaposhtaFetchService } from 'src/utils/api-novaposhta-fetch.service';
+import { RecipientApiService } from 'src/novaposhta/recipient/api-service/recipient-api.service';
+import { MatchService } from 'src/utils/match-model.service';
+import { ApiKeyService } from 'src/novaposhta/api-service/novaposhta-apikey.service';
 
 
 @Module({
@@ -39,7 +44,12 @@ UsersModule,
     UsersService,
     ResponseService,
     InternetDocumentService,
-    SenderService
+    SenderService,
+    ApiIntDocService,
+    ApiNovaposhtaFetchService,
+    RecipientApiService,
+    MatchService,
+    ApiKeyService
   ],
   exports: []
 })
