@@ -1,6 +1,6 @@
 
 export type ResponseData<T> = {
     success: boolean;
-    total: number;
+    status_code: number
     data: T;
   };

@@ -42,8 +42,8 @@ export class OrdersController {
   }
 
   @Delete(':id/internet-document')
-  async deletIntDoc(@Param('id') id: number) {
-    return await this.ordersService.removeIntDoc(id);
+  async deletIntDoc(@Param('id') orderId: number) {
+    return await this.ordersService.removeIntDoc(orderId);
   }
 
   @Post(':id/internet-document/add')

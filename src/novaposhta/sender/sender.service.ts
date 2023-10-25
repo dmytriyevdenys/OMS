@@ -63,7 +63,7 @@ export class SenderService {
     try {
       const sender = await this.senderRepository.findOneBy({ id });
       if (!sender)
-        throw new BadRequestException('Користувач з таким id не існує');
+        throw new BadRequestException('Відправник з таким id не існує');
       return sender;
     } catch (error) {
       throw new BadRequestException('Помилка', error.message);

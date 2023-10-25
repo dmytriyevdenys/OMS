@@ -39,7 +39,9 @@ export class OrdersApiService {
         full_name: dto.buyer.full_name,
         phone: dto.buyer.phones[0],
       },
-      shipping: {},
+      shipping: {
+
+      },
       products: dto.products || [],
       payments:
         dto?.payments?.length > 0

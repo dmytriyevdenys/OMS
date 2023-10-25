@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, HttpCode, HttpStatus } from '@nestjs/common';
 import { OrdersApiService } from './orders-api/orders-api.service';
 import { OrderDto } from './dto/order.dto';
 import { BuyerService } from 'src/buyer/buyer.service';
@@ -10,6 +10,11 @@ import { IntDocDto } from 'src/novaposhta/internet-document/dto/int-doc.dto';
 import { InternetDocumentService } from 'src/novaposhta/internet-document/internet-document.service';
 import { InternetDocumnetEntity } from 'src/novaposhta/internet-document/entities/internet-document.entity';
 import { ApiIntDocService } from 'src/novaposhta/internet-document/api-service/api-int-doc.service';
+import { STATUS_CODES } from 'http';
+import { UserEntity } from 'src/users/entities/user.entity';
+import { ResponseData } from 'src/interfaces/response-data.interface';
+import { ResponseService } from 'src/utils/response.service';
+import { errorMonitor } from 'events';
 
 @Injectable()
 export class OrdersService {
@@ -19,11 +24,12 @@ export class OrdersService {
     private readonly entityManager: EntityManager,
     private readonly intDocService: InternetDocumentService,
     private readonly apiIntDocService: ApiIntDocService,
+    private readonly responseService: ResponseService,
     @InjectRepository(OrderEntity)
     private readonly orderRepository: Repository<OrderEntity>,
   ) {}
 
-  async createOrder(dto: Partial<OrderDto>, user) {
+  async createOrder(dto: Partial<OrderDto>, user: UserEntity): Promise<ResponseData<OrderEntity>> {
     try {
       const order = new OrderEntity(dto);
       order.user = user;
@@ -37,12 +43,10 @@ export class OrdersService {
       if (!newOrder)
         throw new BadRequestException('Не вдалось створити замовлення');
       
-      return newOrder;
+      return await this.responseService.successResponse(newOrder);;
     } catch (error) {
-      throw new BadRequestException(
-        'помилка при створенні замовлення',
-        error.message,
-      );
+       this.responseService.errorResponse(error.message)
+      ;
     }
   }
 
@@ -58,12 +62,12 @@ export class OrdersService {
     }
   }
 
-  async getAllOrders() {
+  async getAllOrders(): Promise<ResponseData<OrderEntity[]>> {
     try {
       const orders = await this.orderRepository.find();
       if (!orders) throw new BadRequestException('Не інсує жодного замовлення');
 
-      return orders;
+      return  this.responseService.successResponse(orders);
     } catch (error) {
       throw error;
     }
@@ -120,6 +124,7 @@ export class OrdersService {
     try { 
       const order = await this.findOrderById(orderId);
       await this.entityManager.remove(order.shipping);
+      await this.entityManager.remove(order.sender)
       delete order.shipping
       return order;
     
@@ -132,12 +137,13 @@ export class OrdersService {
   async removeIntDoc (orderId: number) {
     try {
       const order = await this.findOrderById(orderId);
+      
       const refIntDoc = order.shipping.Ref ;
       
       const removedIntDoc = await this.apiIntDocService.deleteIntDoc(order, refIntDoc);
       if(removedIntDoc) { 
         const updatedOrder = await this.detachIntDoc(orderId);
-        return updatedOrder;
+      return updatedOrder;
       }
     }catch(error) {
       throw error;

@@ -27,7 +27,10 @@ export class AddressEntity extends AbstractEntity<AddressEntity> {
     @Column({nullable: true})
     Number: number;
 
-    @ManyToOne(() => SenderEntity)
+    @ManyToOne(() => SenderEntity, {
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
+    })
     sender: SenderEntity
 
     @ManyToOne(() => BuyerEntity)

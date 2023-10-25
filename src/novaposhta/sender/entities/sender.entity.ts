@@ -52,7 +52,7 @@ export class SenderEntity extends AbstractEntity<SenderEntity> {
   Contact: ContractPersonEntity;
 
   @OneToMany(() => AddressEntity, (address) => address.sender, {
-    cascade: true,
+    cascade: ['remove','update'],
     onUpdate: 'SET NULL',
     onDelete: 'SET NULL',
     eager: true

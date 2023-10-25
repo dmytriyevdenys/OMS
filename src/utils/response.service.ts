@@ -4,16 +4,16 @@ import { ResponseData } from 'src/interfaces/response-data.interface';
   
   @Injectable()
   export class ResponseService {
-    successResponse<T>(data: T): ResponseData<T> {
+    successResponse<T>(data: T, status_code: HttpStatus = HttpStatus.OK): ResponseData<T> {
       return {
         success: true,
-        total: Array.isArray(data) ? data.length : 1,
-        data: data,
+        status_code,
+        data
       };
     }
   
-    errorResponse(message: string, statusCode: HttpStatus) {
-      throw new HttpException({ message }, statusCode);
+    errorResponse(message: string) {
+      throw new HttpException({ message }, HttpStatus.BAD_REQUEST); 
     }
   
     notFoundResponse(message: string) {

@@ -49,7 +49,9 @@ UsersModule,
     ApiNovaposhtaFetchService,
     RecipientApiService,
     MatchService,
-    ApiKeyService
+    ApiKeyService,
+    SenderService
+
   ],
   exports: []
 })

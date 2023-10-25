@@ -1,4 +1,4 @@
-import { BadGatewayException, BadRequestException, Injectable } from '@nestjs/common';
+import {  BadRequestException, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { API_URL_NOVAPOSHTA } from 'src/consts/consts';
 
@@ -25,15 +25,15 @@ export class ApiNovaposhtaFetchService {
       const response = await this.httpService.axiosRef.post(
         apiUrl,
         requestData,
-      );    
-          
-      if (response.data.success) { 
-        return response.data;
+      );               
+      if (!response.data.success) {
+        const errorMessages = response.data.errors.join(', ');
+        throw new BadRequestException(`Помилка на пошті: ${errorMessages}`);
       }
-      
-      throw new BadGatewayException(response.data.error);
+        return response.data;
     } catch (error) {
-      throw new BadRequestException('Помилка на пошті', error.message)
+      
+      throw new BadRequestException(error.message)
     }
   }
 }

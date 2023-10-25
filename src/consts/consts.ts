@@ -22,5 +22,6 @@ export const CalledMethod = {
     save: 'save',
     delete: 'delete',
     update: 'update',
+    getDocumentPrice: 'getDocumentPrice'
 
 }

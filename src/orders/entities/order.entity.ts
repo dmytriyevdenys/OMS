@@ -37,7 +37,7 @@ export class OrderEntity extends AbstractEntity<OrderEntity> {
     @JoinTable()
     products: ProductEntity[]
 
-    @ManyToOne(() => SenderEntity, sender => sender.orders, {onDelete: 'SET NULL', onUpdate: 'SET NULL'})
+    @ManyToOne(() => SenderEntity, sender => sender.orders, {cascade: true, onDelete: 'SET NULL', onUpdate: 'SET NULL'})
     @JoinColumn({name: 'sender_id'})
     sender: SenderEntity
 
