@@ -28,4 +28,9 @@ export class InternetDocumentController {
   async getPrice(@Body() dto: IntDocDto) {
     return await this.apiService.getDeliveryPrice(dto);
   }
+  
+  @Get('tracking/:number')
+  async getTrackingDocument (@Param('number') intDocNumber: string) { 
+    return await this.apiService.getStatusDocument(intDocNumber);
+  }
 }

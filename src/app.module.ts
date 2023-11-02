@@ -18,6 +18,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { SenderModule } from './novaposhta/sender/sender.module';
 import { AddressModule } from './novaposhta/address/address.module';
 import { InternetDocumentModule } from './novaposhta/internet-document/internet-document.module';
+import { PackerModule } from './packer/packer.module';
 @Module({
   imports: [ConfigModule.forRoot({
 
@@ -52,14 +53,15 @@ import { InternetDocumentModule } from './novaposhta/internet-document/internet-
     BuyerModule,
     SenderModule,
     AddressModule,
-    InternetDocumentModule
+    InternetDocumentModule,
+    PackerModule
     ],
-  controllers: [AppController],
+  controllers: [AppController, ],
   providers: [AppService, 
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
-    }
+    }, 
   ],
   exports:[]
 })

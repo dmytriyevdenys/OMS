@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, HttpCode, HttpStatus } from '@nestjs/common';
+import { Injectable, BadRequestException,  } from '@nestjs/common';
 import { OrdersApiService } from './orders-api/orders-api.service';
 import { OrderDto } from './dto/order.dto';
 import { BuyerService } from 'src/buyer/buyer.service';
@@ -10,11 +10,9 @@ import { IntDocDto } from 'src/novaposhta/internet-document/dto/int-doc.dto';
 import { InternetDocumentService } from 'src/novaposhta/internet-document/internet-document.service';
 import { InternetDocumnetEntity } from 'src/novaposhta/internet-document/entities/internet-document.entity';
 import { ApiIntDocService } from 'src/novaposhta/internet-document/api-service/api-int-doc.service';
-import { STATUS_CODES } from 'http';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { ResponseData } from 'src/interfaces/response-data.interface';
 import { ResponseService } from 'src/utils/response.service';
-import { errorMonitor } from 'events';
 
 @Injectable()
 export class OrdersService {

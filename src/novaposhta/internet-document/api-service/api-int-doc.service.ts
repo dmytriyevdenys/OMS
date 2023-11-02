@@ -69,7 +69,7 @@ export class ApiIntDocService {
     const requestDto = await this.mapDtoToRequest(dto)
     const methodProperties = {
       ...requestDto,
-      Ref: ref
+      Ref: ref 
     }
 
     const response = await this.apiService.sendPostRequest(
@@ -113,6 +113,26 @@ export class ApiIntDocService {
     }
   }
 
+  async getStatusDocument(intDocNumber: string) {
+    const apiKey = await this.apiKeyService.getApiKey();
+    const modelName = ModelName.TrackingDocument;
+    const calledMethod = CalledMethod.getStatusDocuments
+    const methodProperties= { 
+      Documents : [
+        {
+          DocumentNumber: intDocNumber
+        }
+      ]
+    }
+    const response = await this.apiService.sendPostRequest(
+      apiKey,
+      modelName,
+      calledMethod,
+      methodProperties
+    )
+    return response.data
+
+  }
 
 
   private async mapDtoToRequest(dto: IntDocDto) {
