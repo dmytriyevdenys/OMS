@@ -10,7 +10,9 @@ import { ResponseService } from 'src/utils/response.service';
 import { CreatePackerDto } from './dto/create-packer.dto';
 import { ResponseData } from 'src/interfaces/response-data.interface';
 import { InternetDocumnetEntity } from 'src/novaposhta/internet-document/entities/internet-document.entity';
-import { log } from 'console';
+import { ApiIntDocService } from 'src/novaposhta/internet-document/api-service/api-int-doc.service';
+import { OrdersApiService } from 'src/orders/orders-api/orders-api.service';
+import { ApiCrmFetchService } from 'src/utils/api-crm-fetch.service';
 
 @Injectable()
 export class PackerService {
@@ -19,6 +21,8 @@ export class PackerService {
     private readonly packerRepository: Repository<PackerEntity>,
     private readonly entityManager: EntityManager,
     private readonly responseSerivice: ResponseService,
+    private readonly apiIntDocServie: ApiIntDocService,
+    private readonly apiCrmFethService: ApiCrmFetchService
   ) {}
 
   async getAllPacker(): Promise<ResponseData<PackerEntity[]>> {
@@ -103,6 +107,16 @@ export class PackerService {
       });
       packer.internet_document.push(intDoc);
       await this.entityManager.save(packer);
+
+      const trackIntDoc = await this.apiIntDocServie.getStatusDocument(intDocNumber);
+      
+      await this.apiCrmFethService.put(`order/${trackIntDoc[0].ClientBarcode}`, {
+        status_id: 20,
+        custom_fields: [{
+          uuid: 'OR_1003',
+          value: `Запакував : ${packer.name} у: число - ${packer.createdAt.toLocaleDateString()} час - ${packer.createdAt.toLocaleTimeString()}`
+        }]
+      })
       return this.responseSerivice.successResponse(intDoc.IntDocNumber);
     } catch (error) {
       throw this.responseSerivice.errorResponse(error.message);

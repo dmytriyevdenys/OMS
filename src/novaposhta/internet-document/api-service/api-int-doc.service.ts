@@ -10,6 +10,7 @@ import { InternetDocumnetEntity } from '../entities/internet-document.entity';
 import { OrderEntity } from 'src/orders/entities/order.entity';
 import { ApiKeyService } from 'src/novaposhta/api-service/novaposhta-apikey.service';
 import { DocumentPrice } from '../interfaces/document-price.interface';
+import { StatusDocument } from '../interfaces/statusDocument.interface';
 
 @Injectable()
 export class ApiIntDocService {
@@ -113,7 +114,7 @@ export class ApiIntDocService {
     }
   }
 
-  async getStatusDocument(intDocNumber: string) {
+  async getStatusDocument(intDocNumber: string): Promise<StatusDocument> {
     const apiKey = await this.apiKeyService.getApiKey();
     const modelName = ModelName.TrackingDocument;
     const calledMethod = CalledMethod.getStatusDocuments

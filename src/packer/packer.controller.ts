@@ -28,8 +28,8 @@ export class PackerController {
     return await this.packerService.createPacker(dto);
    }
 
-   @Post(':id/scan')
-   async addIntDoc(@Param('id') id: number, @Body() intDoc: {intDocNumber: string}) { 
-    return await this.packerService.addIntDocToPacker(id, intDoc.intDocNumber)
+   @Post(':id/scan/:number')
+   async addIntDoc(@Param('id') id: number,@Param('number') number: string) { 
+    return await this.packerService.addIntDocToPacker(id, number)
    }
 }
