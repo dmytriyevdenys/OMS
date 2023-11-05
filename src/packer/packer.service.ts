@@ -22,7 +22,7 @@ export class PackerService {
     private readonly entityManager: EntityManager,
     private readonly responseSerivice: ResponseService,
     private readonly apiIntDocServie: ApiIntDocService,
-    private readonly apiCrmFethService: ApiCrmFetchService
+    private readonly apiCrmFethService: ApiCrmFetchService,
   ) {}
 
   async getAllPacker(): Promise<ResponseData<PackerEntity[]>> {
@@ -97,7 +97,6 @@ export class PackerService {
 
   async addIntDocToPacker(id: number, intDocNumber: string) {
     try {
-        
       const packer = await this.packerRepository.findOne({
         where: { id },
         relations: { internet_document: true },
@@ -108,15 +107,23 @@ export class PackerService {
       packer.internet_document.push(intDoc);
       await this.entityManager.save(packer);
 
-      const trackIntDoc = await this.apiIntDocServie.getStatusDocument(intDocNumber);
-      
-      await this.apiCrmFethService.put(`order/${trackIntDoc[0].ClientBarcode}`, {
-        status_id: 20,
-        custom_fields: [{
-          uuid: 'OR_1003',
-          value: `Запакував : ${packer.name} у: число - ${packer.createdAt.toLocaleDateString()} час - ${packer.createdAt.toLocaleTimeString()}`
-        }]
-      })
+      const trackIntDoc =
+        await this.apiIntDocServie.getStatusDocument(intDocNumber);
+
+      await this.apiCrmFethService.put(
+        `order/${trackIntDoc[0].ClientBarcode}`,
+        {
+          status_id: 20,
+          custom_fields: [
+            {
+              uuid: 'OR_1003',
+              value: `Запакував : ${ 
+                packer.name
+              } у: число - ${intDoc.createdAt.toLocaleDateString()} час - ${intDoc.createdAt.toLocaleTimeString()}`,
+            },
+          ],
+        },
+      );
       return this.responseSerivice.successResponse(intDoc.IntDocNumber);
     } catch (error) {
       throw this.responseSerivice.errorResponse(error.message);

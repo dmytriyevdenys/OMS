@@ -14,7 +14,7 @@ import { NovaposhtaModule } from './novaposhta/novaposhta.module';
 import { RecipientModule } from './novaposhta/recipient/recipient.module';
 import { HttpModule } from '@nestjs/axios';
 import { BuyerModule } from './buyer/buyer.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule } from '@nestjs/typeorm'; 
 import { SenderModule } from './novaposhta/sender/sender.module';
 import { AddressModule } from './novaposhta/address/address.module';
 import { InternetDocumentModule } from './novaposhta/internet-document/internet-document.module';
