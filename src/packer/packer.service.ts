@@ -11,7 +11,6 @@ import { CreatePackerDto } from './dto/create-packer.dto';
 import { ResponseData } from 'src/interfaces/response-data.interface';
 import { InternetDocumnetEntity } from 'src/novaposhta/internet-document/entities/internet-document.entity';
 import { ApiIntDocService } from 'src/novaposhta/internet-document/api-service/api-int-doc.service';
-import { OrdersApiService } from 'src/orders/orders-api/orders-api.service';
 import { ApiCrmFetchService } from 'src/utils/api-crm-fetch.service';
 
 @Injectable()
@@ -78,6 +77,21 @@ export class PackerService {
     }
   }
 
+  async checkPacker (id: number, password: string) {
+    try {const packer = await this.packerRepository.findOne({
+      where: {id},
+      relations: {internet_document: true}
+    })
+
+    if (packer.password === password) { 
+      return packer;
+    }
+      throw new BadRequestException ('Пароль не вірний') }
+      catch (error) { 
+        throw error
+      }
+  }
+
   async getPackerById(id: number, query?: string) {
     try {
       if (query) {
@@ -101,30 +115,31 @@ export class PackerService {
         where: { id },
         relations: { internet_document: true },
       });
-      const intDoc = new InternetDocumnetEntity({
-        IntDocNumber: intDocNumber,
-      });
-      packer.internet_document.push(intDoc);
-      await this.entityManager.save(packer);
-
       const trackIntDoc =
         await this.apiIntDocServie.getStatusDocument(intDocNumber);
-
-      await this.apiCrmFethService.put(
-        `order/${trackIntDoc[0].ClientBarcode}`,
-        {
-          status_id: 20,
-          custom_fields: [
+        if (trackIntDoc) {
+          const intDoc = new InternetDocumnetEntity({
+            IntDocNumber: intDocNumber,
+          });
+          packer.internet_document.push(intDoc);
+          await this.entityManager.save(packer);
+          await this.apiCrmFethService.put(
+            `order/${trackIntDoc[0].ClientBarcode}`,
             {
-              uuid: 'OR_1003',
-              value: `Запакував : ${ 
-                packer.name
-              } у: число - ${intDoc.createdAt.toLocaleDateString()} час - ${intDoc.createdAt.toLocaleTimeString()}`,
+              status_id: 20,
+              custom_fields: [
+                {
+                  uuid: 'OR_1003',
+                  value: `Запакував : ${ 
+                    packer.name
+                  } ${intDoc.createdAt.toLocaleDateString()}, ${intDoc.createdAt.toLocaleTimeString()}`,
+                },
+              ],
             },
-          ],
-        },
-      );
-      return this.responseSerivice.successResponse(intDoc.IntDocNumber);
+          );
+          return this.responseSerivice.successResponse(intDoc);
+        }
+        
     } catch (error) {
       throw this.responseSerivice.errorResponse(error.message);
     }

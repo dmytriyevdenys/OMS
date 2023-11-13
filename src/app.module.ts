@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -25,7 +24,6 @@ import { PackerModule } from './packer/packer.module';
   envFilePath: 'development.env', 
     isGlobal: true
   }),
-    MongooseModule.forRoot(process.env.DB_URI),
     ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({ 
       imports: [ConfigModule],
