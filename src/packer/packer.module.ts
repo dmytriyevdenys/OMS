@@ -17,6 +17,7 @@ import { SenderService } from 'src/novaposhta/sender/sender.service';
 import { MatchService } from 'src/utils/match-model.service';
 import { SenderModule } from 'src/novaposhta/sender/sender.module';
 import { RecipientModule } from 'src/novaposhta/recipient/recipient.module';
+import { InternetDocumentService } from 'src/novaposhta/internet-document/internet-document.service';
 
 @Module({
   imports: [
@@ -37,7 +38,8 @@ import { RecipientModule } from 'src/novaposhta/recipient/recipient.module';
     RecipientApiService,
     ApiCrmFetchService,
     SenderService,
-    MatchService
+    MatchService,
+    InternetDocumentService
   ],
   controllers: [PackerController],
   exports: [TypeOrmModule],

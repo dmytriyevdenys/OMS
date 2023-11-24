@@ -12,6 +12,12 @@ export class InternetDocumnetEntity extends AbstractEntity<InternetDocumnetEntit
     IntDocNumber: string;
 
     @Column({nullable: true})
+    order_id: string;
+
+    @Column({nullable: true})
+    status: string
+
+    @Column({nullable: true})
     Ref: string;
 
     @Column({nullable: true})

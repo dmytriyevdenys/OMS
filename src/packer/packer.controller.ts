@@ -11,6 +11,7 @@ import { PackerService } from './packer.service';
 import { CreatePackerDto } from './dto/create-packer.dto';
 import { Public } from 'src/decorators/public.decorator';
 import { PackerEntity } from './entities/packer.entity';
+import { ScanIntDocDto } from 'src/packer/dto/scan-int-doc.dto';
 
 @Controller('packer')
 export class PackerController {
@@ -19,7 +20,7 @@ export class PackerController {
   @Public()
   @Get()
   async getAll() {
-    return await this.packerService.getAllPacker();
+    return await this.packerService.getAllPacker(); 
   }
 
   @Public()
@@ -50,8 +51,8 @@ export class PackerController {
   }
 
   @Public()
-  @Post(':id/scan/:number')
-  async addIntDoc(@Param('id') id: number, @Param('number') number: string) {
-    return await this.packerService.addIntDocToPacker(id, number);
+  @Post(':id/scan')
+  async scanIntoc(@Param('id') id: number, @Body() dto: ScanIntDocDto) {
+    return await this.packerService.scanIntDoc(id, dto);
   }
 }

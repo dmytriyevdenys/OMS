@@ -20,8 +20,8 @@ export class ApiNovaposhtaFetchService {
       calledMethod: calledMethod,
       methodProperties: methodProperties,
     };
-
-    try {
+    
+    try {      
       const response = await this.httpService.axiosRef.post(
         apiUrl,
         requestData,

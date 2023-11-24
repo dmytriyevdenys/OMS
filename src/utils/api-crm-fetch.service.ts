@@ -42,17 +42,21 @@ export class ApiCrmFetchService {
   }
 
   async put(endpoint: string, data: any) {
+    
     const apiUrl = `${apiUrlCrm}${endpoint}`;
     const headers = {
       'Content-Type': 'application/json',
       Authorization: process.env.API_KEY_CRM,
     };
+    
     try {
       const response = await this.httpService.axiosRef.put(apiUrl, data, {
         headers,
-      });
+      });   
+               
       return response.data;
-    } catch (error) {
+    } catch (error) {     
+       
       throw error;
     }
   }

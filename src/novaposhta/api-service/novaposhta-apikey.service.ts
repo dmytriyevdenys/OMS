@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { SenderService } from '../sender/sender.service';
-import { OrderEntity } from 'src/orders/entities/order.entity';
 import { SenderEntity } from '../sender/entities/sender.entity';
 
 @Injectable()

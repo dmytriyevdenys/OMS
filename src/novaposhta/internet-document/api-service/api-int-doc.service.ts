@@ -131,7 +131,7 @@ export class ApiIntDocService {
       calledMethod,
       methodProperties
     )
-    return response.data
+    return response.data[0]
 
   }
 

@@ -8,10 +8,16 @@ import { PackerEntity } from './entities/packer.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { ResponseService } from 'src/utils/response.service';
 import { CreatePackerDto } from './dto/create-packer.dto';
-import { ResponseData } from 'src/interfaces/response-data.interface';
+import {
+  ResponseData,
+} from 'src/interfaces/response-data.interface';
 import { InternetDocumnetEntity } from 'src/novaposhta/internet-document/entities/internet-document.entity';
 import { ApiIntDocService } from 'src/novaposhta/internet-document/api-service/api-int-doc.service';
 import { ApiCrmFetchService } from 'src/utils/api-crm-fetch.service';
+import { ScanIntDocDto } from 'src/packer/dto/scan-int-doc.dto';
+import { IntDocStatus } from 'src/consts/int-doc-status.enum';
+import { HttpService } from '@nestjs/axios';
+import { InternetDocumentService } from 'src/novaposhta/internet-document/internet-document.service';
 
 @Injectable()
 export class PackerService {
@@ -22,6 +28,8 @@ export class PackerService {
     private readonly responseSerivice: ResponseService,
     private readonly apiIntDocServie: ApiIntDocService,
     private readonly apiCrmFethService: ApiCrmFetchService,
+    private readonly responseService: ResponseService,
+    private readonly intDocService: InternetDocumentService
   ) {}
 
   async getAllPacker(): Promise<ResponseData<PackerEntity[]>> {
@@ -65,7 +73,7 @@ export class PackerService {
     }
   }
 
-  private async findById(id: number): Promise<PackerEntity> {
+  async findById(id: number): Promise<PackerEntity> {
     try {
       const packer = await this.packerRepository.findOneBy({ id });
       if (!packer)
@@ -77,19 +85,20 @@ export class PackerService {
     }
   }
 
-  async checkPacker (id: number, password: string) {
-    try {const packer = await this.packerRepository.findOne({
-      where: {id},
-      relations: {internet_document: true}
-    })
+  async checkPacker(id: number, password: string) {
+    try {
+      const packer = await this.packerRepository.findOne({
+        where: { id },
+        relations: { internet_document: true },
+      });
 
-    if (packer.password === password) { 
-      return packer;
-    }
-      throw new BadRequestException ('Пароль не вірний') }
-      catch (error) { 
-        throw error
+      if (packer.password === password) {
+        return packer;
       }
+      throw new BadRequestException('Пароль не вірний');
+    } catch (error) {
+      throw error;
+    }
   }
 
   async getPackerById(id: number, query?: string) {
@@ -108,40 +117,59 @@ export class PackerService {
       throw this.responseSerivice.errorResponse(error);
     }
   }
-
-  async addIntDocToPacker(id: number, intDocNumber: string) {
+  async scanIntDoc(
+    packerId: number,
+    dto: ScanIntDocDto,
+  ): Promise<ResponseData<Partial<InternetDocumnetEntity>>> {
     try {
       const packer = await this.packerRepository.findOne({
-        where: { id },
+        where: { id: packerId },
         relations: { internet_document: true },
       });
-      const trackIntDoc =
-        await this.apiIntDocServie.getStatusDocument(intDocNumber);
-        if (trackIntDoc) {
-          const intDoc = new InternetDocumnetEntity({
-            IntDocNumber: intDocNumber,
-          });
-          packer.internet_document.push(intDoc);
-          await this.entityManager.save(packer);
-          await this.apiCrmFethService.put(
-            `order/${trackIntDoc[0].ClientBarcode}`,
-            {
+  
+      const existingIntDoc = await this.intDocService.findByIntDocNumber(dto.IntDocNumber);
+  
+      const intDoc = new InternetDocumnetEntity(dto);
+      existingIntDoc ? (intDoc.status = IntDocStatus.Double) : null;
+      packer ? (intDoc.packer = packer) : null;
+  
+      if (dto.IntDocNumber.length >= 14) {
+        const trackIntDoc = await this.apiIntDocServie.getStatusDocument(dto.IntDocNumber);
+  
+        if (trackIntDoc.ClientBarcode) {
+          const orderId = trackIntDoc.ClientBarcode;
+          intDoc.order_id = orderId;
+  
+          if (intDoc.status !== IntDocStatus.Double) {
+            const changedOrder = await this.apiCrmFethService.put(`order/${orderId}`, {
               status_id: 20,
               custom_fields: [
                 {
                   uuid: 'OR_1003',
-                  value: `Запакував : ${ 
-                    packer.name
-                  } ${intDoc.createdAt.toLocaleDateString()}, ${intDoc.createdAt.toLocaleTimeString()}`,
+                  value: `Запакував : ${packer.name}${new Date().toLocaleString()}, ${new Date().toLocaleTimeString()}`,
                 },
               ],
-            },
-          );
-          return this.responseSerivice.successResponse(intDoc);
+            });
+  
+            changedOrder
+              ? (intDoc.status = IntDocStatus.Changed)
+              : (intDoc.status = IntDocStatus.NotChanged);
+          }
         }
-        
+      }
+  
+      await this.entityManager.save(intDoc);
+  
+      return this.responseService.successResponse({
+        id: intDoc.id,
+        IntDocNumber: intDoc.IntDocNumber,
+        createdAt: intDoc.createdAt,
+        order_id: intDoc.order_id,
+        status: intDoc.status,
+      });
     } catch (error) {
-      throw this.responseSerivice.errorResponse(error.message);
+      throw this.responseService.errorResponse(error.message);
     }
   }
+  
 }

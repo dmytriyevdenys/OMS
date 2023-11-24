@@ -8,9 +8,7 @@ import { SenderDto } from './dto/sender.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SenderEntity } from './entities/sender.entity';
 import { EntityManager, Repository } from 'typeorm';
-import { WareHouseDto } from '../address/dto/warehouse.dto';
 import { AddressEntity } from '../address/entities/address.entity';
-import { error } from 'console';
 import { AddressDto } from '../address/dto/address.dto';
 import { UpdateAddressDto } from '../address/dto/update-address.dto';
 

@@ -5,7 +5,6 @@ import { WareHouseDto } from '../dto/warehouse.dto';
 import { MatchService } from 'src/utils/match-model.service';
 import { AddressEntity } from '../entities/address.entity';
 import { ApiKeyService } from '../../api-service/novaposhta-apikey.service';
-import { SenderService } from '../../sender/sender.service';
 
 @Injectable()
 export class ApiAddressService {
@@ -13,7 +12,6 @@ export class ApiAddressService {
     private apiService: ApiNovaposhtaFetchService,
     private matchService: MatchService,
     private readonly apiKeyService: ApiKeyService,
-    private readonly senderService: SenderService
   ) {}
 
   async getCities(city: string): Promise<WareHouseDto> {

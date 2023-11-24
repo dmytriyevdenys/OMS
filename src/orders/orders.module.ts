@@ -50,8 +50,8 @@ UsersModule,
     RecipientApiService,
     MatchService,
     ApiKeyService,
-    SenderService
-
+    SenderService,
+    
   ],
   exports: []
 })
