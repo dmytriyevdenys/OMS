@@ -8,18 +8,25 @@ import {
   Query,
   DefaultValuePipe,
   ParseIntPipe,
+  Sse,
+  Res,
 } from '@nestjs/common';
 import { InternetDocumentService } from './internet-document.service';
 import { IntDocDto } from './dto/int-doc.dto';
 import { ApiIntDocService } from './api-service/api-int-doc.service';
 import { Public } from 'src/decorators/public.decorator';
 import { DEV_ROUTE } from 'src/consts/routes';
+import { Observable, interval, map, pipe } from 'rxjs';
+import { InternetDocumentSubscriber } from './internet-document.subscriber';
+import internal from 'stream';
+import { MessageEvent } from './interfaces/message-event.interface';
 
 @Controller('internet-document')
 export class InternetDocumentController {
   constructor(
     private intDocService: InternetDocumentService,
     private apiService: ApiIntDocService,
+    private intDocSubscriber: InternetDocumentSubscriber
   ) {}
 
   @Public()
@@ -62,4 +69,22 @@ export class InternetDocumentController {
   async getTrackingDocument(@Param('number') intDocNumber: string) {
     return await this.apiService.getStatusDocument(intDocNumber);
   }
+
+  @Public()
+  @Sse('sse')
+  sse(@Res() res): Observable<MessageEvent> {
+    return new Observable(() => {
+      const dataSubscription = this.intDocSubscriber.get().subscribe((data) => {
+        if (data !== null) {
+          const eventData = `data: ${JSON.stringify(data)}\n\n`;
+          res.write(eventData);
+        }
+      });
+
+      return () => {
+        dataSubscription.unsubscribe();
+      };
+    });
+  }
+
 }

@@ -14,6 +14,7 @@ import { ApiKeyService } from '../api-service/novaposhta-apikey.service';
 import { RecipientApiService } from '../recipient/api-service/recipient-api.service';
 import { ResponseService } from 'src/utils/response.service';
 import { ApiCrmFetchService } from 'src/utils/api-crm-fetch.service';
+import { InternetDocumentSubscriber } from './internet-document.subscriber';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ApiCrmFetchService } from 'src/utils/api-crm-fetch.service';
     RecipientApiService,
     ResponseService,
     ApiCrmFetchService,
+    InternetDocumentSubscriber 
   ],
   exports: [TypeOrmModule, InternetDocumentModule],
 })

@@ -16,7 +16,6 @@ import { ApiIntDocService } from 'src/novaposhta/internet-document/api-service/a
 import { ApiCrmFetchService } from 'src/utils/api-crm-fetch.service';
 import { ScanIntDocDto } from 'src/packer/dto/scan-int-doc.dto';
 import { IntDocStatus } from 'src/consts/int-doc-status.enum';
-import { HttpService } from '@nestjs/axios';
 import { InternetDocumentService } from 'src/novaposhta/internet-document/internet-document.service';
 
 @Injectable()
@@ -146,18 +145,16 @@ export class PackerService {
               custom_fields: [
                 {
                   uuid: 'OR_1003',
-                  value: `Запакував : ${packer.name}${new Date().toLocaleString()}, ${new Date().toLocaleTimeString()}`,
+                  value: `Запакував : ${packer.name} ${new Date().toLocaleString()}`,
                 },
               ],
             });
-  
-            changedOrder
-              ? (intDoc.status = IntDocStatus.Changed)
-              : (intDoc.status = IntDocStatus.NotChanged);
+              if (changedOrder) intDoc.status = IntDocStatus.Changed;
+              if (!trackIntDoc.ClientBarcode) intDoc.status = IntDocStatus.NotChanged;
           }
         }
       }
-  
+        if(!intDoc.status) intDoc.status = IntDocStatus.NotChanged;
       await this.entityManager.save(intDoc);
   
       return this.responseService.successResponse({

@@ -2,7 +2,7 @@ import { RecipientEntity } from "src/novaposhta/recipient/entities/recipient.ent
 import { OrderEntity } from "src/orders/entities/order.entity";
 import { PackerEntity } from "src/packer/entities/packer.entity";
 import { AbstractEntity } from "src/utils/abstract-entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from "typeorm";
+import { AfterInsert, Column, Entity, InsertEvent, JoinColumn, ManyToOne, OneToOne, getRepository } from "typeorm";
 
 
 @Entity()
@@ -35,4 +35,7 @@ export class InternetDocumnetEntity extends AbstractEntity<InternetDocumnetEntit
 
     @ManyToOne(() => PackerEntity, packer => packer.internet_document)
     packer: PackerEntity ;
+    
 }
+
+
