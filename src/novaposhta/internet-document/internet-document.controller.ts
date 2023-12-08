@@ -20,6 +20,8 @@ import { Observable, interval, map, pipe } from 'rxjs';
 import { InternetDocumentSubscriber } from './internet-document.subscriber';
 import internal from 'stream';
 import { MessageEvent } from './interfaces/message-event.interface';
+import { query } from 'express';
+import { FindIntDocDto } from './dto/find-int-doc.dto';
 
 @Controller('internet-document')
 export class InternetDocumentController {
@@ -35,6 +37,7 @@ export class InternetDocumentController {
     @Query('packerId') packerId: number,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
+    @Query() query: FindIntDocDto
   ) {
     limit = limit > 100 ? 100 : limit;
     
@@ -48,7 +51,7 @@ export class InternetDocumentController {
       page,
       limit,
       route: `${DEV_ROUTE}internet-document`,
-    });
+    }, query);
   }
 
   @Post()

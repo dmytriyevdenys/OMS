@@ -86,15 +86,12 @@ export class PackerService {
 
   async checkPacker(id: number, password: string) {
     try {
-      const packer = await this.packerRepository.findOne({
-        where: { id },
-        relations: { internet_document: true },
-      });
+     const packer = await this.findById(id);
 
       if (packer.password === password) {
-        return packer;
+        return this.responseSerivice.successResponse(packer);
       }
-      throw new BadRequestException('Пароль не вірний');
+      throw this.responseSerivice.errorResponse('Пароль не вірний');
     } catch (error) {
       throw error;
     }

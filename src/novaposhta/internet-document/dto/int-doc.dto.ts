@@ -1,5 +1,4 @@
-import { Optional } from '@nestjs/common';
-import { IsIn, IsOptional, IsString } from 'class-validator';
+import { IsIn, IsString } from 'class-validator';
 import { BuyerEntity } from 'src/buyer/entities/buyer.entity';
 import { SenderEntity } from 'src/novaposhta/sender/entities/sender.entity';
 

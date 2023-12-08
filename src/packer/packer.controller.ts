@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Query,
 } from '@nestjs/common';
@@ -32,9 +33,9 @@ export class PackerController {
   @Public()
   @Post(':id')
   async checkPacker(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() password: { password: string },
-  ): Promise<PackerEntity> {
+  ) {
     return this.packerService.checkPacker(id, password.password);
   }
 

@@ -10,6 +10,6 @@ export class PackerEntity extends AbstractEntity<PackerEntity> {
     @Column()
     password: string
 
-    @OneToMany(() => InternetDocumnetEntity, (intDoc) => intDoc.packer, {cascade: true, nullable: true})
+    @OneToMany(() => InternetDocumnetEntity, (intDoc) => intDoc.packer, {cascade: true, nullable: true,})
     internet_document: InternetDocumnetEntity[];
 }

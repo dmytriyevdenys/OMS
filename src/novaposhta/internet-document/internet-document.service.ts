@@ -4,7 +4,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InternetDocumnetEntity } from './entities/internet-document.entity';
-import { EntityManager, Repository } from 'typeorm';
+import { Brackets, EntityManager, Repository } from 'typeorm';
 import { IntDocDto } from './dto/int-doc.dto';
 import { ApiIntDocService } from './api-service/api-int-doc.service';
 import { IPaginationOptions, paginate } from 'nestjs-typeorm-paginate';
@@ -13,6 +13,7 @@ import { ScanIntDocDto } from '../../packer/dto/scan-int-doc.dto';
 import {
   ResponseDataPagination,
 } from 'src/interfaces/response-data.interface';
+import { FindIntDocDto } from './dto/find-int-doc.dto';
 
 @Injectable()
 export class InternetDocumentService {
@@ -57,8 +58,6 @@ export class InternetDocumentService {
         queryBuilder,
         options,
       );
-      if (paginateData.items.length === 0)
-        throw this.responseService.errorResponse('Нічого не знайдено');
       
       return this.responseService.successResponsePaginate(paginateData);
     } catch (error) {
@@ -68,14 +67,25 @@ export class InternetDocumentService {
 
   async getAll(
     options: IPaginationOptions,
+    query?: FindIntDocDto
   ): Promise<ResponseDataPagination<InternetDocumnetEntity[]>> {
     try {
+
+     const {filter, search} = query || {} ;
+     
       const queryBulder =  this.intDocRepository
       .createQueryBuilder('internet_document')
-      .leftJoinAndSelect('internet_document.packer', 'packer')
-      
-      .orderBy('internet_document.createdAt', 'DESC')
-    
+    //  IntDocNumber && queryBulder.andWhere('internet_document.IntDocNumber = :IntDocNumber', { IntDocNumber })
+      if (search) queryBulder.andWhere(new Brackets(qb => {
+        filter === 'IntDocNumber' &&
+        qb.where('internet_document.IntDocNumber LIKE :search', { search: `%${search}%` })
+        filter === 'order_id' &&
+        qb.where('internet_document.order_id LIKE (:search)', { search: `%${search}%`})
+     }));
+
+     queryBulder
+     .leftJoinAndSelect('internet_document.packer', 'packer')
+     .orderBy('internet_document.createdAt', 'DESC')
       const paginateData = await paginate<InternetDocumnetEntity>(
         queryBulder,
         options,
