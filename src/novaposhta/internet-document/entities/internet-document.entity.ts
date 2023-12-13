@@ -33,7 +33,7 @@ export class InternetDocumnetEntity extends AbstractEntity<InternetDocumnetEntit
     @OneToOne(() => OrderEntity, order => order.shipping)
     order: OrderEntity
 
-    @ManyToOne(() => PackerEntity, packer => packer.internet_document,) 
+    @ManyToOne(() => PackerEntity, packer => packer.internet_document,{onDelete: 'SET NULL'}) 
     packer: PackerEntity ;
     
 }

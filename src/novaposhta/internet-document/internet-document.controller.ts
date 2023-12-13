@@ -41,7 +41,7 @@ export class InternetDocumentController {
   ) {
     limit = limit > 100 ? 100 : limit;
     
-    if (packerId)
+    if (packerId && !query.search.length)
       return this.intDocService.paginateByPackerId(packerId, {
         page,
         limit,

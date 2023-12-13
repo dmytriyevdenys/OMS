@@ -9,7 +9,6 @@ import { IntDocDto } from './dto/int-doc.dto';
 import { ApiIntDocService } from './api-service/api-int-doc.service';
 import { IPaginationOptions, paginate } from 'nestjs-typeorm-paginate';
 import { ResponseService } from 'src/utils/response.service';
-import { ScanIntDocDto } from '../../packer/dto/scan-int-doc.dto';
 import {
   ResponseDataPagination,
 } from 'src/interfaces/response-data.interface';
@@ -75,7 +74,6 @@ export class InternetDocumentService {
      
       const queryBulder =  this.intDocRepository
       .createQueryBuilder('internet_document')
-    //  IntDocNumber && queryBulder.andWhere('internet_document.IntDocNumber = :IntDocNumber', { IntDocNumber })
       if (search) queryBulder.andWhere(new Brackets(qb => {
         filter === 'IntDocNumber' &&
         qb.where('internet_document.IntDocNumber LIKE :search', { search: `%${search}%` })
