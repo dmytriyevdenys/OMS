@@ -1,17 +1,15 @@
-import { Controller, Get, Post, Body, Request } from '@nestjs/common';
-import { ApiSenderService } from './novaposhta-api/novaposhta-api-sender.service';
-import { Public } from 'src/decorators/public.decorator';
+import { Controller, Get, Post, Body, Delete, Query, Put } from '@nestjs/common';
+import { ApiSenderService } from './sender/api-service/novaposhta-api-sender.service';
+import { SenderDto } from './sender/dto/sender.dto';
+import { SenderService } from './sender/sender.service';
+import { ApiAddressService } from './address/api-service/novaposhta-api-address.service';
+import { WareHouseDto } from './address/dto/warehouse.dto';
 
 
 @Controller('novaposhta')
 export class NovaposhtaController {
-    constructor(
-        private apiSenderService: ApiSenderService
-    ){}
-   
-    @Post('sender')
-    async getCounterparties(@Body() key: {apiKey: string}) {
-        
-        return this.apiSenderService.newSender(key)
-    } 
+  constructor(
+  ) {}
+
+ 
 }

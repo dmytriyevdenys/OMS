@@ -8,11 +8,20 @@ export const ModelName = {
     ContactPerson: 'ContactPerson',
     AdditionalService: 'AdditionalService',
     InternetDocument: 'InternetDocument',
-    TrackingDocument: 'TrackingDocument'
+    TrackingDocument: 'TrackingDocument',
+    
 }
 
 export const CalledMethod = {
     getCounterparties:'getCounterparties',
     getCounterpartyContactPersons: 'getCounterpartyContactPersons',
-    
+    getCities: 'getCities',
+    searchSettlements: 'searchSettlements',
+    searchSettlementStreets: 'searchSettlementStreets',
+    getWarehouses:'getWarehouses',
+    save: 'save',
+    delete: 'delete',
+    update: 'update',
+    getDocumentPrice: 'getDocumentPrice',
+    getStatusDocuments: 'getStatusDocuments'
 }

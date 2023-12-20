@@ -1,11 +1,17 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import {UserDocument } from '../users/schemas/user.schema';
 import * as bcrypt from 'bcryptjs';
 import { UsersService } from 'src/users/users.service';
 import { SignUpDto } from 'src/auth/dto/signup.dto';
 import { SignInDto } from './dto/signin.dto';
-import { AuthResponse } from 'src/interfaces/auth-response.interface';
+import { AuthResponse } from 'src/products/interfaces/auth-response.interface';
+import { UserEntity } from 'src/users/entities/user.entity';
+import { error } from 'console';
 
 @Injectable()
 export class AuthService {
@@ -14,36 +20,49 @@ export class AuthService {
     private userService: UsersService,
   ) {}
 
-  async validateUser (signInDto: SignInDto):Promise<UserDocument> {
+  async validateUser(signInDto: SignInDto): Promise<UserEntity> {
     const { email, password } = signInDto;
     const user = await this.userService.findUserByEmail(email);
-    const isPasswordMatched = await bcrypt.compare(password, user.password);
-    if (!user || !isPasswordMatched) {
-      throw new UnauthorizedException('Некоректний email, або пароль');
+    if (!user) {
+      throw new UnauthorizedException('Некоректний email');
     }
-    return  user
+    const isPasswordMatched = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatched) {
+      throw new UnauthorizedException('Некоректний пароль');
+    }
+    return user;
   }
 
   async signUp(singUpDto: SignUpDto): Promise<AuthResponse> {
-    const { password } = singUpDto;
+    const { password, email } = singUpDto;
+  const user = await this.userService.findUserByEmail(email);
+
+    if (user) {
+      throw new BadRequestException('Користувач з таким email вже існує');
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await this.userService.createUser({
+    const newUser = await this.userService.createUser({
       ...singUpDto,
       password: hashedPassword,
     });
-    return this.generateToken(user);
+    return this.generateToken(newUser);
   }
 
-  async signIn(signInDto: SignInDto): Promise<AuthResponse> {
-    const user = await this.validateUser(signInDto)
+  async signIn(signInDto: SignInDto): Promise<{access_token: string}> {
+   try {
+    const user = await this.validateUser(signInDto);
     return this.generateToken(user);
+   } 
+   catch (error) { 
+    throw error
+   }
   }
 
- private async  generateToken(user: UserDocument): Promise<AuthResponse> {
-    const access_token = this.jwtService.sign({ id: user._id });
+  private async generateToken(user: UserEntity): Promise<{access_token: string}> {
+    const access_token = this.jwtService.sign({ id: user.id });
 
-    return { access_token, user };;
+    return { access_token };
   }
 }

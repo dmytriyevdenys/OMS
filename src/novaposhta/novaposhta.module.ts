@@ -2,18 +2,22 @@ import { Module } from '@nestjs/common';
 import { NovaposhtaController } from './novaposhta.controller';
 import { NovaposhtaService } from './novaposhta.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Sender, SenderSchema } from './schemas/sender.schema';
 import { ApiNovaposhtaFetchService } from 'src/utils/api-novaposhta-fetch.service';
 import { HttpModule } from '@nestjs/axios';
-import { ApiSenderService } from './novaposhta-api/novaposhta-api-sender.service';
+import { MatchService } from 'src/utils/match-model.service';
+import { SenderService } from './sender/sender.service';
+import { ApiAddressService } from './address/api-service/novaposhta-api-address.service';
+import { SenderModule } from './sender/sender.module';
+import { AddressModule } from './address/address.module';
+
 
 @Module({
-  imports:[
+  imports: [
 
-  MongooseModule.forFeature([{name: Sender.name, schema: SenderSchema}]),
-  HttpModule
-  ],
+  ], 
   controllers: [NovaposhtaController],
-  providers: [NovaposhtaService, ApiNovaposhtaFetchService, ApiSenderService]
+  providers: [
+  ],
+  exports:[]
 })
 export class NovaposhtaModule {}

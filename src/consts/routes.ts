@@ -1,0 +1,1 @@
+export const DEV_ROUTE = 'http://localhost:8000/';
