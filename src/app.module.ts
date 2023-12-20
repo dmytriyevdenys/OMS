@@ -21,7 +21,7 @@ import { PackerModule } from './packer/packer.module';
 @Module({
   imports: [ConfigModule.forRoot({
 
-  envFilePath: 'development.env', 
+  envFilePath: '.env.prod', 
     isGlobal: true
   }),
     ScheduleModule.forRoot(),
