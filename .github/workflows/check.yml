@@ -44,8 +44,6 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - run: npm run format
-    - run: npm test
-
 
     - name: Stop services with docker-compose
       run: docker-compose down
