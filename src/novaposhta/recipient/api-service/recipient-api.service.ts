@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { SenderService } from 'src/novaposhta/sender/sender.service';
 import { ApiNovaposhtaFetchService } from 'src/utils/api-novaposhta-fetch.service';
 import { RecipientDto } from '../dto/recipient.dto';
@@ -8,7 +8,6 @@ import { MatchService } from 'src/utils/match-model.service';
 import { RecipientEntity } from '../entities/recipient.entity';
 import { ApiKeyService } from 'src/novaposhta/api-service/novaposhta-apikey.service';
 import { SenderEntity } from 'src/novaposhta/sender/entities/sender.entity';
-import { error } from 'console';
 
 @Injectable()
 export class RecipientApiService {

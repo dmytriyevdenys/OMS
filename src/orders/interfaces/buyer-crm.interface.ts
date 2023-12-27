@@ -5,8 +5,8 @@ interface BuyerCrm {
   phone: string;
   email: null | string;
   note: null | string;
-  picture: null | string; // Ваш тип даних для цього поля
-  image: null | string; // Ваш тип даних для цього поля
+  picture: null | string;
+  image: null | string; 
   orders_sum: string;
   currency: string;
   orders_count: number;

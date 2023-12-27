@@ -45,6 +45,6 @@ interface OrderCrm {
     buyer_comment: null | string;
     products: ProductCrm[];
     buyer: BuyerCrm;
-    shipping: null | any; // Ваш тип даних для цього поля
+    shipping: null | any; 
     payments: PaymentCrm[];
 }
