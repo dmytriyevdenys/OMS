@@ -1,11 +1,7 @@
-name: Node.js CI with Docker Compose
-
+name: Node.js CI 
 on:
   push:
     branches: [ "postgre" ]
-  pull_request:
-    branches: [ "main" ]
-
 jobs:
 
   build-and-run:

@@ -1,0 +1,37 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [ "postgre" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        node-version: [20.10.0]
+    env:
+        PORT: ${{secrets.PORT}}
+        JWT_SECRET: ${{secrets.JWT_SECRET}}
+        JWT_EXPIRES: ${{secrets.JWT_EXPIRES}}
+        API_KEY_CRM: ${{secrets.API_KEY_CRM}}
+        DB_PORT: ${{secrets.DB_PORT}}
+        POSTGRES_HOST: ${{secrets.POSTGRES_HOST}}
+        POSTGRES_USER: ${{secrets.POSTGRES_USER}}
+        POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
+        POSTGRES_NAME: ${{secrets.POSTGRES_NAME}}
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run format
+    - run: npm run start:prod 
