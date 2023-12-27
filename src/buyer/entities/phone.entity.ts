@@ -1,5 +1,5 @@
 import { AbstractEntity } from "src/utils/abstract-entity";
-import { Entity,Column, ManyToOne, Unique, PrimaryColumn, JoinColumn } from "typeorm";
+import { Entity,Column, ManyToOne } from "typeorm";
 import { BuyerEntity } from "./buyer.entity";
 
 

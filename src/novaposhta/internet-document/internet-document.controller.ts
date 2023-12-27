@@ -16,11 +16,9 @@ import { IntDocDto } from './dto/int-doc.dto';
 import { ApiIntDocService } from './api-service/api-int-doc.service';
 import { Public } from 'src/decorators/public.decorator';
 import { DEV_ROUTE } from 'src/consts/routes';
-import { Observable, interval, map, pipe } from 'rxjs';
+import { Observable } from 'rxjs';
 import { InternetDocumentSubscriber } from './internet-document.subscriber';
-import internal from 'stream';
 import { MessageEvent } from './interfaces/message-event.interface';
-import { query } from 'express';
 import { FindIntDocDto } from './dto/find-int-doc.dto';
 
 @Controller('internet-document')

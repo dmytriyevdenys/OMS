@@ -2,7 +2,6 @@ import {
   Injectable,
   UnauthorizedException,
   BadRequestException,
-  NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
@@ -11,7 +10,6 @@ import { SignUpDto } from 'src/auth/dto/signup.dto';
 import { SignInDto } from './dto/signin.dto';
 import { AuthResponse } from 'src/products/interfaces/auth-response.interface';
 import { UserEntity } from 'src/users/entities/user.entity';
-import { error } from 'console';
 
 @Injectable()
 export class AuthService {

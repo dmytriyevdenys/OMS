@@ -13,9 +13,9 @@ interface ProductCrm {
   price_sold: number;
   quantity: number;
   unit_type: null | string;
-  picture: any; // Ваш тип даних для цього поля
+  picture: any; 
   comment: null | string;
-  properties: any[]; // Ваш тип даних для цього поля
+  properties: any[]; 
   product_status_id: null | number;
   created_at: string;
   updated_at: string;

@@ -1,7 +1,5 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { IProductForFrontend } from 'src/products/interfaces/product.interface';
-import { Public } from 'src/decorators/public.decorator';
 import { ProductsApiService } from './products-api/products-api.service';
 import { ProductUpdaterService } from './products-update.service';
 import { ProductEntity } from './entities/product.entity';

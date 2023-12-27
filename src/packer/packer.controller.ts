@@ -11,7 +11,6 @@ import {
 import { PackerService } from './packer.service';
 import { CreatePackerDto } from './dto/create-packer.dto';
 import { Public } from 'src/decorators/public.decorator';
-import { PackerEntity } from './entities/packer.entity';
 import { ScanIntDocDto } from 'src/packer/dto/scan-int-doc.dto';
 
 @Controller('packer')

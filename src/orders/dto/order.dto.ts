@@ -1,4 +1,3 @@
-import { BuyerDto } from "src/buyer/dto/buyer.dto";
 import { BuyerEntity } from "src/buyer/entities/buyer.entity";
 import { InternetDocumnetEntity } from "src/novaposhta/internet-document/entities/internet-document.entity";
 import { SenderEntity } from "src/novaposhta/sender/entities/sender.entity";
@@ -14,7 +13,7 @@ export class OrderCrmDto {
         full_name:string
         phone: string
     };
-    shipping: {};
+    shipping: any;
     products: ProductEntity[];
     payments: Payments[];
     custom_fields: CustomField[];
