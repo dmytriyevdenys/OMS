@@ -2,7 +2,7 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "postgre" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
@@ -35,4 +35,5 @@ jobs:
     - run: npm ci
     - run: npm run format
     - run: npm run build
-    - run: npm run start:prod 
+    - run: cd /home/ubuntu/actions-runner/_work/OMS/OMS
+    - run: p2m restart 0
