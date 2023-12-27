@@ -18,10 +18,12 @@ import { SenderModule } from './novaposhta/sender/sender.module';
 import { AddressModule } from './novaposhta/address/address.module';
 import { InternetDocumentModule } from './novaposhta/internet-document/internet-document.module';
 import { PackerModule } from './packer/packer.module';
+const isDev = process.env.NODE_ENV === 'development';
+
 @Module({
   imports: [ConfigModule.forRoot({
 
-  envFilePath: '.env.dev', 
+    envFilePath: isDev && '.env.prod',
     isGlobal: true
   }),
     ScheduleModule.forRoot(),
