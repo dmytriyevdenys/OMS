@@ -36,4 +36,4 @@ jobs:
     - run: npm run format
     - run: npm run build
     - run: cd /home/ubuntu/actions-runner/_work/OMS/OMS
-    - run: p2m restart 0
+    - run: pm2 restart 0
