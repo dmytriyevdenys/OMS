@@ -13,7 +13,7 @@ export class OrderCrmDto {
         full_name:string
         phone: string
     };
-    shipping: {};
+    shipping: any;
     products: ProductEntity[];
     payments: Payments[];
     custom_fields: CustomField[];
