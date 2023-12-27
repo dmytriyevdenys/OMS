@@ -1,7 +1,7 @@
 name: Node.js CI 
 on:
   push:
-    branches: [ "postgre" ]
+    branches: [ "main" ]
 jobs:
 
   build-and-run:
