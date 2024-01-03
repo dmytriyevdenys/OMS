@@ -23,7 +23,7 @@ const isDev = process.env.NODE_ENV === 'development';
 @Module({
   imports: [ConfigModule.forRoot({
 
-    envFilePath: isDev && '.env.prod', 
+    envFilePath:'.env.dev', 
     isGlobal: true
   }),
     ScheduleModule.forRoot(),

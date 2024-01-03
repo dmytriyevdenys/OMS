@@ -5,24 +5,45 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductEntity } from './entities/product.entity';
-import { EntityManager, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import { ResponseService } from 'src/utils/response.service';
+import { ResponseData } from 'src/interfaces/response-data.interface';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectRepository(ProductEntity)
     private readonly productRepository: Repository<ProductEntity>,
-    private readonly entityManager: EntityManager,
+    private readonly responseService: ResponseService,
   ) {}
 
-  async getAllProducts(): Promise<ProductEntity[]> {
+  async getProducts(search?: string): Promise<ResponseData<ProductEntity[]>> {
     try {
-      const products = await this.productRepository.find();
-      if (!products)
-        throw new BadRequestException('Помилка при завантаженні товарів');
-      return products;
+      if (!search) {
+        const products = await this.productRepository.find({ take: 10 });
+        return this.responseService.successResponse(products);
+      }
+      const regexSearch = search
+        .split(' ')
+        .map((word) => `(?=.*${word})`)
+        .join('');
+      const products = await this.productRepository
+        .createQueryBuilder('product')
+        .where(`product.name ~* :regexSearch`, { regexSearch })
+        .orWhere('product.sku LIKE :search', {search: `%${search}%`})
+        .orderBy(
+          `CASE WHEN product.name = :fullSearch THEN 0 ELSE 1 END`,
+          'ASC',
+        )
+        .addOrderBy('product.price', 'ASC')
+        .setParameter('fullSearch', search)
+        .getMany();
+
+      return this.responseService.successResponse(products);
     } catch (error) {
-      throw error;
+      throw this.responseService.notFoundResponse(
+        'Сталась помилка при пошуку товару',
+      );
     }
   }
 
@@ -37,22 +58,4 @@ export class ProductsService {
     }
   }
 
-  async getProductBySkuOrName(query: string): Promise<ProductEntity[]> {
-    try {
-      const searchWords = query.split(' ').map(word => `(${word})`);
-      const searchExpression = searchWords.join('.*');
-
-      const products = await this.entityManager
-        .createQueryBuilder(ProductEntity, 'product')
-        .where(`LOWER(product.name) ~* :query OR LOWER(product.sku) ~* :query`, { query: searchExpression })
-        .orderBy('product.price', 'DESC') 
-        .getMany();
-
-      if (!products.length) throw new NotFoundException('Товари не знайдені');
-
-      return products;
-    } catch (error) {
-      throw error
-    }
-  }
 }
