@@ -3,6 +3,7 @@ import { ApiCrmFetchService } from 'src/utils/api-crm-fetch.service';
 import { OrderAssociations } from '../interfaces/order-associations.interfaces';
 import { OrderDto, OrderCrmDto } from '../dto/order.dto';
 import { UpdateOrderDto } from '../dto/update-order.dto';
+import { OrderStatusCrm } from '../interfaces/order-status-crm.intarface';
 
 @Injectable()
 export class OrdersApiService {
@@ -140,8 +141,11 @@ export class OrdersApiService {
     }
   }
 
-  async getOrderStatus(): Promise<OrderAssociations[]> {
-    return this.fetchDataAndMap('status', { limit: 50 });
+  async getOrderStatus(): Promise<OrderStatusCrm[]> {
+    // const statuses = await this.fetchDataAndMap('status', { limit: 50 });
+    // return statuses
+    const statuses = await this.apiService.get(`${this.baseUrl}/status`, {limit: 50});
+    return statuses.data;
   }
 
   async getDeliveryService(): Promise<OrderAssociations[]> {

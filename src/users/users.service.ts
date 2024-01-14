@@ -121,8 +121,8 @@ export class UsersService {
    }
 
    async updateProfile (dto: UpdateProfileDto, id: number) {
-   try { 
-    const user = await this.findUserById(id); 
+   try {
+      const user = await this.findUserById(id); 
     const profile = user.profile;
     Object.assign(profile, dto);
     await this.entityManager.save(user);

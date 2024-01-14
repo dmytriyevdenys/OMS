@@ -10,10 +10,10 @@ import {
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { OrdersApiService } from './orders-api/orders-api.service';
-import { Public } from 'src/decorators/public.decorator';
 import { OrderDto } from './dto/order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { IntDocDto } from 'src/novaposhta/internet-document/dto/int-doc.dto';
+import { OrderStatusCrm } from './interfaces/order-status-crm.intarface';
 
 @Controller('order')
 export class OrdersController {
@@ -21,7 +21,6 @@ export class OrdersController {
     private ordersService: OrdersService,
     private ordersApiservice: OrdersApiService,
   ) {}
-  @Public()
   @Get()
   async getAll() {
     return await this.ordersService.getAllOrders();
@@ -59,7 +58,6 @@ export class OrdersController {
     return await this.ordersService.detachIntDoc(id);
   }
 
-  @Public()
   @Get(':id(\\d+)')
   async getOrderById(@Param('id') id: number) {
     return this.ordersService.findOrderById(id);
@@ -71,7 +69,7 @@ export class OrdersController {
   }
 
   @Get('status')
-  async getStatus() {
+  async getStatus(): Promise<OrderStatusCrm[]> {
     return this.ordersApiservice.getOrderStatus();
   }
 
@@ -84,7 +82,6 @@ export class OrdersController {
   async getTag() {
     return this.ordersApiservice.getTag();
   }
-
   @Get('source')
   async getSource() {
     return this.ordersApiservice.getSource();

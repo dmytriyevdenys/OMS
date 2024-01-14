@@ -12,7 +12,6 @@ import {
 import { UsersService } from './users.service';
 import { SignUpDto } from 'src/auth/dto/signup.dto';
 import { UserEntity } from './entities/user.entity';
-import { Public } from 'src/decorators/public.decorator';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { OrdersApiService } from 'src/orders/orders-api/orders-api.service';
@@ -28,7 +27,6 @@ export class UsersController {
     return this.userService.createUser(userDto);
   }
 
-  @Public()
   @Get()
   async getAll(): Promise<UserEntity[]> {
     return this.userService.getAllUsers();

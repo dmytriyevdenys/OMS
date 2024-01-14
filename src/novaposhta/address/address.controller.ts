@@ -5,14 +5,12 @@ import {
   Body,
   Query,
 } from '@nestjs/common';
-import { AddressService } from './address.service';
 import { ApiAddressService } from './api-service/novaposhta-api-address.service';
 import { WareHouseDto } from './dto/warehouse.dto';
 
 @Controller('address')
 export class AddressController {
   constructor(
-    private readonly addressService: AddressService,
     private readonly apiAddressService: ApiAddressService,
   ) {}
 

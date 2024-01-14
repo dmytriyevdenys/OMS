@@ -14,7 +14,6 @@ import {
 import { InternetDocumentService } from './internet-document.service';
 import { IntDocDto } from './dto/int-doc.dto';
 import { ApiIntDocService } from './api-service/api-int-doc.service';
-import { Public } from 'src/decorators/public.decorator';
 import { DEV_ROUTE } from 'src/consts/routes';
 import { Observable } from 'rxjs';
 import { InternetDocumentSubscriber } from './internet-document.subscriber';
@@ -29,7 +28,6 @@ export class InternetDocumentController {
     private intDocSubscriber: InternetDocumentSubscriber
   ) {}
 
-  @Public()
   @Get()
   async getIntDocs(
     @Query('packerId') packerId: number,
@@ -71,7 +69,6 @@ export class InternetDocumentController {
     return await this.apiService.getStatusDocument(intDocNumber);
   }
 
-  @Public()
   @Sse('sse')
   sse(@Res() res): Observable<MessageEvent> {
     return new Observable(() => {
