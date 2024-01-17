@@ -21,6 +21,7 @@ export class ApiAddressService {
       const calledMethod = CalledMethod.getCities;
       const methodProperties = {
         FindByString: city,
+        Limit: '50',
       };
       const response = await this.apiService.sendPostRequest(
         apiKey,
@@ -28,11 +29,12 @@ export class ApiAddressService {
         calledMethod,
         methodProperties,
       );
-      const data = response.data;
+      const data = response.data;            
       const citysData = data.map((city: any) => ({
         Description: `${city.SettlementTypeDescription} ${city.Description} ${city.AreaDescription} обл`,
         Ref: city.Ref,
-        SettlementRef: city.SettlementRef
+        SettlementRef: city.SettlementRef,
+        cityName: city.Description
       }));
 
       return citysData;
