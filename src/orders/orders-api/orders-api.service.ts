@@ -44,14 +44,13 @@ export class OrdersApiService {
 
       },
       products: dto.products || [],
-      payments:
-        dto?.payments?.length > 0
-          ? dto.payments.map((payment) => ({
+      payments: dto.payments
+          ? [{
               id: '2',
-              payment_method: payment.payment_method,
-              amount: payment.amount,
+              payment_method: 'Банківська картка',
+              amount: dto.payments.value.toString(),
               status: 'paid',
-            }))
+            }]
           : [],
       custom_fields: [
         {

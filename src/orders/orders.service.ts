@@ -41,7 +41,7 @@ export class OrdersService {
       if (!newOrder)
         throw new BadRequestException('Не вдалось створити замовлення');
       
-      return await this.responseService.successResponse(newOrder);;
+      return  this.responseService.successResponse(newOrder);;
     } catch (error) {
        this.responseService.errorResponse(error.message)
       ;
