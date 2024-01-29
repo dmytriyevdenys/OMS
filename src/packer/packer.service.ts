@@ -129,9 +129,9 @@ export class PackerService {
       existingIntDoc ? (intDoc.status = IntDocStatus.Double) : null;
       packer ? (intDoc.packer = packer) : null;
   
-      if (dto.IntDocNumber.length >= 14) {
+      if (dto.IntDocNumber.length >= 14 && dto.IntDocNumber.length !== 18) {
         const trackIntDoc = await this.apiIntDocServie.getStatusDocument(dto.IntDocNumber);
-  
+      
         if (trackIntDoc.ClientBarcode) {
           const orderId = trackIntDoc.ClientBarcode;
           intDoc.order_id = orderId;
