@@ -4,6 +4,7 @@ import { SignUpDto } from 'src/auth/dto/signup.dto';
 import { SignInDto } from './dto/signin.dto';
 import { Public } from 'src/decorators/public.decorator';
 import { UserEntity } from 'src/users/entities/user.entity';
+import { IsString } from 'class-validator';
 
 
 
@@ -13,9 +14,9 @@ export class AuthController {
     
    @Public()
    @Post('login')
-   signIn (@Body()signInDto:SignInDto): Promise<{access_token: string}>{
+   async signIn (@Body()signInDto:SignInDto): Promise<{access_token: string}>{
   
-    return this.authService.signIn(signInDto);
+    return await this.authService.signIn(signInDto);
 
    }
    @Public() 
@@ -23,7 +24,11 @@ export class AuthController {
    signUp(@Body() singUpDto: SignUpDto): Promise<{access_token: string}> {
     return this.authService.signUp(singUpDto)
    }
-
+   
+   @Post('refresh')
+   async refreshToken (@Body() access_token: string): Promise<{access_token: string}>{
+      return await this.authService.refreshToken(access_token)
+   }
    @Get('me')
    async me (@Req() req): Promise<UserEntity> {
     return req.user 

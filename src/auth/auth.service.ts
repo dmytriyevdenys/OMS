@@ -58,6 +58,14 @@ export class AuthService {
    }
   }
 
+  async refreshToken (token: string): Promise<{access_token: string}> {
+    const decodedToken = this.jwtService.verify(token);
+    if (decodedToken) {
+      const user = await this.userService.findUserById(decodedToken.id);
+      return this.generateToken(user);
+    }
+  }
+
   private async generateToken(user: UserEntity): Promise<{access_token: string}> {
     const access_token = this.jwtService.sign({ id: user.id });
 
