@@ -4,6 +4,7 @@ import { OrderAssociations } from '../interfaces/order-associations.interfaces';
 import { OrderDto, OrderCrmDto } from '../dto/order.dto';
 import { UpdateOrderDto } from '../dto/update-order.dto';
 import { OrderStatusCrm } from '../interfaces/order-status-crm.intarface';
+import { TTag } from '../interfaces/tag-crm.type';
 
 @Injectable()
 export class OrdersApiService {
@@ -151,8 +152,10 @@ export class OrdersApiService {
     return this.fetchDataAndMap('delivery-service', { limit: 50 });
   }
 
-  async getTag(): Promise<OrderAssociations[]> {
-    return this.fetchDataAndMap('tag');
+  async getTag(): Promise<TTag[]> {
+   const tags = await this.apiService.get(`${this.baseUrl}/tag`)
+   return tags.data
+    ;
   }
 
   async getSource(): Promise<OrderAssociations[]> {

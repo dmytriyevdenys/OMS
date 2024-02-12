@@ -14,6 +14,7 @@ import { OrderDto } from './dto/order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { IntDocDto } from 'src/novaposhta/internet-document/dto/int-doc.dto';
 import { OrderStatusCrm } from './interfaces/order-status-crm.intarface';
+import { TTag } from './interfaces/tag-crm.type';
 
 @Controller('order')
 export class OrdersController {
@@ -79,7 +80,7 @@ export class OrdersController {
   }
 
   @Get('tag')
-  async getTag() {
+  async getTag(): Promise<TTag[]>  {
     return this.ordersApiservice.getTag();
   }
   @Get('source')
