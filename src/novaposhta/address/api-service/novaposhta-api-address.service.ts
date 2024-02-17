@@ -39,7 +39,7 @@ export class ApiAddressService {
 
       return citysData;
     } catch (error) {
-      throw new Error(`Error in getCities: ${error.message} `);
+      throw error;
     }
   }
 
