@@ -29,7 +29,7 @@ export class ProductUpdaterService implements OnModuleInit {
       if (productCount === 0) {
         this.logger.log('База даних порожня. Оновлення товарів...');
         await this.fetchProductsFromCrm();
-      } else {
+      } else { 
         const lastProduct = await this.productRepository.findOneBy({id: 450}); 
         const lastUpdatedDate = lastProduct ? lastProduct.updatedAt : null;
 
@@ -70,7 +70,7 @@ export class ProductUpdaterService implements OnModuleInit {
         throw new BadRequestException('Помилка при завантаженні товарів');
       }
       
-      return newProducts;
+      return newProducts; 
     } catch (error) { 
       this.logger.log('Помилка при завантаженні товарів в БД');
     }

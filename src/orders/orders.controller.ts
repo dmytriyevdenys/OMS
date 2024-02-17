@@ -13,8 +13,8 @@ import { OrdersApiService } from './orders-api/orders-api.service';
 import { OrderDto } from './dto/order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { IntDocDto } from 'src/novaposhta/internet-document/dto/int-doc.dto';
-import { OrderStatusCrm } from './interfaces/order-status-crm.intarface';
 import { TTag } from './interfaces/tag-crm.type';
+import { OrderStatusEntity } from './entities/order-status.entity';
 
 @Controller('order')
 export class OrdersController {
@@ -70,8 +70,8 @@ export class OrdersController {
   }
 
   @Get('status')
-  async getStatus(): Promise<OrderStatusCrm[]> {
-    return this.ordersApiservice.getOrderStatus();
+  async getStatus(): Promise<OrderStatusEntity[]>{
+    return this.ordersService.getStatuses();
   }
 
   @Get('delivery-service')

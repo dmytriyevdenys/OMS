@@ -36,12 +36,12 @@ const isDev = process.env.NODE_ENV === 'development';
         username: configService.get('POSTGRES_USER'),
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_NAME'),
-        entities: [],
         synchronize: true,
-        autoLoadEntities: true
+        autoLoadEntities: true, 
+        
       }),
       inject: [ConfigService],
-    }),
+    }), 
     ProductsModule,
     AuthModule,
     UsersModule,

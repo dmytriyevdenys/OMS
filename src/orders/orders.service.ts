@@ -13,6 +13,7 @@ import { ApiIntDocService } from 'src/novaposhta/internet-document/api-service/a
 import { UserEntity } from 'src/users/entities/user.entity';
 import { ResponseData } from 'src/interfaces/response-data.interface';
 import { ResponseService } from 'src/utils/response.service';
+import { OrderStatusEntity } from './entities/order-status.entity';
 
 @Injectable()
 export class OrdersService {
@@ -25,6 +26,8 @@ export class OrdersService {
     private readonly responseService: ResponseService,
     @InjectRepository(OrderEntity)
     private readonly orderRepository: Repository<OrderEntity>,
+    @InjectRepository(OrderStatusEntity)
+    private readonly statusRepository: Repository<OrderStatusEntity>
   ) {}
 
   async createOrder(dto: Partial<OrderDto>, user: UserEntity): Promise<ResponseData<OrderEntity>> {
@@ -68,6 +71,17 @@ export class OrdersService {
       return  this.responseService.successResponse(orders);
     } catch (error) {
       throw error;
+    }
+  }
+
+  async getStatuses () {
+    try {
+      const statuses = await this.statusRepository.find();
+      if (!statuses) throw new BadRequestException('Не знайдено жодно статуса')
+      return statuses;
+    }
+    catch (error) {
+      throw error
     }
   }
 

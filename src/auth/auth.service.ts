@@ -33,11 +33,11 @@ export class AuthService {
 
   async signUp(singUpDto: SignUpDto): Promise<AuthResponse> {
     const { password, email } = singUpDto;
-  const user = await this.userService.findUserByEmail(email);
+  // const user = await this.userService.findUserByEmail(email);
 
-    if (user) {
-      throw new BadRequestException('Користувач з таким email вже існує');
-    }
+  //   if (user) {
+  //     throw new BadRequestException('Користувач з таким email вже існує');
+  //   }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 

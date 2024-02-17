@@ -2,6 +2,7 @@
 /dist
 /node_modules
 .env.prod
+/.github/workflows/check.yml
 # Logs
 logs
 *.log

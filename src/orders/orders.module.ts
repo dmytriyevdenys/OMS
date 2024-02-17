@@ -23,6 +23,7 @@ import { RecipientApiService } from 'src/novaposhta/recipient/api-service/recipi
 import { MatchService } from 'src/utils/match-model.service';
 import { ApiKeyService } from 'src/novaposhta/api-service/novaposhta-apikey.service';
 import { PaymentEntity } from './entities/payment.entity';
+import { OrderStatusEntity } from './entities/order-status.entity';
 
 
 @Module({
@@ -30,7 +31,7 @@ import { PaymentEntity } from './entities/payment.entity';
 
 UsersModule,
   HttpModule,
-    TypeOrmModule.forFeature([OrderEntity, PaymentEntity]),
+    TypeOrmModule.forFeature([OrderEntity, PaymentEntity, OrderStatusEntity]),
     BuyerModule,
     InternetDocumentModule,
     SenderModule
