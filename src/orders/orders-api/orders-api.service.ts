@@ -74,10 +74,10 @@ export class OrdersApiService {
     return dataOrders;
   }
 
-  async getAll () { 
+  async getAll (): Promise<OrderCrm[]> { 
     try {
       const endpoint ='order';
-      const orders = [];
+      const orders: OrderCrm[] = [];
       let responseData;
       let currentPage = 1;
       const delayBetweenRequests = 1500;
@@ -142,8 +142,6 @@ export class OrdersApiService {
   }
 
   async getOrderStatus(): Promise<OrderStatusCrm[]> {
-    // const statuses = await this.fetchDataAndMap('status', { limit: 50 });
-    // return statuses
     const statuses = await this.apiService.get(`${this.baseUrl}/status`, {limit: 50});
     return statuses.data;
   }

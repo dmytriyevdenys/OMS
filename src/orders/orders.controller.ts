@@ -31,6 +31,11 @@ export class OrdersController {
   async getAllFromCrm() {
     return await this.ordersApiservice.getAll();
   }
+
+  @Get('crm/:id')
+  async getCrmOrderById (@Param('id') id: string) {
+    return await this.ordersApiservice.getOrderById(id)
+  }
   @Post()
   async createOrder(@Body() dto: Partial<OrderDto>, @Req() req) {
     return this.ordersService.createOrder(dto, req.user);
