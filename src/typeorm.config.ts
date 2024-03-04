@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
-import { join } from 'path'; // Додано для правильної роботи з шляхами файлів
+import { join } from 'path'; 
 
 const configService = new ConfigService({
   envFilePath: '../.env.dev',
@@ -14,7 +14,7 @@ const AppDataSource = new DataSource({
   password: 'root',
   database: 'postgres',
   entities: [
-    join(__dirname, '**', 'entities', '*.entity.js'), // Вказати правильний шлях до скомпільованих entity файлів
+    join(__dirname, '**', 'entities', '*.entity.js'), 
   ],
   migrations: ['src/migrations/*.ts'],
 });

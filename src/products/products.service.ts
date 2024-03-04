@@ -58,4 +58,14 @@ export class ProductsService {
     }
   }
 
+  async getProductBySku (sku: string) {
+    try {
+        const product = await this.productRepository.findOneBy({sku});
+        return product;
+    }
+    catch (error) {
+      throw error;
+    }
+  }
+
 }

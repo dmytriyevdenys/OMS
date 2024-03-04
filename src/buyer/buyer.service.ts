@@ -57,7 +57,8 @@ export class BuyerService {
     try {
       const buyer = await this.buyerRepository.findOne({ where: {id}, relations: {orders: true} });
       if (!buyer) {
-        throw new NotFoundException('покупець не існує');
+        // throw new NotFoundException('покупець не існує');
+        return null;
       }
       return buyer;
     } catch (error) {

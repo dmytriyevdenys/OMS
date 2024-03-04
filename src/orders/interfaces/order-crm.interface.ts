@@ -1,5 +1,7 @@
+import { CustomField } from "../dto/order.dto";
+import { TShippingCrm } from "./shipping-crm.type";
 
-interface OrderCrm { 
+export interface OrderCrm { 
     id: string;
     source_uuid: null | string;
     global_source_uuid: null | string;
@@ -45,6 +47,7 @@ interface OrderCrm {
     buyer_comment: null | string;
     products: ProductCrm[];
     buyer: BuyerCrm;
-    shipping: null | any; 
+    shipping: TShippingCrm
     payments: PaymentCrm[];
+    custom_fields: CustomField[]
 }

@@ -24,5 +24,6 @@ import { ResponseService } from 'src/utils/response.service';
     ResponseService
   ],
   controllers: [ProductsController],
+  exports: [TypeOrmModule]
 })
 export class ProductsModule {}

@@ -5,6 +5,7 @@ import { OrderDto, OrderCrmDto } from '../dto/order.dto';
 import { UpdateOrderDto } from '../dto/update-order.dto';
 import { OrderStatusCrm } from '../interfaces/order-status-crm.intarface';
 import { TTag } from '../interfaces/tag-crm.type';
+import { OrderCrm } from '../interfaces/order-crm.interface';
 
 @Injectable()
 export class OrdersApiService {
@@ -69,7 +70,7 @@ export class OrdersApiService {
 
   async getOrders() {
     const dataOrders = await this.apiService.get(
-      `order?include=shipping.deliveryService,products.offer,manager`,
+      `order?include=shipping.deliveryService,products.offer,manager,custom_fields,payments,buyer`,
     );
     return dataOrders;
   }
@@ -88,7 +89,7 @@ export class OrdersApiService {
             requestCount++;
           console.log(`Запит ${requestCount}: Виконано`);
 
-            const data = await this.apiService.get(endpoint, {
+            const data = await this.apiService.get(`${endpoint}?include=shipping.deliveryService,products.offer,manager,custom_fields`, {
               limit: 50,
               page: currentPage,
             });
@@ -110,7 +111,7 @@ export class OrdersApiService {
 
   async getOrderById(id: string) {
     const order = await this.apiService.get(
-      `order/${id}?include=shipping.deliveryService,products.offer,manager`,
+      `order/${id}?include=shipping.deliveryService,products.offer,manager,custom_fields,payments`,
     );
     return order;
   }

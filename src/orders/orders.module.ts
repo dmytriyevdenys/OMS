@@ -22,8 +22,12 @@ import { ApiNovaposhtaFetchService } from 'src/utils/api-novaposhta-fetch.servic
 import { RecipientApiService } from 'src/novaposhta/recipient/api-service/recipient-api.service';
 import { MatchService } from 'src/utils/match-model.service';
 import { ApiKeyService } from 'src/novaposhta/api-service/novaposhta-apikey.service';
-import { PaymentEntity } from './entities/payment.entity';
+import { PaymentEntity } from './entities/payments/payment.entity';
 import { OrderStatusEntity } from './entities/order-status.entity';
+import { ProductsModule } from 'src/products/products.module';
+import { ProductsService } from 'src/products/products.service';
+import { ProductsApiService } from 'src/products/products-api/products-api.service';
+import { PaymentMethodEntity } from './entities/payments/payment-method.entity';
 
 
 @Module({
@@ -31,10 +35,11 @@ import { OrderStatusEntity } from './entities/order-status.entity';
 
 UsersModule,
   HttpModule,
-    TypeOrmModule.forFeature([OrderEntity, PaymentEntity, OrderStatusEntity]),
+    TypeOrmModule.forFeature([OrderEntity, PaymentEntity, OrderStatusEntity, PaymentMethodEntity]),
     BuyerModule,
     InternetDocumentModule,
-    SenderModule
+    SenderModule,
+    ProductsModule
   ],
   controllers: [OrdersController, NewOrderWebHookController],
   providers: [
@@ -53,7 +58,7 @@ UsersModule,
     MatchService,
     ApiKeyService,
     SenderService,
-    
+    ProductsService,
   ],
   exports: []
 })

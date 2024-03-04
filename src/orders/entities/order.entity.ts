@@ -5,7 +5,7 @@ import { ProductEntity } from "src/products/entities/product.entity";
 import { UserEntity } from "src/users/entities/user.entity";
 import { AbstractEntity } from "src/utils/abstract-entity";
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToOne,  } from "typeorm";
-import { PaymentEntity } from "./payment.entity";
+import { PaymentEntity } from "./payments/payment.entity";
 import { OrderStatusEntity } from "./order-status.entity";
 
 @Entity()
@@ -24,7 +24,7 @@ export class OrderEntity extends AbstractEntity<OrderEntity> {
     @Column({nullable: true})
     totalPrice: number;
     
-    @ManyToOne(() => PaymentEntity, { eager: true, cascade: true, onDelete: 'SET NULL', onUpdate: 'SET NULL' })
+    @OneToOne(() => PaymentEntity, payment => payment.order_id, { eager: true, cascade: true, onDelete: 'SET NULL', onUpdate: 'SET NULL' })
     @JoinColumn({ name: 'payment_id' })
     payment: PaymentEntity;
 
@@ -40,7 +40,7 @@ export class OrderEntity extends AbstractEntity<OrderEntity> {
     @JoinColumn({name: 'buyer_id'})
     buyer: BuyerEntity;
 
-    @ManyToMany(() => ProductEntity, {onDelete: 'SET NULL', onUpdate: 'SET NULL'})
+    @ManyToMany(() => ProductEntity, {cascade: true, onDelete: 'SET NULL', onUpdate: 'SET NULL'})
     @JoinTable() 
     products: ProductEntity[]
 

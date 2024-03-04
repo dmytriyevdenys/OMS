@@ -22,8 +22,6 @@ export class CreateStatuses1708147447702 implements MigrationInterface {
             ('Утилізація', 'utilization', '#0747A6', true),
             ('Помилка доставки', 'delivery_error', '#F20C0C', true)
         `);
-
-
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
