@@ -14,11 +14,6 @@ import { UserEntity } from 'src/users/entities/user.entity';
 import { ResponseData } from 'src/interfaces/response-data.interface';
 import { ResponseService } from 'src/utils/response.service';
 import { OrderStatusEntity } from './entities/order-status.entity';
-import { OrderCrm } from './interfaces/order-crm.interface';
-import { PaymentEntity } from './entities/payments/payment.entity';
-import { BuyerEntity } from 'src/buyer/entities/buyer.entity';
-import { ProductsService } from 'src/products/products.service';
-import { PaymentMethodEntity } from './entities/payments/payment-method.entity';
 
 @Injectable()
 export class OrdersService {
@@ -29,15 +24,10 @@ export class OrdersService {
     private readonly intDocService: InternetDocumentService,
     private readonly apiIntDocService: ApiIntDocService,
     private readonly responseService: ResponseService,
-    private readonly productService: ProductsService,
     @InjectRepository(OrderEntity)
     private readonly orderRepository: Repository<OrderEntity>,
     @InjectRepository(OrderStatusEntity)
     private readonly statusRepository: Repository<OrderStatusEntity>,
-    @InjectRepository(PaymentEntity)
-    private readonly paymentRepository: Repository<PaymentEntity>,
-    @InjectRepository(PaymentMethodEntity)
-    private readonly paymentMethodRepository: Repository<PaymentMethodEntity>,
   ) {}
 
   async createOrder(
@@ -72,55 +62,6 @@ export class OrdersService {
       return order;
     } catch (error) {
       throw error;
-    }
-  }
-
-  async setOrderFromCrm(
-    orderFromCrm: OrderCrm,
-    user: UserEntity,
-  ): Promise<OrderEntity> {
-    const existingOrder = await this.getOrderByCrmId(orderFromCrm.id);
-    if (!existingOrder) {
-      const statusId = this.syncOrderStatus(orderFromCrm.status_id);
-      const status = await this.statusRepository.findOneBy({ id: statusId });
-      const additionalnformation = orderFromCrm.products
-        .map((product) => product.name)
-        .join(' ');
-      const payment = await this.syncPaymentStatus(
-        orderFromCrm.payments_total,
-        orderFromCrm.grand_total,
-      );
-      const notes = orderFromCrm.custom_fields?.map((field) => field.value) || [
-        '',
-      ];
-      const buyer = await this.syncBuyer(
-        orderFromCrm.buyer || {
-          full_name: orderFromCrm.shipping.recipient_full_name,
-          phone: orderFromCrm.shipping.recipient_phone
-        },
-      );
-      const products = await Promise.all(
-        orderFromCrm.products.map(async (productFromCrm) => {
-          const product = await this.productService.getProductBySku(
-            productFromCrm.sku,
-          );
-          return product;
-        }),
-      );
-      const orderMap: Partial<OrderEntity> = {
-        orderCrm_id: orderFromCrm.id,
-        status,
-        additionalnformation,
-        totalPrice: orderFromCrm.grand_total,
-        payment,
-        notes,
-        user,
-        buyer,
-        products,
-      };
-      const order = new OrderEntity(orderMap);
-      const newOrder = await this.entityManager.save(order);
-      return newOrder;
     }
   }
 
@@ -230,71 +171,4 @@ export class OrdersService {
     }
   }
 
-  private syncOrderStatus(statusId: string) {
-    const statusMapping: Record<string, number> = {
-      '1': 1,
-      '3': 2,
-      '4': 3,
-      '5': 4,
-      '6': 5,
-      '21': 6,
-      '20': 7,
-      '12': 8,
-      '19': 9,
-      '8': 10,
-      '22': 11,
-    };
-    return statusMapping[statusId];
-  }
-
-  private async syncPaymentStatus(paymentTotal: number, grandTotal: number) {
-    try {
-      if (paymentTotal === 0) {
-        const paymentMethod = await this.paymentMethodRepository.findOneBy({
-          name: 'CashOnDelivery',
-        });
-        const payment = new PaymentEntity(paymentMethod);
-        payment.value = grandTotal;
-        payment.payment_method_id = paymentMethod.id;
-        const newPayment = await this.entityManager.save(payment);
-        return newPayment;
-      }
-      if (paymentTotal > 0 && paymentTotal < grandTotal) {
-        const paymentMethod = await this.paymentMethodRepository.findOneBy({
-          name: 'Advance',
-        });
-        paymentMethod.value = paymentTotal;
-        const payment = new PaymentEntity(paymentMethod);
-        payment.payment_method_id = paymentMethod.id;
-        const newPayment = await this.entityManager.save(payment);
-        return newPayment;
-      }
-
-      if (paymentTotal === grandTotal) {
-        const paymentMethod = await this.paymentMethodRepository.findOneBy({
-          name: 'Card',
-        });
-        paymentMethod.value = paymentTotal;
-        const payment = new PaymentEntity(paymentMethod);
-        payment.payment_method_id = paymentMethod.id;
-        const newPayment = await this.entityManager.save(payment);
-        return newPayment;
-      }
-    } catch (error) {
-      throw new BadRequestException('Платіж не знайденою', error.message);
-    }
-  }
-
-  private async syncBuyer(buyerFromCrm: Partial<BuyerCrm>) {
-    const buyer = await this.buyerService.validateBuyer([buyerFromCrm.phone]);
-    if (buyer) return buyer;
-    if (!buyer) {
-      const buyer = new BuyerEntity({
-        full_name: buyerFromCrm.full_name,
-        phones: [buyerFromCrm.phone],
-      });
-      const newBuyer = await this.buyerService.createBuyer(buyer);
-      return newBuyer;
-    }
-  }
 }

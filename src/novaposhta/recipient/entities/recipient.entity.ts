@@ -6,7 +6,7 @@ export class RecipientEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({nullable: true})
     Ref: string;
 
     @Column()
@@ -24,13 +24,13 @@ export class RecipientEntity {
     @Column({nullable: true})
     Email: string;
 
-    @Column()
+    @Column({nullable: true})
     CounterpartyType: string;
 
     @Column({nullable: true})
     CounterpartyProperty: string;
 
-    @Column()
+    @Column({nullable: true})
     ContactRef: string;
 
     @OneToOne(() => InternetDocumnetEntity)

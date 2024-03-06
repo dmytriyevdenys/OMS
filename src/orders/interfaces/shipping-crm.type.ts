@@ -29,7 +29,7 @@ export type TShippingCrm = {
     shipment_payload: ShipmentPayload;
     address_payload: AddressPayload;
     is_warehouse: boolean;
-    shipping_preferred_method: any; // Невідомо, який тип має бути shipping_preferred_method
+    shipping_preferred_method: any; 
     shipping_address: any; // Невідомо, який тип має бути shipping_address
     recipient_phone: string;
     recipient_full_name: string;

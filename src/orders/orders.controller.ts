@@ -16,12 +16,14 @@ import { IntDocDto } from 'src/novaposhta/internet-document/dto/int-doc.dto';
 import { TTag } from './interfaces/tag-crm.type';
 import { OrderStatusEntity } from './entities/order-status.entity';
 import { OrderCrm } from './interfaces/order-crm.interface';
+import { SyncOderService } from './sync-order.service';
 
 @Controller('order')
 export class OrdersController {
   constructor(
     private ordersService: OrdersService,
     private ordersApiservice: OrdersApiService,
+    private syncOrderService: SyncOderService
   ) {}
   @Get()
   async getAll() {
@@ -35,7 +37,7 @@ export class OrdersController {
 
   @Post('test')
   async test (@Body() dto: OrderCrm, @Req() req){
-    return await this.ordersService.setOrderFromCrm(dto, req.user)
+    return await this.syncOrderService.setOrderFromCrm(dto, req.user)
   }
 
   @Get('crm/:id')
