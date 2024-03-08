@@ -67,7 +67,11 @@ export class OrdersService {
 
   async getAllOrders(): Promise<ResponseData<OrderEntity[]>> {
     try {
-      const orders = await this.orderRepository.find();
+      const orders = await this.orderRepository.find({
+        relations: {
+          products: true,
+        },
+      });
       if (!orders) throw new BadRequestException('Не інсує жодного замовлення');
 
       return this.responseService.successResponse(orders);
@@ -75,6 +79,41 @@ export class OrdersService {
       throw error;
     }
   }
+
+  async getOrderByStatuses(statusIds: number[]) {
+    try {
+      const orders = await this.orderRepository.createQueryBuilder('order') 
+        .leftJoinAndSelect('order.status', 'status')
+        .leftJoinAndSelect('order.buyer', 'buyer')
+        .leftJoinAndSelect('order.shipping', 'shipping')
+        .select([
+          'order.id as id',
+          'order.additionalnformation as additionalnformation',
+          'order.createdAt as created_at',
+          'order.totalPrice as total_price',
+          'buyer.full_name as full_name',
+          'order.status',
+          'shipping.IntDocNumber as IntDocNumber'
+        ])
+        .where('status.id IN (:...statusIds)', { statusIds })
+        .getRawMany();
+  
+      const groupedOrders = orders.reduce((result, order) => {
+        const statusId = order.status_id; 
+        if (!result[statusId]) {
+          result[statusId] = [];
+        }
+  
+        result[statusId].push(order);
+        return result;
+      }, {});
+  
+      return groupedOrders;
+    } catch (error) {
+      throw error;
+    }
+  }
+  
 
   async getOrderByCrmId(id: string) {
     try {
@@ -86,9 +125,11 @@ export class OrdersService {
     }
   }
 
-  async getStatuses() {
+  async getStatusesForOrderBoard(ids: number[]) {
     try {
-      const statuses = await this.statusRepository.find();
+      const statuses = await this.statusRepository.createQueryBuilder('status')
+      .where('status.id IN (:...ids)', {ids})
+      .getMany()
       if (!statuses) throw new BadRequestException('Не знайдено жодно статуса');
       return statuses;
     } catch (error) {
@@ -105,6 +146,7 @@ export class OrdersService {
           products: true,
           buyer: true,
           sender: true,
+          status: true
         },
       });
       return order;
@@ -170,5 +212,4 @@ export class OrdersService {
       throw error;
     }
   }
-
 }

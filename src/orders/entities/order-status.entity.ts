@@ -13,7 +13,7 @@ export class OrderStatusEntity extends AbstractEntity<OrderStatusEntity> {
 
     @Column()
     color: string;
-
+ 
     @Column()
     is_active: boolean;
 

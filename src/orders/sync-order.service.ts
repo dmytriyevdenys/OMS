@@ -16,6 +16,8 @@ import { AddressEntity } from 'src/novaposhta/address/entities/address.entity';
 import { InternetDocumnetEntity } from 'src/novaposhta/internet-document/entities/internet-document.entity';
 import { RecipientEntity } from 'src/novaposhta/recipient/entities/recipient.entity';
 import { ProductEntity } from 'src/products/entities/product.entity';
+import { OrdersApiService } from './orders-api/orders-api.service';
+import { ApiCrmFetchService } from 'src/utils/api-crm-fetch.service';
 
 @Injectable()
 export class SyncOderService {
@@ -24,6 +26,8 @@ export class SyncOderService {
     private readonly entityManager: EntityManager,
     private readonly orderService: OrdersService,
     private readonly productService: ProductsService,
+    private readonly apiService: ApiCrmFetchService,
+    private readonly apiOrderService: OrdersApiService,
     @InjectRepository(PaymentMethodEntity)
     private readonly paymentMethodRepository: Repository<PaymentMethodEntity>,
     @InjectRepository(OrderStatusEntity)
@@ -34,54 +38,110 @@ export class SyncOderService {
     orderFromCrm: OrderCrm,
     user: UserEntity,
   ): Promise<OrderEntity> {
-    const existingOrder = await this.orderService.getOrderByCrmId(
-      orderFromCrm.id,
-    );
+    try {
+      const existingOrder = await this.orderService.getOrderByCrmId(
+        orderFromCrm.id,
+      );
 
-    if (!existingOrder) {
-      const statusId = this.syncOrderStatus(orderFromCrm.status_id);
-      const status = await this.statusRepository.findOneBy({ id: statusId });
-      const additionalnformation = this.cleanedString(
-        orderFromCrm.products.map((product) => product.name).join(' '),
-      );
-      const payment = await this.syncPaymentStatus(
-        orderFromCrm.payments_total,
-        orderFromCrm.grand_total,
-      );
-      const notes = orderFromCrm.custom_fields?.map((field) => this.cleanedString(field.value)) || [
-        '',
-      ];
-      const { address, shipping } = await this.syncShipping(
-        orderFromCrm.shipping,
-      );
-      const buyer = await this.syncBuyer(
-        orderFromCrm.buyer || {
-          full_name: orderFromCrm.shipping.recipient_full_name,
-          phone: orderFromCrm.shipping.recipient_phone,
-        },
-      );
-      buyer.address = address;
+      if (!existingOrder) {
+        const statusId = this.syncOrderStatus(orderFromCrm.status_id);
 
-      const products = await this.syncProducts(orderFromCrm.products);
-      const orderMap: Partial<OrderEntity> = {
-        orderCrm_id: orderFromCrm.id,
-        status,
-        additionalnformation,
-        totalPrice: orderFromCrm.grand_total,
-        payment,
-        notes,
-        buyer,
-        products,
-        shipping: { ...shipping, order_id: orderFromCrm.id },
-      };
-      const order = new OrderEntity(orderMap);
-      order.user = user;
-      const newOrder = await this.entityManager.save(order);
-      return newOrder;
+        const status = await this.statusRepository.findOneBy({ id: statusId });
+        const additionalnformation = this.cleanedString(
+          orderFromCrm.products.map((product) => product.name).join(' '),
+        );
+        const payment = await this.syncPaymentStatus(
+          orderFromCrm.payments_total,
+          orderFromCrm.grand_total,
+        );
+        const notes = orderFromCrm.custom_fields?.map((field) =>
+          this.cleanedString(field.value || ''),
+        ) || [''];
+        const sycnShipping = await this.syncShipping(orderFromCrm.shipping);        
+        const buyer = await this.syncBuyer(
+          orderFromCrm.buyer || {
+            full_name: orderFromCrm.shipping.recipient_full_name,
+            phone: orderFromCrm.shipping.recipient_phone,
+          },
+        );
+        buyer.address = sycnShipping.address;
+
+        const products = await this.syncProducts(orderFromCrm.products);
+        const orderMap: Partial<OrderEntity> = {
+          orderCrm_id: orderFromCrm.id,
+          status,
+          additionalnformation,
+          totalPrice: Math.floor(orderFromCrm.grand_total),
+          payment,
+          notes,
+          buyer,
+          user,
+          products,
+          shipping: { ...sycnShipping?.shipping, order_id: orderFromCrm.id },
+        };
+        const order = new OrderEntity(orderMap);
+        const newOrder = await this.entityManager.save(order);
+        if (!newOrder)
+          throw new BadRequestException('помикла при збереженні замовлення');
+        return newOrder;
+        return order;
+      }
+    } catch (error) {
+      throw error;
     }
   }
 
-  private syncOrderStatus(statusId: string) {
+  async importAllOrdersFromCrm(user: UserEntity) {
+    try {
+      await this.entityManager.transaction(async (queryRunner) => {
+        let currentPage = 1;
+        const delayBetweenRequests = 1300;
+        let requestCount = 0;
+        let lastPage = 1;
+
+        async function delay(ms: number): Promise<void> {
+          return new Promise((resolve) => setTimeout(resolve, ms));
+        }
+
+        do {
+          requestCount++;
+          console.log(`Запит ${requestCount}: Виконано`);
+
+          const data = await this.apiService.get(
+            `${this.apiOrderService.urlOfOrder}`,
+            {
+              limit: 50,
+              page: currentPage,
+            },
+          );
+
+          await Promise.all(
+            data.data.map(async (order: OrderCrm) => {
+              const newOrder = await this.setOrderFromCrm(order, user);
+              if (newOrder) {
+                await queryRunner
+                  .createQueryBuilder()
+                  .insert()
+                  .into(OrderEntity)
+                  .values(newOrder)
+                  .orIgnore(`("orderCrm_id") DO NOTHING`)
+                  .execute();
+                console.log(`Замовлення № ${order.id} записано`);
+              }
+            }),
+          );
+          lastPage = data.last_page;
+          currentPage++;
+          await delay(delayBetweenRequests);
+        } while (currentPage <= 8);
+      });
+      return 'Успішно';
+    } catch (error) {
+      console.error('An error occurred in importAllOrdersFromCrm:', error);
+      throw error;
+    }
+  }
+  syncOrderStatus(statusId: string) {
     const statusMapping: Record<string, number> = {
       '1': 1,
       '3': 2,
@@ -94,6 +154,7 @@ export class SyncOderService {
       '19': 9,
       '8': 10,
       '22': 11,
+      '28': 9,
     };
     return statusMapping[statusId];
   }
@@ -109,7 +170,7 @@ export class SyncOderService {
         }
         if (!productFromCrm.sku) {
           const product = new ProductEntity(productFromCrm);
-          const productName = this.cleanedString(product.name)
+          const productName = this.cleanedString(product.name);
           product.name = productName;
           return product;
         }
@@ -120,12 +181,17 @@ export class SyncOderService {
 
   private async syncPaymentStatus(paymentTotal: number, grandTotal: number) {
     try {
+      const roundedTotal = (total: number) => Math.floor(total);
+
       if (paymentTotal === 0) {
         const paymentMethod = await this.paymentMethodRepository.findOneBy({
           name: 'CashOnDelivery',
         });
-        const payment = new PaymentEntity(paymentMethod);
-        payment.value = grandTotal;
+        const payment = new PaymentEntity({
+          name: paymentMethod.name,
+          label: paymentMethod.label,
+        });
+        payment.value = roundedTotal(grandTotal);
         payment.payment_method_id = paymentMethod.id;
         const newPayment = await this.entityManager.save(payment);
         return newPayment;
@@ -134,8 +200,12 @@ export class SyncOderService {
         const paymentMethod = await this.paymentMethodRepository.findOneBy({
           name: 'Advance',
         });
-        paymentMethod.value = paymentTotal;
-        const payment = new PaymentEntity(paymentMethod);
+        paymentMethod.value = roundedTotal(paymentTotal);
+        const payment = new PaymentEntity({
+          name: paymentMethod.name,
+          label: paymentMethod.label,
+        });
+
         payment.payment_method_id = paymentMethod.id;
         const newPayment = await this.entityManager.save(payment);
         return newPayment;
@@ -145,8 +215,11 @@ export class SyncOderService {
         const paymentMethod = await this.paymentMethodRepository.findOneBy({
           name: 'Card',
         });
-        paymentMethod.value = paymentTotal;
-        const payment = new PaymentEntity(paymentMethod);
+        paymentMethod.value = roundedTotal(paymentTotal);
+        const payment = new PaymentEntity({
+          name: paymentMethod.name,
+          label: paymentMethod.label,
+        });
         payment.payment_method_id = paymentMethod.id;
         const newPayment = await this.entityManager.save(payment);
         return newPayment;
@@ -170,33 +243,36 @@ export class SyncOderService {
   }
 
   private async syncShipping(shippingCrm: TShippingCrm) {
-    const regex = /№(\d+)/;
-    const match = shippingCrm.full_address.match(regex);
-    const address = new AddressEntity({
-      Ref: shippingCrm.address_payload.warehouse_ref || '',
-      CityDescription: shippingCrm.shipping_address_city,
-      CityRef: shippingCrm.address_payload.city_ref || '',
-      SettlementRef: '',
-      SettlementDescription: '',
-      Description: shippingCrm.full_address,
-      Number: match ? Number(match[0]) : null,
-    });
+    if (shippingCrm) {
+      const regex = /№(\d+)/;
+      const match = shippingCrm.full_address.match(regex) ;      
+      const address = new AddressEntity({
+        Ref: shippingCrm.address_payload.warehouse_ref || '',
+        CityDescription: shippingCrm.shipping_address_city,
+        CityRef: shippingCrm.address_payload.city_ref || '',
+        SettlementRef: '',
+        SettlementDescription: '',
+        Description: shippingCrm.full_address,
+        Number: match ? Number(match[1]) : null,
+      });
+      const recipientFullName = shippingCrm?.recipient_full_name;
 
-    const recipient = new RecipientEntity({
-      FirstName: shippingCrm.recipient_full_name.split(' ')[1],
-      LastName: shippingCrm.recipient_full_name.split(' ')[0],
-      MiddleName: shippingCrm.recipient_full_name.split(' ')[2] || '',
-      Phone: shippingCrm.recipient_phone || '',
-    });
+      const recipient = new RecipientEntity({
+        FirstName: recipientFullName?.split(' ')[1] || '',
+        LastName: recipientFullName?.split(' ')[0] || '',
+        MiddleName: recipientFullName?.split(' ')[2] || '',
+        Phone: shippingCrm?.recipient_phone || '',
+      });
 
-    const shipping = new InternetDocumnetEntity({
-      Ref: shippingCrm.shipment_payload.uuid,
-      IntDocNumber: shippingCrm.tracking_code,
-      status: shippingCrm.shipping_status,
-      recipient,
-    });
+      const shipping = new InternetDocumnetEntity({
+        Ref: shippingCrm.shipment_payload.uuid,
+        IntDocNumber: shippingCrm.tracking_code,
+        status: shippingCrm.shipping_status,
+        recipient,
+      });
 
-    return { address, shipping };
+      return { address, shipping };
+    }
   }
 
   private cleanedString(string: string): string {

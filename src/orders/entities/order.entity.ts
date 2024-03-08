@@ -21,7 +21,7 @@ export class OrderEntity extends AbstractEntity<OrderEntity> {
     @Column({nullable: true})
     additionalnformation: string;
 
-    @Column({nullable: true})
+    @Column({nullable: true, })
     totalPrice: number;
     
     @OneToOne(() => PaymentEntity, payment => payment.order_id, { eager: true, cascade: true, onDelete: 'SET NULL', onUpdate: 'SET NULL' })
@@ -49,7 +49,7 @@ export class OrderEntity extends AbstractEntity<OrderEntity> {
     sender: SenderEntity
 
     @OneToOne(() => InternetDocumnetEntity, {eager: true, cascade: true, onDelete: 'SET NULL', onUpdate: 'SET NULL'})
-    @JoinColumn()
+    @JoinColumn({name: 'shipping_id'}) 
     shipping: InternetDocumnetEntity
 
 }

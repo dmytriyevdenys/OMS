@@ -10,7 +10,7 @@ import { OrderCrm } from '../interfaces/order-crm.interface';
 @Injectable()
 export class OrdersApiService {
   private readonly baseUrl: string;
-  private readonly urlOfOrder: string;
+   readonly urlOfOrder: string;
   constructor(private apiService: ApiCrmFetchService) {
     this.baseUrl = 'order';
     this.urlOfOrder = `${this.baseUrl}?include=shipping.deliveryService,products.offer,manager,custom_fields,payments,buyer`;
@@ -90,7 +90,7 @@ export class OrdersApiService {
             requestCount++;
             console.log(`Запит ${requestCount}: Виконано`);
 
-            const data = await this.apiService.get(
+            const data: OrderCrm = await this.apiService.get(
               `${this.urlOfOrder}`,
               {
                 limit: 50,

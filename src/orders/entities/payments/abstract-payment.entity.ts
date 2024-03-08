@@ -1,5 +1,5 @@
 import { AbstractEntity } from 'src/utils/abstract-entity';
-import { Column, Entity } from 'typeorm';
+import { Column } from 'typeorm';
 
 export abstract class AbstractPaymentEntity<T> extends AbstractEntity<T>  {
   @Column()

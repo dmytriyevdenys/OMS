@@ -7,6 +7,9 @@ import {
   Req,
   Put,
   Delete,
+  Query,
+  ParseArrayPipe,
+  ValidationPipe,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { OrdersApiService } from './orders-api/orders-api.service';
@@ -25,9 +28,22 @@ export class OrdersController {
     private ordersApiservice: OrdersApiService,
     private syncOrderService: SyncOderService
   ) {}
+
   @Get()
+  async getOrderByStatuses (
+    @Query('statuses', new ParseArrayPipe({ items: Number }), ValidationPipe) statuses: number[])
+    {    
+    return await this.ordersService.getOrderByStatuses(statuses);
+  }
+
+  @Get('all')
   async getAll() {
     return await this.ordersService.getAllOrders();
+  }
+
+  @Post('test') 
+  async test (@Body () dto: OrderCrm, @Req () req) {
+    return  this.syncOrderService.setOrderFromCrm(dto, req.user)
   }
 
   @Get('crm')
@@ -35,9 +51,9 @@ export class OrdersController {
     return await this.ordersApiservice.getAll();
   }
 
-  @Post('test')
-  async test (@Body() dto: OrderCrm, @Req() req){
-    return await this.syncOrderService.setOrderFromCrm(dto, req.user)
+  @Get('import')
+  async importAll (@Req() req) {
+    return await this.syncOrderService.importAllOrdersFromCrm(req.user);
   }
 
   @Get('crm/:id')
@@ -83,8 +99,10 @@ export class OrdersController {
   }
 
   @Get('status')
-  async getStatus(): Promise<OrderStatusEntity[]>{
-    return this.ordersService.getStatuses();
+  async getStatus(
+    @Query('id', new ParseArrayPipe({ items: Number }), ValidationPipe) id: number[]
+  ): Promise<OrderStatusEntity[]>{
+    return this.ordersService.getStatusesForOrderBoard(id);
   }
 
   @Get('delivery-service')
