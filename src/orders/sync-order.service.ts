@@ -20,7 +20,7 @@ import { OrdersApiService } from './orders-api/orders-api.service';
 import { ApiCrmFetchService } from 'src/utils/api-crm-fetch.service';
 
 @Injectable()
-export class SyncOderService {
+export class SyncOrderService {
   constructor(
     private readonly buyerService: BuyerService,
     private readonly entityManager: EntityManager,
@@ -84,7 +84,6 @@ export class SyncOderService {
         if (!newOrder)
           throw new BadRequestException('помикла при збереженні замовлення');
         return newOrder;
-        return order;
       }
     } catch (error) {
       throw error;
@@ -166,6 +165,7 @@ export class SyncOderService {
           const product = await this.productService.getProductBySku(
             productFromCrm.sku,
           );
+          product.quantity = productFromCrm.quantity
           return product;
         }
         if (!productFromCrm.sku) {

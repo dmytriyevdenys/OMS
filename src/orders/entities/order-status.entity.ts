@@ -17,6 +17,6 @@ export class OrderStatusEntity extends AbstractEntity<OrderStatusEntity> {
     @Column()
     is_active: boolean;
 
-    @OneToMany(() => OrderEntity, order => order.status, {onDelete: 'SET NULL', onUpdate: 'SET NULL'})
+    @OneToMany(() => OrderEntity, order => order.status,)
     orders: OrderEntity[];
 } 

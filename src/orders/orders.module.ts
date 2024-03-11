@@ -26,9 +26,8 @@ import { PaymentEntity } from './entities/payments/payment.entity';
 import { OrderStatusEntity } from './entities/order-status.entity';
 import { ProductsModule } from 'src/products/products.module';
 import { ProductsService } from 'src/products/products.service';
-import { ProductsApiService } from 'src/products/products-api/products-api.service';
 import { PaymentMethodEntity } from './entities/payments/payment-method.entity';
-import { SyncOderService } from './sync-order.service';
+import { SyncOrderService } from './sync-order.service';
 
 
 @Module({
@@ -45,7 +44,7 @@ UsersModule,
   controllers: [OrdersController, NewOrderWebHookController],
   providers: [
     OrdersService,
-    SyncOderService,
+    SyncOrderService,
     ApiCrmFetchService,
     OrdersApiService,
     NewOrderWebHookService,

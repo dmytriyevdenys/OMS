@@ -36,6 +36,7 @@ export class OrdersApiService {
   }
 
   private async mapDto(dto: UpdateOrderDto): Promise<OrderCrmDto> {
+   try {     
     const crmDto: OrderCrmDto = {
       source_id: dto.source_id,
       manager_id: dto.manager_id,
@@ -67,7 +68,11 @@ export class OrdersApiService {
         },
       ],
     };
+    if (!crmDto) throw new BadRequestException('Помилка') 
     return crmDto;
+  } catch (error) {
+    throw error;
+  }
   }
 
   async getOrders() {

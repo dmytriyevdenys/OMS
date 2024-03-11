@@ -14,7 +14,7 @@ export class OrderEntity extends AbstractEntity<OrderEntity> {
     @Column({nullable: true})
     orderCrm_id: string;
 
-   @ManyToOne(() => OrderStatusEntity, status => status.orders, {onUpdate: 'SET NULL', onDelete: 'SET NULL'})
+   @ManyToOne(() => OrderStatusEntity, status => status.orders, {cascade: true, onUpdate: 'SET NULL', onDelete: 'SET NULL'})
    @JoinColumn({name: 'status_id'})
     status: OrderStatusEntity;
 

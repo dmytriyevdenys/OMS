@@ -55,11 +55,14 @@ export class OrdersService {
 
   async updateOrder(orderId: number, dto: UpdateOrderDto) {
     try {
-      const order = await this.findOrderById(orderId);
-      const updateOrder = Object.assign(order, dto);
-      await this.ordersApiService.updateOrder(order.orderCrm_id, dto);
-      await this.entityManager.save(updateOrder);
-      return order;
+      await this.entityManager.transaction(async (entityManager) => {
+
+        const order = await this.findOrderById(orderId);
+        const updateOrder = Object.assign(order, dto);
+        // await this.ordersApiService.updateOrder(order.orderCrm_id, updateOrder);
+        await entityManager.save(updateOrder);
+        return updateOrder;
+      })
     } catch (error) {
       throw error;
     }
@@ -82,38 +85,41 @@ export class OrdersService {
 
   async getOrderByStatuses(statusIds: number[]) {
     try {
-      const orders = await this.orderRepository.createQueryBuilder('order') 
-        .leftJoinAndSelect('order.status', 'status')
-        .leftJoinAndSelect('order.buyer', 'buyer')
-        .leftJoinAndSelect('order.shipping', 'shipping')
-        .select([
-          'order.id as id',
-          'order.additionalnformation as additionalnformation',
-          'order.createdAt as created_at',
-          'order.totalPrice as total_price',
-          'buyer.full_name as full_name',
-          'order.status',
-          'shipping.IntDocNumber as IntDocNumber'
-        ])
-        .where('status.id IN (:...statusIds)', { statusIds })
-        .getRawMany();
-  
-      const groupedOrders = orders.reduce((result, order) => {
-        const statusId = order.status_id; 
-        if (!result[statusId]) {
-          result[statusId] = [];
-        }
-  
-        result[statusId].push(order);
-        return result;
-      }, {});
-  
-      return groupedOrders;
+      const groupedOrders: { order_id: number; orders: OrderEntity[] }[] =
+        await this.statusRepository
+          .createQueryBuilder('status')
+          .leftJoinAndSelect('status.orders', 'order')
+          .leftJoinAndSelect('order.buyer', 'buyer')
+          .leftJoinAndSelect('order.shipping', 'shipping')
+          .select([
+            'COALESCE(status.id, 0) as status_id',
+            'ARRAY_AGG(' +
+              'CASE WHEN order.id IS NOT NULL THEN ' +
+              'JSONB_BUILD_OBJECT(' +
+              "'id', order.id," +
+              "'additionalnformation', order.additionalnformation," +
+              "'created_at', order.createdAt," +
+              "'total_price', order.totalPrice," +
+              "'full_name', buyer.full_name," +
+              "'IntDocNumber', shipping.IntDocNumber," +
+              "'status_id', COALESCE(status.id, 0)" +
+              ')' +
+              ' ELSE NULL END' +
+              ') AS orders',
+          ])
+          .where('COALESCE(status.id, 0) IN (:...statusIds)', { statusIds })
+          .groupBy('COALESCE(status.id, 0)')
+          .getRawMany();
+      const orders = groupedOrders.map((elem) => ({
+        ...elem,
+        orders: elem.orders.filter((order) => order !== null),
+      }));
+
+      return orders;
     } catch (error) {
       throw error;
     }
   }
-  
 
   async getOrderByCrmId(id: string) {
     try {
@@ -127,9 +133,10 @@ export class OrdersService {
 
   async getStatusesForOrderBoard(ids: number[]) {
     try {
-      const statuses = await this.statusRepository.createQueryBuilder('status')
-      .where('status.id IN (:...ids)', {ids})
-      .getMany()
+      const statuses = await this.statusRepository
+        .createQueryBuilder('status')
+        .where('status.id IN (:...ids)', { ids })
+        .getMany();
       if (!statuses) throw new BadRequestException('Не знайдено жодно статуса');
       return statuses;
     } catch (error) {
@@ -146,7 +153,7 @@ export class OrdersService {
           products: true,
           buyer: true,
           sender: true,
-          status: true
+          status: true,
         },
       });
       return order;
