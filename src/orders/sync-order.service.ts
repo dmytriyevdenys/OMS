@@ -48,8 +48,7 @@ export class SyncOrderService {
 
         const status = await this.statusRepository.findOneBy({ id: statusId });
         const additionalnformation = this.cleanedString(
-          orderFromCrm.products.map((product) => product.name).join(' '),
-        );
+          orderFromCrm.products.map((product) => product.name).join(' '));
         const payment = await this.syncPaymentStatus(
           orderFromCrm.payments_total,
           orderFromCrm.grand_total,
@@ -64,8 +63,10 @@ export class SyncOrderService {
             phone: orderFromCrm.shipping.recipient_phone,
           },
         );
-        buyer.address = sycnShipping.address;
-
+        buyer.addresses = [];
+        buyer.addresses.push(sycnShipping.address);
+        await this.entityManager.save(buyer);
+      
         const products = await this.syncProducts(orderFromCrm.products);
         const orderMap: Partial<OrderEntity> = {
           orderCrm_id: orderFromCrm.id,
@@ -166,12 +167,15 @@ export class SyncOrderService {
             productFromCrm.sku,
           );
           product.quantity = productFromCrm.quantity
+          
           return product;
         }
         if (!productFromCrm.sku) {
           const product = new ProductEntity(productFromCrm);
           const productName = this.cleanedString(product.name);
           product.name = productName;
+          product.custom_item = true;
+          await this.entityManager.save(product);
           return product;
         }
       }),

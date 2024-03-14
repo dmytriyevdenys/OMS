@@ -68,7 +68,8 @@ export class ApiAddressService {
     const modelName = ModelName.Address;
     const calledMethod = CalledMethod.searchSettlements
     const methodProperties = { 
-      CityName: cityName
+      CityName: cityName,
+      limit: 50
     }
 
     const response = await this.apiService.sendPostRequest(
@@ -77,8 +78,12 @@ export class ApiAddressService {
       calledMethod,
       methodProperties
     )
-
-    return response.data;
+      const settlements = response.data[0]?.Addresses?.map(address => ({
+          Description: address.Present,
+          Ref: address.DeliveryCity,
+          cityName: address.MainDescription
+        }));
+    return settlements;
   }
 
   async getStreets (settlementRef: string, streetName: string) { 

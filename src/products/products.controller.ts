@@ -14,6 +14,7 @@ export class ProductsController {
   async getProduct(@Query('search') search?: string): Promise<ResponseData<ProductEntity[]>>{
     return await this.productsService.getProducts(search);
   }
+
   @Get(':id')
   async getProductById(
     @Param('id') id: number,

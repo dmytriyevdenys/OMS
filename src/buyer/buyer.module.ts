@@ -4,10 +4,11 @@ import { BuyerService } from './buyer.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BuyerEntity } from './entities/buyer.entity';
 import { ResponseService } from 'src/utils/response.service';
+import { BuyerRecipientEntity } from './entities/buyer-recipient.entity';
 
 @Module({
   imports: [
-  TypeOrmModule.forFeature([BuyerEntity])
+  TypeOrmModule.forFeature([BuyerEntity, BuyerRecipientEntity])
   ],
   controllers: [BuyerController],
   providers: [BuyerService, ResponseService],

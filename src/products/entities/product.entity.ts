@@ -1,20 +1,15 @@
 import { OrderEntity } from 'src/orders/entities/order.entity';
 import {
   Column,
-  CreateDateColumn,
   Entity,
   Index,
   ManyToMany,
-  PrimaryColumn,
-  UpdateDateColumn,
 } from 'typeorm';
+import { AbstractEntity } from 'src/utils/abstract-entity';
 
 @Entity()
 @Index(['name', 'sku'], { unique: true })
-export class ProductEntity {
-  @PrimaryColumn()
-  id: number;
-
+export class ProductEntity extends AbstractEntity<ProductEntity> {
   @Column()
   name: string;
 
@@ -25,21 +20,14 @@ export class ProductEntity {
   weight: number | null;
 
   @Column({ nullable: true })
-  sku: string | null;
+  sku: string ;
 
   @Column({ nullable: true })
   price: number;
 
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
-
-  @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
-
+  @Column({default: false})
+  custom_item: boolean;
+  
   @ManyToMany(() => OrderEntity, (order) => order.products)
   order: OrderEntity[];
-
-  constructor(entity: Partial<ProductEntity>) {
-    Object.assign(this, entity);
-  }
 }

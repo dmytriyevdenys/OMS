@@ -82,7 +82,7 @@ export class InternetDocumentService {
      }));
 
      queryBulder
-     .leftJoinAndSelect('internet_document.packer', 'packer')
+     .innerJoinAndSelect('internet_document.packer', 'packer')
      .orderBy('internet_document.createdAt', 'DESC')
       const paginateData = await paginate<InternetDocumnetEntity>(
         queryBulder,

@@ -23,30 +23,30 @@ export class ProductsService {
         const products = await this.productRepository.find({ take: 10 });
         return this.responseService.successResponse(products);
       }
+  
       const regexSearch = search
         .split(' ')
         .map((word) => `(?=.*${word})`)
         .join('');
+  
       const products = await this.productRepository
         .createQueryBuilder('product')
+        .leftJoin('product.order', 'orders')
         .where(`product.name ~* :regexSearch`, { regexSearch })
-        .orWhere('product.sku LIKE :search', {search: `%${search}%`})
-        .orderBy(
-          `CASE WHEN product.name = :fullSearch THEN 0 ELSE 1 END`,
-          'ASC',
-        )
-        .addOrderBy('product.price', 'ASC')
+        .orWhere('product.sku LIKE :search', { search: `%${search}%` })
+        .groupBy('product.id')
+        .orderBy(`CASE WHEN product.name = :fullSearch THEN 0 ELSE 1 END`, 'ASC')
+        .addOrderBy('COUNT(orders.id)', 'DESC')
+        .addOrderBy('product.price', 'DESC')
         .setParameter('fullSearch', search)
         .getMany();
-
+  
       return this.responseService.successResponse(products);
     } catch (error) {
-      throw this.responseService.notFoundResponse(
-        'Сталась помилка при пошуку товару',
-      );
+      throw this.responseService.notFoundResponse(error.message);
     }
   }
-
+  
   async getProductById(id: number): Promise<ProductEntity> {
     try {
       if (!id) throw new BadRequestException(`Поле id обов'язкове`);
