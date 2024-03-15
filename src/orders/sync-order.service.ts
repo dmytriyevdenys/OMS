@@ -15,9 +15,11 @@ import { TShippingCrm } from './interfaces/shipping-crm.type';
 import { AddressEntity } from 'src/novaposhta/address/entities/address.entity';
 import { InternetDocumnetEntity } from 'src/novaposhta/internet-document/entities/internet-document.entity';
 import { RecipientEntity } from 'src/novaposhta/recipient/entities/recipient.entity';
-import { ProductEntity } from 'src/products/entities/product.entity';
 import { OrdersApiService } from './orders-api/orders-api.service';
 import { ApiCrmFetchService } from 'src/utils/api-crm-fetch.service';
+import { OrderProductEntity } from 'src/products/entities/order-product.entity';
+import { BuyerRecipientEntity } from 'src/buyer/entities/buyer-recipient.entity';
+
 
 @Injectable()
 export class SyncOrderService {
@@ -62,9 +64,9 @@ export class SyncOrderService {
             full_name: orderFromCrm.shipping.recipient_full_name,
             phone: orderFromCrm.shipping.recipient_phone,
           },
-        );
+        );        
         buyer.addresses = [];
-        buyer.addresses.push(sycnShipping.address);
+        buyer.addresses.push(sycnShipping?.address);
         await this.entityManager.save(buyer);
       
         const products = await this.syncProducts(orderFromCrm.products);
@@ -81,7 +83,10 @@ export class SyncOrderService {
           shipping: { ...sycnShipping?.shipping, order_id: orderFromCrm.id },
         };
         const order = new OrderEntity(orderMap);
+        console.log(order);
+
         const newOrder = await this.entityManager.save(order);
+
         if (!newOrder)
           throw new BadRequestException('помикла при збереженні замовлення');
         return newOrder;
@@ -90,7 +95,6 @@ export class SyncOrderService {
       throw error;
     }
   }
-
   async importAllOrdersFromCrm(user: UserEntity) {
     try {
       await this.entityManager.transaction(async (queryRunner) => {
@@ -159,24 +163,31 @@ export class SyncOrderService {
     return statusMapping[statusId];
   }
 
-  private async syncProducts(productsCrm: ProductCrm[]) {
+  async syncProducts(productsCrm: ProductCrm[]) {
     const products = await Promise.all(
       productsCrm.map(async (productFromCrm) => {
         if (productFromCrm.sku) {
           const product = await this.productService.getProductBySku(
             productFromCrm.sku,
           );
-          product.quantity = productFromCrm.quantity
-          
-          return product;
+          if (product && product.quantity !== null) {
+            product.quantity = product.quantity - productFromCrm.quantity;
+          }
+          const newProduct = new OrderProductEntity(product);
+          newProduct.product = product;
+
+          newProduct.quantity = productFromCrm.quantity;
+          return newProduct;
         }
         if (!productFromCrm.sku) {
-          const product = new ProductEntity(productFromCrm);
-          const productName = this.cleanedString(product.name);
-          product.name = productName;
-          product.custom_item = true;
-          await this.entityManager.save(product);
-          return product;
+          const newProduct = new OrderProductEntity({
+            name: productFromCrm.name,
+            price: productFromCrm.price,
+            quantity: productFromCrm.quantity,
+            weight: productFromCrm.weight || null,
+          });
+
+          return newProduct;
         }
       }),
     );
@@ -185,55 +196,79 @@ export class SyncOrderService {
 
   private async syncPaymentStatus(paymentTotal: number, grandTotal: number) {
     try {
-      const roundedTotal = (total: number) => Math.floor(total);
-
       if (paymentTotal === 0) {
         const paymentMethod = await this.paymentMethodRepository.findOneBy({
           name: 'CashOnDelivery',
         });
-        const payment = new PaymentEntity({
-          name: paymentMethod.name,
-          label: paymentMethod.label,
-        });
-        payment.value = roundedTotal(grandTotal);
-        payment.payment_method_id = paymentMethod.id;
-        const newPayment = await this.entityManager.save(payment);
-        return newPayment;
+        const payment = this.createPayment(paymentMethod, grandTotal);
+        return payment;
       }
       if (paymentTotal > 0 && paymentTotal < grandTotal) {
         const paymentMethod = await this.paymentMethodRepository.findOneBy({
           name: 'Advance',
         });
-        paymentMethod.value = roundedTotal(paymentTotal);
-        const payment = new PaymentEntity({
-          name: paymentMethod.name,
-          label: paymentMethod.label,
-        });
-
-        payment.payment_method_id = paymentMethod.id;
-        const newPayment = await this.entityManager.save(payment);
-        return newPayment;
+        const payment = this.createPayment(paymentMethod, paymentTotal);
+        return payment;
       }
 
       if (paymentTotal === grandTotal) {
         const paymentMethod = await this.paymentMethodRepository.findOneBy({
           name: 'Card',
         });
-        paymentMethod.value = roundedTotal(paymentTotal);
-        const payment = new PaymentEntity({
-          name: paymentMethod.name,
-          label: paymentMethod.label,
-        });
-        payment.payment_method_id = paymentMethod.id;
-        const newPayment = await this.entityManager.save(payment);
-        return newPayment;
+        const payment = this.createPayment(paymentMethod, grandTotal);
+        return payment;
       }
     } catch (error) {
       throw new BadRequestException('Платіж не знайденою', error.message);
     }
   }
 
-  private async syncBuyer(buyerFromCrm: Partial<BuyerCrm>) {
+  private createPayment(
+    paymentMethod: PaymentMethodEntity,
+    paymentTotal: number,
+  ) {
+    const roundedTotal = (total: number) => Math.floor(total);
+    paymentMethod.value = roundedTotal(paymentTotal);
+    const paymnet = new PaymentEntity({
+      name: paymentMethod.name,
+      label: paymentMethod.label,
+      payment_method_id: paymentMethod.id,
+    });
+    return paymnet;
+  }
+
+  private async syncBuyer(
+    buyerFromCrm: Partial<BuyerCrm>,
+  ) {
+    // const buyer = await this.buyerService.validateBuyer([buyerFromCrm.phone]);
+    // if (buyer) {
+    //   if (buyer.full_name !== shippingCrm?.recipient_full_name) {
+    //     const buyerRecipient = new BuyerRecipientEntity({
+    //       full_name: shippingCrm.recipient_full_name,
+    //       phones: [shippingCrm.recipient_phone],
+    //     });
+    //     buyer.recipients.push(buyerRecipient);
+    //     return buyer;
+    //   }
+    //   return buyer;
+    // }
+    // if (!buyer) {
+    //   const newBuyer = new BuyerEntity({
+    //     full_name: buyerFromCrm.full_name,
+    //     phones: [buyerFromCrm.phone],
+    //     recipients: [],
+    //   });
+      
+    //   if (newBuyer.full_name !== shippingCrm?.recipient_full_name) {
+    //     const buyerRecipient = new BuyerRecipientEntity({
+    //       full_name: shippingCrm.recipient_full_name,
+    //       phones: [shippingCrm.recipient_phone],
+    //     });
+    //     newBuyer.recipients.push(buyerRecipient);
+    //   }
+    //   const createdBuyer = await this.buyerService.createBuyer(newBuyer);
+    //   return createdBuyer;
+    // }
     const buyer = await this.buyerService.validateBuyer([buyerFromCrm.phone]);
     if (buyer) return buyer;
     if (!buyer) {
@@ -249,7 +284,7 @@ export class SyncOrderService {
   private async syncShipping(shippingCrm: TShippingCrm) {
     if (shippingCrm) {
       const regex = /№(\d+)/;
-      const match = shippingCrm.full_address.match(regex) ;      
+      const match = shippingCrm.full_address.match(regex);
       const address = new AddressEntity({
         Ref: shippingCrm.address_payload.warehouse_ref || '',
         CityDescription: shippingCrm.shipping_address_city,

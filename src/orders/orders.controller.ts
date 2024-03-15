@@ -43,7 +43,12 @@ export class OrdersController {
 
   @Post('test') 
   async test (@Body () dto: OrderCrm, @Req () req) {
-    return  this.syncOrderService.setOrderFromCrm(dto, req.user)
+    return  await this.syncOrderService.setOrderFromCrm(dto, req.user)
+  }
+
+  @Post('testproduct')
+  async testproduct(@Body () dto: ProductCrm[]) {
+    return await this.syncOrderService.syncProducts(dto);
   }
 
   @Get('crm')

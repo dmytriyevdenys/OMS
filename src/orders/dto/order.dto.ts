@@ -3,6 +3,7 @@ import { InternetDocumnetEntity } from "src/novaposhta/internet-document/entitie
 import { SenderEntity } from "src/novaposhta/sender/entities/sender.entity";
 import { ProductEntity } from "src/products/entities/product.entity";
 import { PaymentEntity } from "../entities/payments/payment.entity";
+import { OrderProductEntity } from "src/products/entities/order-product.entity";
 
 
 export class OrderCrmDto {
@@ -15,7 +16,7 @@ export class OrderCrmDto {
         phone: string
     };
     shipping: any;
-    products: ProductEntity[];
+    products: OrderProductEntity[];
     payments: Payments[];
     custom_fields: CustomField[];
   }
@@ -42,7 +43,7 @@ export class OrderDto {
     shipping: InternetDocumnetEntity;
     source_id: number;
     manager_id: number;
-    products:ProductEntity[];
+    products:OrderProductEntity[];
     totalPrice: number;
     additionalnformation: string;
     payments: PaymentEntity;

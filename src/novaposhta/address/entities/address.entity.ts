@@ -33,7 +33,7 @@ export class AddressEntity extends AbstractEntity<AddressEntity> {
     })
     sender: SenderEntity
 
-    @ManyToOne(() => BuyerEntity)
+    @ManyToOne(() => BuyerEntity, buyer => buyer.addresses)
     buyer: BuyerEntity
     
 }

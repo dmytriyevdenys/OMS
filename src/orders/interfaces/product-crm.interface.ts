@@ -1,6 +1,7 @@
 interface ProductCrm { 
-    id: number;
+  id: number;
   sku: string;
+  weight: number;
   variation_id: null | number;
   publication_source_uuid: null | string;
   name: string;

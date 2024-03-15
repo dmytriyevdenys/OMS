@@ -9,11 +9,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductEntity } from './entities/product.entity';
 import { MatchService } from 'src/utils/match-model.service';
 import { ResponseService } from 'src/utils/response.service';
+import { OrderProductEntity } from './entities/order-product.entity';
 
 @Module({
   imports: [
     HttpModule,
-    TypeOrmModule.forFeature([ProductEntity])
+    TypeOrmModule.forFeature([ProductEntity, OrderProductEntity])
   ],
   providers: [
     ProductsService,

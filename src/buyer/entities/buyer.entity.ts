@@ -15,6 +15,6 @@ export class BuyerEntity extends AbstractCustomerEntity<BuyerEntity> {
     @OneToMany(() => AddressEntity, address => address.buyer,{cascade: true})
     addresses: AddressEntity[]
      
-    @OneToMany(() => BuyerRecipientEntity, recipient => recipient.buyer)
+    @OneToMany(() => BuyerRecipientEntity, recipient => recipient.buyer, {cascade: true})
     recipients: BuyerRecipientEntity[]
 }

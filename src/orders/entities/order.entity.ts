@@ -1,12 +1,12 @@
 import { BuyerEntity } from "src/buyer/entities/buyer.entity";
 import { InternetDocumnetEntity } from "src/novaposhta/internet-document/entities/internet-document.entity";
 import { SenderEntity } from "src/novaposhta/sender/entities/sender.entity";
-import { ProductEntity } from "src/products/entities/product.entity";
 import { UserEntity } from "src/users/entities/user.entity";
 import { AbstractEntity } from "src/utils/abstract-entity";
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne,  } from "typeorm";
 import { PaymentEntity } from "./payments/payment.entity";
 import { OrderStatusEntity } from "./order-status.entity";
+import { OrderProductEntity } from "src/products/entities/order-product.entity";
 
 @Entity()
 export class OrderEntity extends AbstractEntity<OrderEntity> {
@@ -40,9 +40,8 @@ export class OrderEntity extends AbstractEntity<OrderEntity> {
     @JoinColumn({name: 'buyer_id'})
     buyer: BuyerEntity;
 
-    @ManyToMany(() => ProductEntity, product => product.order, { onDelete: 'SET NULL', onUpdate: 'SET NULL'})
-    @JoinTable() 
-    products: ProductEntity[]
+    @OneToMany(() => OrderProductEntity, product => product.order, {cascade: true, onDelete: 'SET NULL', onUpdate: 'SET NULL'})
+    products: OrderProductEntity[]
 
    
     @ManyToOne(() => SenderEntity, sender => sender.orders, {cascade: true, onDelete: 'SET NULL', onUpdate: 'SET NULL'})

@@ -30,16 +30,17 @@ export class ProductsService {
         .join('');
   
       const products = await this.productRepository
-        .createQueryBuilder('product')
-        .leftJoin('product.order', 'orders')
-        .where(`product.name ~* :regexSearch`, { regexSearch })
-        .orWhere('product.sku LIKE :search', { search: `%${search}%` })
-        .groupBy('product.id')
-        .orderBy(`CASE WHEN product.name = :fullSearch THEN 0 ELSE 1 END`, 'ASC')
-        .addOrderBy('COUNT(orders.id)', 'DESC')
-        .addOrderBy('product.price', 'DESC')
-        .setParameter('fullSearch', search)
-        .getMany();
+      .createQueryBuilder('product')
+      .leftJoin('product.order_product', 'orderProduct')
+      .leftJoin('orderProduct.order', 'order')
+      .where(`product.name ~* :regexSearch`, { regexSearch })
+      .orWhere('product.sku LIKE :search', { search: `%${search}%` })
+      .groupBy('product.id, orderProduct.id') 
+      .orderBy(`CASE WHEN product.name = :fullSearch THEN 0 ELSE 1 END`, 'ASC')
+      .addOrderBy('COUNT(order.id)', 'DESC')
+      .addOrderBy('product.price', 'DESC')
+      .setParameter('fullSearch', search)
+      .getMany();
   
       return this.responseService.successResponse(products);
     } catch (error) {
