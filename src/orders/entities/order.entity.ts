@@ -1,6 +1,7 @@
 import { BuyerEntity } from "src/buyer/entities/buyer.entity";
 import { InternetDocumnetEntity } from "src/novaposhta/internet-document/entities/internet-document.entity";
 import { SenderEntity } from "src/novaposhta/sender/entities/sender.entity";
+import { ProductEntity } from "src/products/entities/product.entity";
 import { UserEntity } from "src/users/entities/user.entity";
 import { AbstractEntity } from "src/utils/abstract-entity";
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne,  } from "typeorm";
@@ -40,7 +41,8 @@ export class OrderEntity extends AbstractEntity<OrderEntity> {
     @JoinColumn({name: 'buyer_id'})
     buyer: BuyerEntity;
 
-    @OneToMany(() => OrderProductEntity, product => product.order, {cascade: true, onDelete: 'SET NULL', onUpdate: 'SET NULL'})
+    @ManyToMany(() => OrderProductEntity, product => product.order, { onDelete: 'SET NULL', onUpdate: 'SET NULL'})
+    @JoinTable() 
     products: OrderProductEntity[]
 
    

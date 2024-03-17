@@ -30,7 +30,7 @@ export class ProductUpdaterService implements OnModuleInit {
         this.logger.log('База даних порожня. Оновлення товарів...');
         await this.fetchProductsFromCrm();
       } else { 
-        const lastProduct = await this.productRepository.findOneBy({id: 450}); 
+        const lastProduct = await this.productRepository.findOneBy({id: productCount}); 
         const lastUpdatedDate = lastProduct ? lastProduct.updatedAt : null;
 
         const comparisonDate = new Date();

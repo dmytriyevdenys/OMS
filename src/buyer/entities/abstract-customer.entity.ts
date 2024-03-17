@@ -10,4 +10,5 @@ export abstract class AbstractCustomerEntity<T> extends AbstractEntity<T> {
 
     @Column({nullable: true})
     email: string;
+
 }
