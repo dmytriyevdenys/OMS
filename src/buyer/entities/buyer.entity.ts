@@ -12,9 +12,9 @@ export class BuyerEntity extends AbstractCustomerEntity<BuyerEntity> {
     @JoinColumn({name: 'order_id'})
     orders: OrderEntity[];
 
-    @OneToMany(() => AddressEntity, address => address.buyer,{cascade: true})
+    @OneToMany(() => AddressEntity, address => address.buyer,{cascade: true, eager: true})
     addresses: AddressEntity[]
      
-    @OneToMany(() => BuyerRecipientEntity, recipient => recipient.buyer, {cascade: true})
+    @OneToMany(() => BuyerRecipientEntity, recipient => recipient.buyer, {cascade: true, eager: true})
     recipients: BuyerRecipientEntity[]
 }
