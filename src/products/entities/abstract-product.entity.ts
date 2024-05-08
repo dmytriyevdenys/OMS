@@ -1,7 +1,9 @@
-import { AbstractEntity } from "src/utils/abstract-entity";
-import { Column } from "typeorm";
+import { Column, CreateDateColumn, PrimaryColumn, UpdateDateColumn } from "typeorm";
 
-export abstract class AbstractProductEntity<T> extends AbstractEntity<T> {
+export abstract class AbstractProductEntity<T>  {
+    @PrimaryColumn()
+    id: number;
+
     @Column()
     name: string;
   
@@ -16,4 +18,14 @@ export abstract class AbstractProductEntity<T> extends AbstractEntity<T> {
   
     @Column({ nullable: true })
     price: number;
+
+    @CreateDateColumn({name: 'created_at', type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+    createdAt: Date
+
+    @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+    updatedAt: Date
+
+    constructor (entity: Partial<T>) {
+        Object.assign(this, entity);
+    }
 }

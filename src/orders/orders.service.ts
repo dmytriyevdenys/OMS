@@ -144,6 +144,15 @@ export class OrdersService {
     }
   }
 
+  async getAllStatuses () { 
+    try {
+      const statuses = await this.statusRepository.find();
+      return statuses
+    } catch (error) { 
+      throw error;
+    }
+  }
+
   async findOrderById(id: number) {
     try {
       const order = await this.orderRepository.findOne({

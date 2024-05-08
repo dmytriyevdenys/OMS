@@ -105,8 +105,10 @@ export class OrdersController {
 
   @Get('status')
   async getStatus(
-    @Query('id', new ParseArrayPipe({ items: Number }), ValidationPipe) id: number[]
+    @Query('id', new ParseArrayPipe({ items: Number }), ValidationPipe) id: number[],
+    @Query('all', ValidationPipe) all: boolean,
   ): Promise<OrderStatusEntity[]>{
+    if (all) return this.ordersService.getAllStatuses();
     return this.ordersService.getStatusesForOrderBoard(id);
   }
 

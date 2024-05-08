@@ -10,8 +10,8 @@ export class BuyerController {
   constructor(private buyerService: BuyerService) {}
 
   @Get()
-  async findBuyer(@Query('buyer') buyer: string): Promise<BuyerEntity[]> {
-    if (buyer) return await this.buyerService.findBuyer(buyer);
+  async findBuyer(@Query('search') search: string): Promise<BuyerEntity[]> {
+    if (search) return await this.buyerService.findBuyer(search);
 
     return await this.buyerService.getAllBuyer();
   }

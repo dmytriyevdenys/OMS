@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import {  Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { ProductsApiService } from './products-api/products-api.service';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -30,9 +30,11 @@ export class ProductUpdaterService implements OnModuleInit {
         this.logger.log('База даних порожня. Оновлення товарів...');
         await this.fetchProductsFromCrm();
       } else { 
-        const lastProduct = await this.productRepository.findOneBy({id: productCount}); 
-        const lastUpdatedDate = lastProduct ? lastProduct.updatedAt : null;
-
+        const lastProduct = await this.productRepository.find({
+          order: { updatedAt: 'DESC' },
+          take: 1
+        }); 
+        const lastUpdatedDate = lastProduct ? lastProduct[0].updatedAt : null;
         const comparisonDate = new Date();
         comparisonDate.setMonth(comparisonDate.getMonth() - 1);
 
@@ -49,7 +51,7 @@ export class ProductUpdaterService implements OnModuleInit {
       }
 
       this.logger.log('Завершено перевірку бази даних та оновлення товарів.');
-    } catch (error) {
+    } catch (error) {      
       this.logger.error(`Помилка оновлення товарів або перевірки бази даних: ${error.message}`);
     }
   }
@@ -58,20 +60,20 @@ export class ProductUpdaterService implements OnModuleInit {
   async fetchProductsFromCrm () {
     try {
       const products = await this.productsApiService.getAll();
-      const newProducts = [];
   
       for (const product of products) {
-        const entity = new ProductEntity(product);
-        const savedProduct = await this.entityManager.save(entity);
-        newProducts.push(savedProduct); 
+        const existingProduct = await this.entityManager.findOneBy(ProductEntity, {id: product.id});
+        if (existingProduct) {
+        const updatedProduct = Object.assign(existingProduct, product);
+        await this.entityManager.save(updatedProduct);
+        }
+        else {
+        const entity = new ProductEntity(product);                
+        await this.entityManager.save(entity);
+        }
       }
       
-      if (newProducts.length === 0) {
-        throw new BadRequestException('Помилка при завантаженні товарів');
-      }
-      
-      return newProducts; 
-    } catch (error) { 
+    } catch (error) {  
       this.logger.log('Помилка при завантаженні товарів в БД');
     }
   }
