@@ -34,12 +34,13 @@ export class UsersService {
     }
   }
 
-  async updateUser(id: number, dto ) {
+  async updateUser(id: number, dto: Partial<UserEntity>) {
     try {
       const user = await this.usersRepository.findOneBy({ id });
       if (!user) {
         throw new BadRequestException('не вдалось оновити користувача');
       }
+      Object.assign(user,dto);
       await this.entityManager.save(user);
       return user;
     } catch (error) {
