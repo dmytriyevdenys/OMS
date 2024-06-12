@@ -1,8 +1,6 @@
 import { Column, CreateDateColumn, PrimaryColumn, UpdateDateColumn } from "typeorm";
 
 export abstract class AbstractProductEntity<T>  {
-    @PrimaryColumn()
-    id: number;
 
     @Column()
     name: string;

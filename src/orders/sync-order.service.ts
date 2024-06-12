@@ -46,12 +46,12 @@ export class SyncOrderService {
         orderFromCrm.id,
       );
 
-      if (!existingOrder) {
+    if (!existingOrder) {
         const statusId = this.syncOrderStatus(orderFromCrm.status_id);
 
         const status = await this.statusRepository.findOneBy({ id: statusId });
         const additionalnformation = this.cleanedString(
-          orderFromCrm.products.map((product) => product.name).join(' '));
+          orderFromCrm.products.map((product) => `${product.name} ${product.comment}`).join(' '));
         const payment = await this.syncPaymentStatus(
           orderFromCrm.payments_total,
           orderFromCrm.grand_total,
@@ -86,7 +86,7 @@ export class SyncOrderService {
           shipping: { ...sycnShipping?.shipping, order_id: orderFromCrm.id },
         };
         const order = new OrderEntity(orderMap);
-        const newOrder = await this.entityManager.save(order)
+        const newOrder = await this.entityManager.save(order);
         return newOrder;
       }
     } catch (error) {
@@ -100,42 +100,52 @@ export class SyncOrderService {
         const delayBetweenRequests = 1300;
         let requestCount = 0;
         let lastPage = 1;
-
+  
         async function delay(ms: number): Promise<void> {
           return new Promise((resolve) => setTimeout(resolve, ms));
         }
-
+  
         do {
-          requestCount++;
-          console.log(`Запит ${requestCount}: Виконано`);
-
-          const data = await this.apiService.get(
-            `${this.apiOrderService.urlOfOrder}`,
-            {
-              limit: 50,
-              page: currentPage,
-            },
-          );
-
-          await Promise.all(
-            data.data.map(async (order: OrderCrm) => {
-              const newOrder = await this.setOrderFromCrm(order, user);
-              if (newOrder) {
-                await queryRunner
-                  .createQueryBuilder()
-                  .insert()
-                  .into(OrderEntity)
-                  .values(newOrder)
-                  .orIgnore(`("orderCrm_id") DO NOTHING`)
-                  .execute();
-                console.log(`Замовлення № ${order.id} записано`);
-              }
-            }),
-          );
-          lastPage = data.last_page;
-          currentPage++;
-          await delay(delayBetweenRequests);
-        } while (currentPage <= 8);
+          try {
+            requestCount++;
+            console.log(`Запит ${requestCount}: Виконано`);
+  
+            const data = await this.apiService.get(
+              `${this.apiOrderService.urlOfOrder}`,
+              {
+                limit: 50,
+                page: currentPage,
+              },
+            );
+  
+            await Promise.all(
+              data.data.map(async (order: OrderCrm) => {
+                try {
+                  const newOrder = await this.setOrderFromCrm(order, user);
+                  if (newOrder) {
+                    await queryRunner
+                      .createQueryBuilder()
+                      .insert()
+                      .into(OrderEntity)
+                      .values(newOrder)
+                      .orIgnore(`("orderCrm_id") DO NOTHING`)
+                      .execute();
+                    console.log(`Замовлення № ${order.id} записано`);
+                  }
+                } catch (error) {
+                  console.error(`Помилка запису замовлення № ${order.id}:`, error);
+                }
+              })
+            );
+  
+            lastPage = data.last_page;
+            currentPage++;
+  
+            await delay(delayBetweenRequests);
+          } catch (error) {
+            console.error(`Помилка запиту на сторінці ${currentPage}:`, error);
+          }
+        } while (currentPage <= lastPage && currentPage <= 8);
       });
       return 'Успішно';
     } catch (error) {
@@ -143,6 +153,7 @@ export class SyncOrderService {
       throw error;
     }
   }
+  
   syncOrderStatus(statusId: string) {
     const statusMapping: Record<string, number> = {
       '1': 1,
@@ -162,34 +173,42 @@ export class SyncOrderService {
   }
 
   async syncProducts(productsCrm: ProductCrm[]) {
+
+  const createProduct = async(productCrm: ProductCrm) => {
+      const newProduct = new OrderProductEntity({
+        name: productCrm.name,
+        price: productCrm.price,
+        quantity: productCrm.quantity,
+        weight: productCrm.weight || null,
+        comment: productCrm.comment || null
+      });
+      await this.entityManager.save(newProduct);
+      return newProduct;
+    }
+
     const products = await Promise.all(
       productsCrm.map(async (productFromCrm) => {
                   
         if (productFromCrm.sku) {
           const product = await this.productService.getProductBySku(
             productFromCrm.sku,
-          );
+          );          
           if (product && product.quantity !== null) {
             product.quantity = product.quantity - productFromCrm.quantity;
             const newProduct = new OrderProductEntity(product);
           newProduct.product = product;
           newProduct.quantity = productFromCrm.quantity;
+          newProduct.comment = productFromCrm.comment || null;
           await this.entityManager.save(newProduct);
+          
           return newProduct;
           }
-          
+          await createProduct(productFromCrm);
         }
         if (!productFromCrm.sku) {
-          const newProduct = new OrderProductEntity({
-            name: productFromCrm.name,
-            price: productFromCrm.price,
-            quantity: productFromCrm.quantity,
-            weight: productFromCrm.weight || null,
-          });
-          await this.entityManager.save(newProduct);
-          return newProduct;
+        await createProduct(productFromCrm)
         }
-      }),
+      })
     );
     return products;
   }
@@ -243,37 +262,43 @@ export class SyncOrderService {
     buyerFromCrm: Partial<BuyerCrm>,
     shippingCrm: TShippingCrm
   ) {
-    const buyer = await this.buyerService.validateBuyer([buyerFromCrm.phone]);
-    if (buyer) {
-      if (buyer.full_name !== shippingCrm?.recipient_full_name) {
-        const buyerRecipient = new BuyerRecipientEntity({
-          full_name: shippingCrm.recipient_full_name,
-          phones: [shippingCrm.recipient_phone],
-        });
-        buyer.recipients.push(buyerRecipient);
-        await this.entityManager.save(buyer);
+    try {
+      const buyer = await this.buyerService.validateBuyer([buyerFromCrm.phone]);
+      if (buyer) {
+        if (buyer.full_name !== shippingCrm?.recipient_full_name) {
+          const buyerRecipient = new BuyerRecipientEntity({
+            full_name: shippingCrm.recipient_full_name,
+            phones: [shippingCrm.recipient_phone],
+          });
+          buyer.recipients.push(buyerRecipient);
+          await this.entityManager.save(buyer);
+        }
         return buyer;
-      }
-      return buyer;
-    }
-    if (!buyer) {
-      const newBuyer = new BuyerEntity({
-        full_name: buyerFromCrm.full_name,
-        phones: [buyerFromCrm.phone],
-        recipients: [],
-      });
-      
-      if (newBuyer.full_name !== shippingCrm?.recipient_full_name) {
-        const buyerRecipient = new BuyerRecipientEntity({
-          full_name: shippingCrm.recipient_full_name,
-          phones: [shippingCrm.recipient_phone],
+      } else {
+        const newBuyer = new BuyerEntity({
+          full_name: buyerFromCrm.full_name,
+          phones: [buyerFromCrm.phone],
+          recipients: [],
         });
+  
+        const recipientName = shippingCrm?.recipient_full_name || newBuyer.full_name;
+        const recipientPhone = shippingCrm?.recipient_phone || buyerFromCrm.phone;
+  
+        const buyerRecipient = new BuyerRecipientEntity({
+          full_name: recipientName,
+          phones: [recipientPhone],
+        });
+  
         newBuyer.recipients.push(buyerRecipient);
+        const createdBuyer = await this.buyerService.createBuyer(newBuyer);
+        return createdBuyer;
       }
-      const createdBuyer = await this.buyerService.createBuyer(newBuyer);
-      return createdBuyer;
+    } catch (error) {
+      console.error('An error occurred in syncBuyer:', error);
+      throw error;
     }
   }
+  
 
   private async syncShipping(shippingCrm: TShippingCrm) {    
     if (shippingCrm && shippingCrm.shipping_address_city) {

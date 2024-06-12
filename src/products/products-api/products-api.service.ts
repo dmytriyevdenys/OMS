@@ -39,4 +39,5 @@ export class ProductsApiService {
       throw error;
     }
   }
+
 }
