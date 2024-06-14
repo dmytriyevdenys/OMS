@@ -14,7 +14,7 @@ export class ProductEntity extends AbstractProductEntity<ProductEntity> {
   @PrimaryColumn()
   id: number;
  
-  @OneToMany(() => OrderProductEntity, (product) => product.product)
+  @OneToMany(() => OrderProductEntity, (product) => product.product ,{nullable: true, })
   order_product: OrderProductEntity[];
 
 }

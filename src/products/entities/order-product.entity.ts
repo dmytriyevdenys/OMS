@@ -12,7 +12,7 @@ export class OrderProductEntity extends AbstractProductEntity<OrderProductEntity
     @Column({ nullable: true })
     comment: string;
 
-    @ManyToOne(() => ProductEntity, product => product.order_product, { cascade: true })
+    @ManyToOne(() => ProductEntity, product => product.order_product, { nullable: true })
     product: ProductEntity;
 
     @ManyToOne(() => OrderEntity, order => order.products)

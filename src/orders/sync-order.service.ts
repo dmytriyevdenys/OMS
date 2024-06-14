@@ -34,7 +34,6 @@ export class SyncOrderService {
     private readonly paymentMethodRepository: Repository<PaymentMethodEntity>,
     @InjectRepository(OrderStatusEntity)
     private readonly statusRepository: Repository<OrderStatusEntity>,
-
   ) {}
 
   async setOrderFromCrm(
@@ -46,32 +45,40 @@ export class SyncOrderService {
         orderFromCrm.id,
       );
 
-    if (!existingOrder) {
+      if (!existingOrder) {
         const statusId = this.syncOrderStatus(orderFromCrm.status_id);
 
         const status = await this.statusRepository.findOneBy({ id: statusId });
-        const additionalnformation = this.cleanedString(
-          orderFromCrm.products.map((product) => `${product.name} ${product.comment}`).join(' '));
+        const additionalnformation = orderFromCrm.products
+          .map((product) => {
+            const comment = product.comment ? product.comment : '';
+            const info = `${product.name} ${comment}`;
+            return info;
+          })
+          .join(' ');
         const payment = await this.syncPaymentStatus(
           orderFromCrm.payments_total,
           orderFromCrm.grand_total,
         );
-        
-        const notes = orderFromCrm.custom_fields?.map((field) =>
-          this.cleanedString(field.value || ''),
-        ) || [''];
-        const sycnShipping = await this.syncShipping(orderFromCrm?.shipping);        
+
+        const notes = [
+          (
+            orderFromCrm.custom_fields?.map((field) => field.value) || ['']
+          ).join(' '),
+        ];
+
+        const sycnShipping = await this.syncShipping(orderFromCrm?.shipping);
         const buyer = await this.syncBuyer(
           orderFromCrm.buyer || {
             full_name: orderFromCrm.shipping.recipient_full_name,
             phone: orderFromCrm.shipping.recipient_phone,
           },
-          orderFromCrm.shipping
-        );        
+          orderFromCrm.shipping,
+        );
         buyer.addresses = [];
         buyer.addresses.push(sycnShipping?.address);
         await this.entityManager.save(buyer);
-      
+
         const products = await this.syncProducts(orderFromCrm.products);
         const orderMap: Partial<OrderEntity> = {
           orderCrm_id: orderFromCrm.id,
@@ -100,16 +107,16 @@ export class SyncOrderService {
         const delayBetweenRequests = 1300;
         let requestCount = 0;
         let lastPage = 1;
-  
+
         async function delay(ms: number): Promise<void> {
           return new Promise((resolve) => setTimeout(resolve, ms));
         }
-  
+
         do {
           try {
             requestCount++;
             console.log(`Запит ${requestCount}: Виконано`);
-  
+
             const data = await this.apiService.get(
               `${this.apiOrderService.urlOfOrder}`,
               {
@@ -117,7 +124,7 @@ export class SyncOrderService {
                 page: currentPage,
               },
             );
-  
+
             await Promise.all(
               data.data.map(async (order: OrderCrm) => {
                 try {
@@ -133,14 +140,17 @@ export class SyncOrderService {
                     console.log(`Замовлення № ${order.id} записано`);
                   }
                 } catch (error) {
-                  console.error(`Помилка запису замовлення № ${order.id}:`, error);
+                  console.error(
+                    `Помилка запису замовлення № ${order.id}:`,
+                    error,
+                  );
                 }
-              })
+              }),
             );
-  
+
             lastPage = data.last_page;
             currentPage++;
-  
+
             await delay(delayBetweenRequests);
           } catch (error) {
             console.error(`Помилка запиту на сторінці ${currentPage}:`, error);
@@ -153,7 +163,7 @@ export class SyncOrderService {
       throw error;
     }
   }
-  
+
   syncOrderStatus(statusId: string) {
     const statusMapping: Record<string, number> = {
       '1': 1,
@@ -173,42 +183,40 @@ export class SyncOrderService {
   }
 
   async syncProducts(productsCrm: ProductCrm[]) {
-
-  const createProduct = async(productCrm: ProductCrm) => {
+    const createProduct = async (productCrm: ProductCrm) => {
       const newProduct = new OrderProductEntity({
         name: productCrm.name,
         price: productCrm.price,
         quantity: productCrm.quantity,
         weight: productCrm.weight || null,
-        comment: productCrm.comment || null
+        comment: productCrm.comment || null,
       });
       await this.entityManager.save(newProduct);
       return newProduct;
-    }
+    };
 
     const products = await Promise.all(
       productsCrm.map(async (productFromCrm) => {
-                  
         if (productFromCrm.sku) {
           const product = await this.productService.getProductBySku(
             productFromCrm.sku,
-          );          
+          );
           if (product && product.quantity !== null) {
             product.quantity = product.quantity - productFromCrm.quantity;
             const newProduct = new OrderProductEntity(product);
-          newProduct.product = product;
-          newProduct.quantity = productFromCrm.quantity;
-          newProduct.comment = productFromCrm.comment || null;
-          await this.entityManager.save(newProduct);
-          
-          return newProduct;
+            newProduct.product = product;
+            newProduct.quantity = productFromCrm.quantity;
+            newProduct.comment = productFromCrm.comment || null;
+            await this.entityManager.save(newProduct);
+
+            return newProduct;
           }
-          await createProduct(productFromCrm);
+          return await createProduct(productFromCrm);
         }
         if (!productFromCrm.sku) {
-        await createProduct(productFromCrm)
+          return await createProduct(productFromCrm);
         }
-      })
+      }),
     );
     return products;
   }
@@ -252,7 +260,7 @@ export class SyncOrderService {
       name: paymentMethod.name,
       label: paymentMethod.label,
       payment_method_id: paymentMethod.id,
-      value: paymentMethod.value
+      value: paymentMethod.value,
     });
     await this.entityManager.save(paymnet);
     return paymnet;
@@ -260,7 +268,7 @@ export class SyncOrderService {
 
   private async syncBuyer(
     buyerFromCrm: Partial<BuyerCrm>,
-    shippingCrm: TShippingCrm
+    shippingCrm: TShippingCrm,
   ) {
     try {
       const buyer = await this.buyerService.validateBuyer([buyerFromCrm.phone]);
@@ -280,15 +288,17 @@ export class SyncOrderService {
           phones: [buyerFromCrm.phone],
           recipients: [],
         });
-  
-        const recipientName = shippingCrm?.recipient_full_name || newBuyer.full_name;
-        const recipientPhone = shippingCrm?.recipient_phone || buyerFromCrm.phone;
-  
+
+        const recipientName =
+          shippingCrm?.recipient_full_name || newBuyer.full_name;
+        const recipientPhone =
+          shippingCrm?.recipient_phone || buyerFromCrm.phone;
+
         const buyerRecipient = new BuyerRecipientEntity({
           full_name: recipientName,
           phones: [recipientPhone],
         });
-  
+
         newBuyer.recipients.push(buyerRecipient);
         const createdBuyer = await this.buyerService.createBuyer(newBuyer);
         return createdBuyer;
@@ -298,9 +308,8 @@ export class SyncOrderService {
       throw error;
     }
   }
-  
 
-  private async syncShipping(shippingCrm: TShippingCrm) {    
+  private async syncShipping(shippingCrm: TShippingCrm) {
     if (shippingCrm && shippingCrm.shipping_address_city) {
       const regex = /№(\d+)/;
       const match = shippingCrm.full_address.match(regex);
@@ -321,7 +330,7 @@ export class SyncOrderService {
         MiddleName: recipientFullName?.split(' ')[2] || '',
         Phone: shippingCrm?.recipient_phone || '',
       });
-      
+
       const shipping = new InternetDocumnetEntity({
         Ref: shippingCrm.shipment_payload.uuid,
         IntDocNumber: shippingCrm.tracking_code,
@@ -331,10 +340,5 @@ export class SyncOrderService {
       await this.entityManager.save(shipping);
       return { address, shipping };
     }
-  }
-
-  private cleanedString(string: string): string {
-    const cleanedString = string.replace(/["'\\]+/g, '');
-    return cleanedString;
   }
 }

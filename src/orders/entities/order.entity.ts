@@ -8,6 +8,7 @@ import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany
 import { PaymentEntity } from "./payments/payment.entity";
 import { OrderStatusEntity } from "./order-status.entity";
 import { OrderProductEntity } from "src/products/entities/order-product.entity";
+import { SourceEntity } from "./sources/source.entity";
 
 @Entity()
 export class OrderEntity extends AbstractEntity<OrderEntity> {
@@ -15,6 +16,10 @@ export class OrderEntity extends AbstractEntity<OrderEntity> {
     @Column({nullable: true})
     orderCrm_id: string;
 
+    @ManyToOne(() => SourceEntity, source => source.orders, {cascade: true, onUpdate: 'SET NULL', onDelete: 'SET NULL'})
+    @JoinColumn({name: 'source_id'})
+    source: SourceEntity;
+    
    @ManyToOne(() => OrderStatusEntity, status => status.orders, {cascade: true, onUpdate: 'SET NULL', onDelete: 'SET NULL'})
    @JoinColumn({name: 'status_id'})
     status: OrderStatusEntity;

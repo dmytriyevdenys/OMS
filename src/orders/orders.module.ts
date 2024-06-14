@@ -28,6 +28,7 @@ import { ProductsModule } from 'src/products/products.module';
 import { ProductsService } from 'src/products/products.service';
 import { PaymentMethodEntity } from './entities/payments/payment-method.entity';
 import { SyncOrderService } from './sync-order.service';
+import { SourceEntity } from './entities/sources/source.entity';
 
 
 @Module({
@@ -35,7 +36,7 @@ import { SyncOrderService } from './sync-order.service';
 
 UsersModule,
   HttpModule,
-    TypeOrmModule.forFeature([OrderEntity, PaymentEntity, OrderStatusEntity, PaymentMethodEntity]),
+    TypeOrmModule.forFeature([OrderEntity, PaymentEntity, OrderStatusEntity, PaymentMethodEntity, SourceEntity]),
     BuyerModule,
     InternetDocumentModule,
     SenderModule,

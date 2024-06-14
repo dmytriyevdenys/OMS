@@ -1,4 +1,4 @@
-import { Entity, JoinColumn, ManyToOne, OneToOne, RelationId, } from "typeorm";
+import { Entity, JoinColumn, ManyToOne, OneToOne } from "typeorm";
 import { OrderEntity } from "../order.entity";
 import { AbstractPaymentEntity } from "./abstract-payment.entity";
 import { PaymentMethodEntity } from "./payment-method.entity";
