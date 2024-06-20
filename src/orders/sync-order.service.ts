@@ -2,23 +2,23 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BuyerService } from 'src/buyer/buyer.service';
 import { EntityManager, Repository } from 'typeorm';
-import { PaymentMethodEntity } from './entities/payments/payment-method.entity';
-import { PaymentEntity } from './entities/payments/payment.entity';
+import { PaymentMethodEntity } from '../payments/entities/payment-method.entity';
+import { PaymentEntity } from '../payments/entities/payment.entity';
 import { BuyerEntity } from 'src/buyer/entities/buyer.entity';
 import { OrdersService } from './orders.service';
 import { OrderCrm } from './interfaces/order-crm.interface';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { OrderEntity } from './entities/order.entity';
-import { OrderStatusEntity } from './entities/order-status.entity';
+import { OrderStatusEntity } from './order-status/entities/order-status.entity';
 import { ProductsService } from 'src/products/products.service';
 import { TShippingCrm } from './interfaces/shipping-crm.type';
-import { AddressEntity } from 'src/novaposhta/address/entities/address.entity';
-import { InternetDocumnetEntity } from 'src/novaposhta/internet-document/entities/internet-document.entity';
-import { RecipientEntity } from 'src/novaposhta/recipient/entities/recipient.entity';
 import { OrdersApiService } from './orders-api/orders-api.service';
 import { ApiCrmFetchService } from 'src/utils/api-crm-fetch.service';
 import { OrderProductEntity } from 'src/products/entities/order-product.entity';
 import { BuyerRecipientEntity } from 'src/buyer/entities/buyer-recipient.entity';
+import { AddressEntity } from 'src/deliveries/novaposhta/address/entities/address.entity';
+import { RecipientEntity } from 'src/deliveries/novaposhta/recipient/entities/recipient.entity';
+import { InternetDocumnetEntity } from 'src/deliveries/novaposhta/internet-document/entities/internet-document.entity';
 
 
 @Injectable()

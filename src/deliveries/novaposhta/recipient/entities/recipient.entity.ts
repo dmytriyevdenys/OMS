@@ -1,0 +1,42 @@
+import { InternetDocumnetEntity } from "src/deliveries/novaposhta/internet-document/entities/internet-document.entity";
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+
+@Entity()
+export class RecipientEntity { 
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column({nullable: true})
+    Ref: string;
+
+    @Column()
+    FirstName: string;
+
+    @Column({nullable: true})
+    MiddleName: string;
+
+    @Column()
+    LastName: string;
+
+    @Column()
+    Phone: string;
+
+    @Column({nullable: true})
+    Email: string;
+
+    @Column({nullable: true})
+    CounterpartyType: string;
+
+    @Column({nullable: true})
+    CounterpartyProperty: string;
+
+    @Column({nullable: true})
+    ContactRef: string;
+
+    @OneToOne(() => InternetDocumnetEntity)
+    en: InternetDocumnetEntity;
+
+    constructor (entity: Partial<RecipientEntity>) {
+        Object.assign(this, entity);
+    }
+}

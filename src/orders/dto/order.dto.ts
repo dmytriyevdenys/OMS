@@ -1,8 +1,7 @@
 import { BuyerEntity } from "src/buyer/entities/buyer.entity";
-import { InternetDocumnetEntity } from "src/novaposhta/internet-document/entities/internet-document.entity";
-import { SenderEntity } from "src/novaposhta/sender/entities/sender.entity";
-import { ProductEntity } from "src/products/entities/product.entity";
-import { PaymentEntity } from "../entities/payments/payment.entity";
+import { InternetDocumnetEntity } from "src/deliveries/novaposhta/internet-document/entities/internet-document.entity";
+import { SenderEntity } from "src/deliveries/novaposhta/sender/entities/sender.entity";
+import { PaymentEntity } from "../../payments/entities/payment.entity";
 import { OrderProductEntity } from "src/products/entities/order-product.entity";
 
 

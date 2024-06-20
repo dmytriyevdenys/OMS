@@ -15,11 +15,11 @@ import { OrdersService } from './orders.service';
 import { OrdersApiService } from './orders-api/orders-api.service';
 import { OrderDto } from './dto/order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { IntDocDto } from 'src/novaposhta/internet-document/dto/int-doc.dto';
 import { TTag } from './interfaces/tag-crm.type';
-import { OrderStatusEntity } from './entities/order-status.entity';
+import { OrderStatusEntity } from './order-status/entities/order-status.entity';
 import { OrderCrm } from './interfaces/order-crm.interface';
 import { SyncOrderService } from './sync-order.service';
+import { IntDocDto } from 'src/deliveries/novaposhta/internet-document/dto/int-doc.dto';
 
 @Controller('order')
 export class OrdersController {
@@ -60,6 +60,7 @@ export class OrdersController {
   async importAll (@Req() req) {
     return await this.syncOrderService.importAllOrdersFromCrm(req.user);
   }
+
 
   @Get('crm/:id')
   async getCrmOrderById (@Param('id') id: string) {

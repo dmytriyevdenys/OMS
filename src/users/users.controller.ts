@@ -20,7 +20,7 @@ import { OrdersApiService } from 'src/orders/orders-api/orders-api.service';
 export class UsersController {
   constructor(
     private readonly userService: UsersService,
-    private orderApiService: OrdersApiService,
+    private readonly orderApiService: OrdersApiService,
   ) {}
   @Post()
   async createUser(@Body() userDto: SignUpDto): Promise<UserEntity> {

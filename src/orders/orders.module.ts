@@ -13,22 +13,24 @@ import { UsersService } from 'src/users/users.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { OrderEntity } from './entities/order.entity';
 import { ResponseService } from 'src/utils/response.service';
-import { InternetDocumentService } from 'src/novaposhta/internet-document/internet-document.service';
-import { InternetDocumentModule } from 'src/novaposhta/internet-document/internet-document.module';
-import { SenderService } from 'src/novaposhta/sender/sender.service';
-import { SenderModule } from 'src/novaposhta/sender/sender.module';
-import { ApiIntDocService } from 'src/novaposhta/internet-document/api-service/api-int-doc.service';
 import { ApiNovaposhtaFetchService } from 'src/utils/api-novaposhta-fetch.service';
-import { RecipientApiService } from 'src/novaposhta/recipient/api-service/recipient-api.service';
 import { MatchService } from 'src/utils/match-model.service';
-import { ApiKeyService } from 'src/novaposhta/api-service/novaposhta-apikey.service';
-import { PaymentEntity } from './entities/payments/payment.entity';
-import { OrderStatusEntity } from './entities/order-status.entity';
+import { PaymentEntity } from '../payments/entities/payment.entity';
+import { OrderStatusEntity } from './order-status/entities/order-status.entity';
 import { ProductsModule } from 'src/products/products.module';
 import { ProductsService } from 'src/products/products.service';
-import { PaymentMethodEntity } from './entities/payments/payment-method.entity';
+import { PaymentMethodEntity } from '../payments/entities/payment-method.entity';
 import { SyncOrderService } from './sync-order.service';
 import { SourceEntity } from './entities/sources/source.entity';
+import { OrderStatusModule } from './order-status/order-status.module';
+import { OrderSourceModule } from './order-source/order-source.module';
+import { InternetDocumentModule } from 'src/deliveries/novaposhta/internet-document/internet-document.module';
+import { SenderModule } from 'src/deliveries/novaposhta/sender/sender.module';
+import { InternetDocumentService } from 'src/deliveries/novaposhta/internet-document/internet-document.service';
+import { SenderService } from 'src/deliveries/novaposhta/sender/sender.service';
+import { ApiIntDocService } from 'src/deliveries/novaposhta/internet-document/api-service/api-int-doc.service';
+import { RecipientApiService } from 'src/deliveries/novaposhta/recipient/api-service/recipient-api.service';
+import { ApiKeyService } from 'src/deliveries/novaposhta/api-service/novaposhta-apikey.service';
 
 
 @Module({
@@ -41,6 +43,9 @@ UsersModule,
     InternetDocumentModule,
     SenderModule,
     ProductsModule,
+    OrderStatusModule,
+    OrderStatusModule,
+    OrderSourceModule,
   ],
   controllers: [OrdersController, NewOrderWebHookController],
   providers: [

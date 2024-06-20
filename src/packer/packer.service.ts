@@ -11,12 +11,12 @@ import { CreatePackerDto } from './dto/create-packer.dto';
 import {
   ResponseData,
 } from 'src/interfaces/response-data.interface';
-import { InternetDocumnetEntity } from 'src/novaposhta/internet-document/entities/internet-document.entity';
-import { ApiIntDocService } from 'src/novaposhta/internet-document/api-service/api-int-doc.service';
+import { InternetDocumnetEntity } from 'src/deliveries/novaposhta/internet-document/entities/internet-document.entity';
+import { ApiIntDocService } from 'src/deliveries/novaposhta/internet-document/api-service/api-int-doc.service';
 import { ApiCrmFetchService } from 'src/utils/api-crm-fetch.service';
 import { ScanIntDocDto } from 'src/packer/dto/scan-int-doc.dto';
 import { IntDocStatus } from 'src/consts/int-doc-status.enum';
-import { InternetDocumentService } from 'src/novaposhta/internet-document/internet-document.service';
+import { InternetDocumentService } from 'src/deliveries/novaposhta/internet-document/internet-document.service';
 
 @Injectable()
 export class PackerService {

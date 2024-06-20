@@ -1,8 +1,8 @@
 import { OrderEntity } from "src/orders/entities/order.entity";
 import {  Entity, JoinColumn, OneToMany } from "typeorm";
-import { AddressEntity } from "src/novaposhta/address/entities/address.entity";
 import { AbstractCustomerEntity } from "./abstract-customer.entity";
 import { BuyerRecipientEntity } from "./buyer-recipient.entity";
+import { AddressEntity } from "src/deliveries/novaposhta/address/entities/address.entity";
 
 
 @Entity()

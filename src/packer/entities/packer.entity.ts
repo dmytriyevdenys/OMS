@@ -1,4 +1,4 @@
-import { InternetDocumnetEntity } from "src/novaposhta/internet-document/entities/internet-document.entity";
+import { InternetDocumnetEntity } from "src/deliveries/novaposhta/internet-document/entities/internet-document.entity";
 import { AbstractEntity } from "src/utils/abstract-entity";
 import { Column, Entity, OneToMany,  } from "typeorm";
 

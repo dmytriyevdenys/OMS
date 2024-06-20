@@ -6,14 +6,14 @@ import { OrderEntity } from './entities/order.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { IntDocDto } from 'src/novaposhta/internet-document/dto/int-doc.dto';
-import { InternetDocumentService } from 'src/novaposhta/internet-document/internet-document.service';
-import { InternetDocumnetEntity } from 'src/novaposhta/internet-document/entities/internet-document.entity';
-import { ApiIntDocService } from 'src/novaposhta/internet-document/api-service/api-int-doc.service';
+import { IntDocDto } from 'src/deliveries/novaposhta/internet-document/dto/int-doc.dto';
+import { InternetDocumentService } from 'src/deliveries/novaposhta/internet-document/internet-document.service';
+import { InternetDocumnetEntity } from 'src/deliveries/novaposhta/internet-document/entities/internet-document.entity';
+import { ApiIntDocService } from 'src/deliveries/novaposhta/internet-document/api-service/api-int-doc.service';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { ResponseData } from 'src/interfaces/response-data.interface';
 import { ResponseService } from 'src/utils/response.service';
-import { OrderStatusEntity } from './entities/order-status.entity';
+import { OrderStatusEntity } from './order-status/entities/order-status.entity';
 
 @Injectable()
 export class OrdersService {

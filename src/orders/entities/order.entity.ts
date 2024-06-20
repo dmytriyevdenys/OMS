@@ -1,12 +1,11 @@
 import { BuyerEntity } from "src/buyer/entities/buyer.entity";
-import { InternetDocumnetEntity } from "src/novaposhta/internet-document/entities/internet-document.entity";
-import { SenderEntity } from "src/novaposhta/sender/entities/sender.entity";
-import { ProductEntity } from "src/products/entities/product.entity";
+import { InternetDocumnetEntity } from "src/deliveries/novaposhta/internet-document/entities/internet-document.entity";
+import { SenderEntity } from "src/deliveries/novaposhta/sender/entities/sender.entity";
 import { UserEntity } from "src/users/entities/user.entity";
 import { AbstractEntity } from "src/utils/abstract-entity";
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne,  } from "typeorm";
-import { PaymentEntity } from "./payments/payment.entity";
-import { OrderStatusEntity } from "./order-status.entity";
+import { PaymentEntity } from "../../payments/entities/payment.entity";
+import { OrderStatusEntity } from "../order-status/entities/order-status.entity";
 import { OrderProductEntity } from "src/products/entities/order-product.entity";
 import { SourceEntity } from "./sources/source.entity";
 

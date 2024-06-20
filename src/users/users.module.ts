@@ -1,5 +1,4 @@
 import { Module, } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { HttpModule } from '@nestjs/axios';
@@ -8,12 +7,13 @@ import { ApiCrmFetchService } from 'src/utils/api-crm-fetch.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { ProfileEntity } from './entities/profile.entity';
+import { RoleEntity } from './entities/role.entity';
 
 
 
 @Module({
   imports: [
-  TypeOrmModule.forFeature([UserEntity, ProfileEntity]),
+  TypeOrmModule.forFeature([UserEntity, ProfileEntity, RoleEntity]),
   HttpModule
   ],
   providers: [UsersService, OrdersApiService, ApiCrmFetchService],
