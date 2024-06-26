@@ -16,7 +16,6 @@ import { OrdersApiService } from './orders-api/orders-api.service';
 import { OrderDto } from './dto/order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { TTag } from './interfaces/tag-crm.type';
-import { OrderStatusEntity } from './order-status/entities/order-status.entity';
 import { OrderCrm } from './interfaces/order-crm.interface';
 import { SyncOrderService } from './sync-order.service';
 import { IntDocDto } from 'src/deliveries/novaposhta/internet-document/dto/int-doc.dto';
@@ -102,15 +101,6 @@ export class OrdersController {
   @Put(':id')
   async update(@Param('id') id: number, @Body() dto: UpdateOrderDto) {
     return await this.ordersService.updateOrder(id, dto);
-  }
-
-  @Get('status')
-  async getStatus(
-    @Query('id', new ParseArrayPipe({ items: Number }), ValidationPipe) id: number[],
-    @Query('all', ValidationPipe) all: boolean,
-  ): Promise<OrderStatusEntity[]>{
-    if (all) return this.ordersService.getAllStatuses();
-    return this.ordersService.getStatusesForOrderBoard(id);
   }
 
   @Get('delivery-service')

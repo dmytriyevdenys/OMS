@@ -26,5 +26,4 @@ export class UserEntity extends AbstractEntity<UserEntity> {
     @OneToMany(() => OrderEntity, order => order.user)
     orders: OrderEntity[];
 
-
 }

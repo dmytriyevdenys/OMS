@@ -8,12 +8,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { ProfileEntity } from './entities/profile.entity';
 import { RoleEntity } from './entities/role.entity';
+import { PermissionEntity } from './entities/permission.entity';
 
 
 
 @Module({
   imports: [
-  TypeOrmModule.forFeature([UserEntity, ProfileEntity, RoleEntity]),
+  TypeOrmModule.forFeature([UserEntity, ProfileEntity, RoleEntity, PermissionEntity]),
   HttpModule
   ],
   providers: [UsersService, OrdersApiService, ApiCrmFetchService],

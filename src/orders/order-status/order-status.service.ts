@@ -1,26 +1,34 @@
-import { Injectable } from '@nestjs/common';
-import { CreateOrderStatusDto } from './dto/create-order-status.dto';
-import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { OrderStatusEntity } from './entities/order-status.entity';
 
 @Injectable()
 export class OrderStatusService {
-  create(createOrderStatusDto: CreateOrderStatusDto) {
-    return 'This action adds a new orderStatus';
+    constructor (
+        @InjectRepository(OrderStatusEntity)
+        private readonly statusRepository: Repository<OrderStatusEntity>
+    ) {}
+
+  async getAllStatuses () { 
+    try {
+      const statuses = await this.statusRepository.find();
+      return statuses
+    } catch (error) { 
+      throw error;
+    }
   }
 
-  findAll() {
-    return `This action returns all orderStatus`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} orderStatus`;
-  }
-
-  update(id: number, updateOrderStatusDto: UpdateOrderStatusDto) {
-    return `This action updates a #${id} orderStatus`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} orderStatus`;
+  async getStatusesForOrderBoard(ids: number[]) {
+    try {
+      const statuses = await this.statusRepository
+        .createQueryBuilder('status')
+        .where('status.id IN (:...ids)', { ids })
+        .getMany();
+      if (!statuses) throw new BadRequestException('Не знайдено жодно статуса');
+      return statuses;
+    } catch (error) {
+      throw error;
+    }
   }
 }

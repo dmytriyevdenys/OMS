@@ -131,28 +131,6 @@ export class OrdersService {
     }
   }
 
-  async getStatusesForOrderBoard(ids: number[]) {
-    try {
-      const statuses = await this.statusRepository
-        .createQueryBuilder('status')
-        .where('status.id IN (:...ids)', { ids })
-        .getMany();
-      if (!statuses) throw new BadRequestException('Не знайдено жодно статуса');
-      return statuses;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async getAllStatuses () { 
-    try {
-      const statuses = await this.statusRepository.find();
-      return statuses
-    } catch (error) { 
-      throw error;
-    }
-  }
-
   async findOrderById(id: number) {
     try {
       const order = await this.orderRepository.findOne({

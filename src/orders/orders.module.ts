@@ -38,7 +38,7 @@ import { ApiKeyService } from 'src/deliveries/novaposhta/api-service/novaposhta-
 
 UsersModule,
   HttpModule,
-    TypeOrmModule.forFeature([OrderEntity, PaymentEntity, OrderStatusEntity, PaymentMethodEntity, SourceEntity]),
+    TypeOrmModule.forFeature([OrderEntity, PaymentEntity, PaymentMethodEntity, SourceEntity]),
     BuyerModule,
     InternetDocumentModule,
     SenderModule,
