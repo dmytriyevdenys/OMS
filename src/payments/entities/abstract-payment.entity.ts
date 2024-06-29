@@ -8,6 +8,4 @@ export abstract class AbstractPaymentEntity<T> extends AbstractEntity<T>  {
   @Column()
   label: string;
 
-  @Column({ default: 0 })
-  value: number;
 }

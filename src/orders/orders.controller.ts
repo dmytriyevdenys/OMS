@@ -19,13 +19,17 @@ import { TTag } from './interfaces/tag-crm.type';
 import { OrderCrm } from './interfaces/order-crm.interface';
 import { SyncOrderService } from './sync-order.service';
 import { IntDocDto } from 'src/deliveries/novaposhta/internet-document/dto/int-doc.dto';
+import { PaymentsService } from 'src/payments/payments.service';
+import { ResponseData } from 'src/interfaces/response-data.interface';
+import { PaymentMethodEntity } from 'src/payments/entities/payment-method.entity';
 
 @Controller('order')
 export class OrdersController {
   constructor(
-    private ordersService: OrdersService,
-    private ordersApiservice: OrdersApiService,
-    private syncOrderService: SyncOrderService
+    private readonly ordersService: OrdersService,
+    private readonly ordersApiservice: OrdersApiService,
+    private readonly syncOrderService: SyncOrderService,
+    private readonly paymentsService: PaymentsService
   ) {}
 
   @Get()
@@ -123,8 +127,8 @@ export class OrdersController {
   }
 
   @Get('payment')
-  async getPayment() {
-    return this.ordersApiservice.getPayment();
+  async getPaymentMethods(): Promise<ResponseData<PaymentMethodEntity[]>>{
+    return await this.paymentsService.getPaymentMethods();
   }
 
   @Post('crm')

@@ -15,27 +15,26 @@ import { RecipientApiService } from '../recipient/api-service/recipient-api.serv
 import { ResponseService } from 'src/utils/response.service';
 import { ApiCrmFetchService } from 'src/utils/api-crm-fetch.service';
 import { InternetDocumentSubscriber } from './internet-document.subscriber';
+import { RecipientModule } from '../recipient/recipient.module';
 
 @Module({
   imports: [
     SenderModule,
     TypeOrmModule.forFeature([InternetDocumnetEntity]),
     HttpModule, 
+    RecipientModule,
   ],
   controllers: [InternetDocumentController],
   providers: [
     InternetDocumentService,
-    SenderService,
     ApiNovaposhtaFetchService,
     ApiIntDocService,
-    RecipientService,
     ApiKeyService,
     MatchService,
-    RecipientApiService,
     ResponseService,
     ApiCrmFetchService,
     InternetDocumentSubscriber 
   ],
-  exports: [TypeOrmModule, InternetDocumentModule],
+  exports: [TypeOrmModule, InternetDocumentService, ApiIntDocService, ApiKeyService],
 })
 export class InternetDocumentModule {}

@@ -255,12 +255,12 @@ export class SyncOrderService {
     paymentTotal: number,
   ) {
     const roundedTotal = (total: number) => Math.floor(total);
-    paymentMethod.value = roundedTotal(paymentTotal);
+    const value = roundedTotal(paymentTotal);
     const paymnet = new PaymentEntity({
       name: paymentMethod.name,
       label: paymentMethod.label,
       payment_method_id: paymentMethod.id,
-      value: paymentMethod.value,
+      value
     });
     await this.entityManager.save(paymnet);
     return paymnet;

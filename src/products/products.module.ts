@@ -25,6 +25,6 @@ import { OrderProductEntity } from './entities/order-product.entity';
     ResponseService
   ],
   controllers: [ProductsController],
-  exports: [TypeOrmModule]
+  exports: [TypeOrmModule, ProductsService]
 })
 export class ProductsModule {}

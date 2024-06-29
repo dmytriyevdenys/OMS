@@ -12,6 +12,6 @@ import { BuyerRecipientEntity } from './entities/buyer-recipient.entity';
   ],
   controllers: [BuyerController],
   providers: [BuyerService, ResponseService],
-  exports:[TypeOrmModule]
+  exports:[TypeOrmModule, BuyerService]
 })
 export class BuyerModule {}

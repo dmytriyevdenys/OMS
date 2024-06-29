@@ -24,6 +24,6 @@ import { RecipientApiService } from './api-service/recipient-api.service';
     ApiKeyService,
     RecipientApiService
       ],
-  exports: [RecipientModule],
+  exports: [TypeOrmModule, RecipientApiService, RecipientService],
 })
 export class RecipientModule {}

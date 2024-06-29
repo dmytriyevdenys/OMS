@@ -21,6 +21,6 @@ import { ContractPersonEntity } from './entities/contact-person.entity';
     MatchService,
     ApiNovaposhtaFetchService,
   ],
-  exports: [TypeOrmModule, SenderModule]
+  exports: [TypeOrmModule, SenderService]
 })
 export class SenderModule {}
