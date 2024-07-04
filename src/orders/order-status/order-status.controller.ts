@@ -8,10 +8,8 @@ export class OrderStatusController {
 
   @Get()
   async getStatus(
-    @Query('id', new ParseArrayPipe({ items: Number }), ValidationPipe) id: number[],
-    @Query('all', ValidationPipe) all: boolean,
-  ): Promise<OrderStatusEntity[]>{
-    if (all) return this.statusService.getAllStatuses();
-    return this.statusService.getStatusesForOrderBoard(id);
+    @Query('id', new ParseArrayPipe({ items: Number, optional: true},), ValidationPipe) id?: number[],
+  ): Promise<OrderStatusEntity[]> {     
+      return await this.statusService.getAllStatuses(id);
+    }
   }
-}

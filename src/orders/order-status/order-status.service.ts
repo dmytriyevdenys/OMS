@@ -10,8 +10,9 @@ export class OrderStatusService {
         private readonly statusRepository: Repository<OrderStatusEntity>
     ) {}
 
-  async getAllStatuses () { 
+  async getAllStatuses (ids?: number[]) { 
     try {
+      if (ids) return await this.getStatusesForOrderBoard(ids);
       const statuses = await this.statusRepository.find();
       return statuses
     } catch (error) { 
@@ -19,7 +20,7 @@ export class OrderStatusService {
     }
   }
 
-  async getStatusesForOrderBoard(ids: number[]) {
+  private async getStatusesForOrderBoard(ids: number[]) {
     try {
       const statuses = await this.statusRepository
         .createQueryBuilder('status')
