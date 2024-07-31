@@ -21,6 +21,7 @@
     "typeorm": "npx typeorm-ts-node-commonjs "
   },
   "dependencies": {
+    "@casl/ability": "^6.7.1",
     "@nestjs/axios": "^3.0.0",
     "@nestjs/cache-manager": "^2.1.0",
     "@nestjs/common": "^10.0.0",

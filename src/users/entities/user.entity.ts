@@ -2,7 +2,7 @@ import { OrderEntity } from "src/orders/entities/order.entity";
 import { AbstractEntity } from "src/utils/abstract-entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
 import { ProfileEntity } from "./profile.entity";
-import { RoleEntity } from "./role.entity";
+import { RoleEntity } from "../../auth/role/entities/role.entity";
 
 @Entity()
 export class UserEntity extends AbstractEntity<UserEntity> { 
@@ -16,7 +16,7 @@ export class UserEntity extends AbstractEntity<UserEntity> {
     @Column()
     name: string;
 
-    @ManyToOne(() => RoleEntity)
+    @ManyToOne(() => RoleEntity, {eager: true})
     role: RoleEntity;
 
     @OneToOne (() => ProfileEntity, profile => profile.user, {cascade: true, eager: true})

@@ -12,7 +12,7 @@ import { PackerService } from './packer.service';
 import { CreatePackerDto } from './dto/create-packer.dto';
 import { ScanIntDocDto } from 'src/packer/dto/scan-int-doc.dto';
 
-@Controller('packer')
+@Controller()
 export class PackerController {
   constructor(private readonly packerService: PackerService) {}
 

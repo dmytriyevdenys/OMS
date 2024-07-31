@@ -2,7 +2,7 @@ import { Controller, Get, Query, ValidationPipe, ParseArrayPipe } from '@nestjs/
 import { OrderStatusService } from './order-status.service';
 import { OrderStatusEntity } from './entities/order-status.entity';
 
-@Controller('order/status')
+@Controller()
 export class OrderStatusController {
   constructor(private readonly statusService: OrderStatusService) {}
 

@@ -10,6 +10,7 @@ import {
   Query,
   ParseArrayPipe,
   ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { OrdersApiService } from './orders-api/orders-api.service';
@@ -22,8 +23,12 @@ import { IntDocDto } from 'src/deliveries/novaposhta/internet-document/dto/int-d
 import { PaymentsService } from 'src/payments/payments.service';
 import { ResponseData } from 'src/interfaces/response-data.interface';
 import { PaymentMethodEntity } from 'src/payments/entities/payment-method.entity';
+import { PoliciesGuard } from 'src/auth/ability/policies.guard';
+import { CheckPolicies } from 'src/auth/ability/policy-handler';
+import { OrderPolicyHandler } from 'src/auth/ability/order-policy.handler';
+import { Action } from 'src/auth/ability/actions.enum';
 
-@Controller('order')
+@Controller()
 export class OrdersController {
   constructor(
     private readonly ordersService: OrdersService,
@@ -33,6 +38,8 @@ export class OrdersController {
   ) {}
 
   @Get()
+  @UseGuards(PoliciesGuard)
+  @CheckPolicies(new OrderPolicyHandler([Action.ViewAll]))
   async getOrderByStatuses (
     @Query('statuses', new ParseArrayPipe({ items: Number }), ValidationPipe) statuses: number[])
     {    

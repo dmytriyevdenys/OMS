@@ -16,7 +16,7 @@ import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { OrdersApiService } from 'src/orders/orders-api/orders-api.service';
 
-@Controller('user')
+@Controller()
 export class UsersController {
   constructor(
     private readonly userService: UsersService,

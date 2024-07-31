@@ -1,6 +1,6 @@
 import { AbstractEntity } from 'src/utils/abstract-entity';
 import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
-import { PermissionEntity } from './permission.entity';
+import { PermissionEntity } from '../../permission/entities/permission.entity';
 
 @Entity()
 export class RoleEntity extends AbstractEntity<RoleEntity> {
@@ -22,7 +22,7 @@ export class RoleEntity extends AbstractEntity<RoleEntity> {
   @Column()
   accepted_all: boolean;
 
-  @ManyToMany(() => PermissionEntity, (permission) => permission.roles)
+  @ManyToMany(() => PermissionEntity, (permission) => permission.roles, {eager: true})
   @JoinTable()
   permissions: PermissionEntity[];
 }

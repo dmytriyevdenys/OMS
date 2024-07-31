@@ -21,6 +21,7 @@ import { OrderSourceModule } from './order-source/order-source.module';
 import { InternetDocumentModule } from 'src/deliveries/novaposhta/internet-document/internet-document.module';
 import { PaymentsModule } from '../payments/payments.module';
 import { SenderModule } from 'src/deliveries/novaposhta/sender/sender.module';
+import { CaslAbilityFactory } from 'src/auth/ability/casl-ability.factory';
 
 
 
@@ -48,6 +49,7 @@ import { SenderModule } from 'src/deliveries/novaposhta/sender/sender.module';
     ResponseService,
     ApiNovaposhtaFetchService,
     MatchService,
+    CaslAbilityFactory
   ],
   exports: [],
 })

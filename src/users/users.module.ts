@@ -7,14 +7,10 @@ import { ApiCrmFetchService } from 'src/utils/api-crm-fetch.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
 import { ProfileEntity } from './entities/profile.entity';
-import { RoleEntity } from './entities/role.entity';
-import { PermissionEntity } from './entities/permission.entity';
-
-
 
 @Module({
   imports: [
-  TypeOrmModule.forFeature([UserEntity, ProfileEntity, RoleEntity, PermissionEntity]),
+  TypeOrmModule.forFeature([UserEntity, ProfileEntity]),
   HttpModule
   ],
   providers: [UsersService, OrdersApiService, ApiCrmFetchService],

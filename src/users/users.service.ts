@@ -60,7 +60,7 @@ export class UsersService {
 
   async getAllUsers(): Promise<UserEntity[]> {
     try {
-      const users = await this.usersRepository.find();
+      const users = await this.usersRepository.find({relations: ['role']});
       if (!users) {
         throw new BadRequestException('Не вдалось завантажити користивачів');
       }

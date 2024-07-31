@@ -17,6 +17,8 @@ import { DeliveriesModule } from './deliveries/deliveries.module';
 import { CommunicationsModule } from './communications/communications.module';
 import { DatabaseModule } from './database/database.module';
 import { TasksModule } from './tasks/tasks.module';
+import { RoutersModule } from './routers.module';
+import { CaslModule } from './auth/ability/casl.module';
 const isDev = process.env.NODE_ENV === 'development';
 
 @Module({
@@ -29,7 +31,6 @@ const isDev = process.env.NODE_ENV === 'development';
     AuthModule,
     UsersModule,
     OrdersModule,
-    ProductsModule,
     HttpModule,
     BuyerModule,
     PackerModule,
@@ -37,7 +38,9 @@ const isDev = process.env.NODE_ENV === 'development';
     DeliveriesModule,
     CommunicationsModule,
     DatabaseModule,
-    TasksModule
+    TasksModule,
+    RoutersModule,
+    CaslModule
     ],
   controllers: [AppController, ],
   providers: [AppService, 
