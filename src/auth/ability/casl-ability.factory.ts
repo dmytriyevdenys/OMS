@@ -1,33 +1,26 @@
 import { Injectable } from '@nestjs/common';
-import { createMongoAbility, MongoAbility } from '@casl/ability';
+import { createMongoAbility, MongoAbility, AbilityBuilder } from '@casl/ability';
 import { UserEntity } from 'src/users/entities/user.entity';
-import { Action } from './actions.enum';
 
+export type Actions = 'create_order' | 'manage_catalog' | 'modify_clients' | 'view_all';
 type Subjects = 'orders' | 'catalog' | 'clients' | 'all';
 
-export type AppAbility = MongoAbility<[Action, Subjects]>;
+export type AppAbility = MongoAbility<[Actions, Subjects]>;
 
 @Injectable()
 export class CaslAbilityFactory {
-  createForUser(user: UserEntity) {
-    const ability = createMongoAbility<AppAbility>();
+  createForUser(user: UserEntity): AppAbility {
+    const { can, build } = new AbilityBuilder<AppAbility>(createMongoAbility);
 
-    const role = user.role; 
+    const role = user.role;
     if (role) {
       role.permissions.forEach(permission => {
-        const action = permission.name as Action;
-        if (Object.values(Action).includes(action)) {
-          const subject = permission.group_name as Subjects;
-          ability.can(action, subject);
-        } else {
-          console.warn(`Invalid action: ${permission.name}`);
-        }
+        const action = permission.name as Actions;
+        const subject = permission.group_name as Subjects;
+          can(action, subject);
       });
-    } else {
-      ability.cannot(Action.ManageCatalog, 'all');
-    }
-    console.log('Created Ability:', ability); // Друкує створений Ability об'єкт
-
+    } 
+    const ability = build();
     return ability;
   }
 }

@@ -1,16 +1,18 @@
-import { Action } from './actions.enum';
-import { AppAbility } from './casl-ability.factory';
+import { Actions, AppAbility } from './casl-ability.factory';
 import { IPolicyHandler } from './policies.guard';
 
 
 export class OrderPolicyHandler implements IPolicyHandler {
-  private readonly requiredActions: Action[];
+  private readonly requiredActions: Actions[];
 
-  constructor(requiredActions: Action[]) {
+  constructor(requiredActions: Actions[]) {
     this.requiredActions = requiredActions;
   }
 
-  handle(ability: AppAbility): boolean {
-    return this.requiredActions.every(action => ability.can(action, 'orders'));
+  handle(ability: AppAbility) {
+    return this.requiredActions.every(action => {
+      const canPerform = ability.can(action, 'orders');
+      return canPerform;
+    });
   }
 }
