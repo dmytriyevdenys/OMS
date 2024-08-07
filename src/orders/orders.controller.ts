@@ -25,7 +25,7 @@ import { ResponseData } from 'src/interfaces/response-data.interface';
 import { PaymentMethodEntity } from 'src/payments/entities/payment-method.entity';
 import { PoliciesGuard } from 'src/auth/ability/policies.guard';
 import { CheckPolicies } from 'src/auth/ability/policy-handler';
-import { OrderPolicyHandler } from 'src/auth/ability/order-policy.handler';
+import { createPolicyHandler} from 'src/auth/ability/permission-policy.handler';
 import { Action } from 'src/auth/ability/actions.enum';
 
 @Controller()
@@ -39,7 +39,7 @@ export class OrdersController {
 
   @Get()
   @UseGuards(PoliciesGuard)
-  @CheckPolicies(new OrderPolicyHandler([Action.ViewAll]))
+  @CheckPolicies(createPolicyHandler([Action.ViewAll],'orders'))
   async getOrderByStatuses (
     @Query('statuses', new ParseArrayPipe({ items: Number }), ValidationPipe) statuses: number[])
     {    
