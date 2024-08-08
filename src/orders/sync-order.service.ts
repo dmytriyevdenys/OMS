@@ -19,11 +19,14 @@ import { BuyerRecipientEntity } from 'src/buyer/entities/buyer-recipient.entity'
 import { AddressEntity } from 'src/deliveries/novaposhta/address/entities/address.entity';
 import { RecipientEntity } from 'src/deliveries/novaposhta/recipient/entities/recipient.entity';
 import { InternetDocumnetEntity } from 'src/deliveries/novaposhta/internet-document/entities/internet-document.entity';
+import { OrderAssociations } from './interfaces/order-associations.interfaces';
 
 
 @Injectable()
 export class SyncOrderService {
-  constructor(
+  private sourcesCache:OrderAssociations[];
+
+    constructor(
     private readonly buyerService: BuyerService,
     private readonly entityManager: EntityManager,
     private readonly orderService: OrdersService,
@@ -34,13 +37,16 @@ export class SyncOrderService {
     private readonly paymentMethodRepository: Repository<PaymentMethodEntity>,
     @InjectRepository(OrderStatusEntity)
     private readonly statusRepository: Repository<OrderStatusEntity>,
-  ) {}
+  ) {
+    
+  }
 
   async setOrderFromCrm(
     orderFromCrm: OrderCrm,
     user: UserEntity,
   ): Promise<OrderEntity> {
     try {
+     await this.fetchAndCacheOrderSources();
       const existingOrder = await this.orderService.getOrderByCrmId(
         orderFromCrm.id,
       );
@@ -49,6 +55,7 @@ export class SyncOrderService {
         const statusId = this.syncOrderStatus(orderFromCrm.status_id);
 
         const status = await this.statusRepository.findOneBy({ id: statusId });
+        const source = this.syncOrderSource(Number(orderFromCrm.id))
         const additionalnformation = orderFromCrm.products
           .map((product) => {
             const comment = product.comment ? product.comment : '';
@@ -162,6 +169,15 @@ export class SyncOrderService {
       console.error('An error occurred in importAllOrdersFromCrm:', error);
       throw error;
     }
+  }
+
+  async syncOrderSource (sourceId: number) {
+    const currentSource = this.sourcesCache.find(source => source.id === sourceId);
+    return currentSource;
+  } 
+  private async fetchAndCacheOrderSources () {
+    const sources = await this.apiOrderService.getSource();
+    sources.forEach(source => this.sourcesCache[source.id] = source)
   }
 
   syncOrderStatus(statusId: string) {

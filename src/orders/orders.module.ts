@@ -15,7 +15,7 @@ import { ApiNovaposhtaFetchService } from 'src/utils/api-novaposhta-fetch.servic
 import { MatchService } from 'src/utils/match-model.service';
 import { ProductsModule } from 'src/products/products.module';
 import { SyncOrderService } from './sync-order.service';
-import { SourceEntity } from './entities/sources/source.entity';
+import { SourceEntity } from './order-source/entities/source.entity';
 import { OrderStatusModule } from './order-status/order-status.module';
 import { OrderSourceModule } from './order-source/order-source.module';
 import { InternetDocumentModule } from 'src/deliveries/novaposhta/internet-document/internet-document.module';
@@ -34,7 +34,6 @@ import { CaslAbilityFactory } from 'src/auth/ability/casl-ability.factory';
     InternetDocumentModule,
     SenderModule,
     ProductsModule,
-    OrderStatusModule,
     OrderStatusModule,
     OrderSourceModule,
     PaymentsModule,

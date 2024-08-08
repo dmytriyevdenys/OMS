@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, UpdateDateColumn } from "typeorm";
-import { OrderEntity } from "../order.entity";
+import { OrderEntity } from "../../entities/order.entity";
 
 
 @Entity()
@@ -13,6 +13,15 @@ export class SourceEntity  {
 
     @Column()
     alias: string;
+
+    @Column({ default: 'other' })
+    driver: string;
+
+    @Column({ nullable: true })
+    source_name: string;
+
+    @Column({ nullable: true })
+    source_uuid: string;
 
     @Column({default: true})
     isActive: boolean;

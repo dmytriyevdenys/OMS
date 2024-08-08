@@ -1,4 +1,14 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
+import { OrderSourceService } from './order-source.service';
+import { SourceEntity } from './entities/source.entity';
+import { ResponseData } from 'src/interfaces/response-data.interface';
 
-@Controller('order-source')
-export class OrderSourceController {}
+@Controller()
+export class OrderSourceController {
+  constructor(private readonly sourceService: OrderSourceService) {}
+
+  @Get()
+  async getSources(): Promise<ResponseData<SourceEntity[]>>{
+    return await this.sourceService.getAllSources();
+  }
+}

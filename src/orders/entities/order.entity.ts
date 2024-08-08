@@ -7,7 +7,7 @@ import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany
 import { PaymentEntity } from "../../payments/entities/payment.entity";
 import { OrderStatusEntity } from "../order-status/entities/order-status.entity";
 import { OrderProductEntity } from "src/products/entities/order-product.entity";
-import { SourceEntity } from "./sources/source.entity";
+import { SourceEntity } from "../order-source/entities/source.entity";
 
 @Entity()
 export class OrderEntity extends AbstractEntity<OrderEntity> {

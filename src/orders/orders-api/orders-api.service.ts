@@ -116,10 +116,15 @@ export class OrdersApiService {
   }
 
   async getOrderById(id: string) {
-    const order = await this.apiService.get(
-      `order/${id}?include=shipping.deliveryService,products.offer,manager,custom_fields,payments,buyer`,
-    );
-    return order;
+    try {
+      const order = await this.apiService.get(
+        `order/${id}?include=shipping.deliveryService,products.offer,manager,custom_fields,payments,buyer,`,
+      );
+      return order;
+    }catch (error) {
+      throw error;
+    }
+ 
   }
 
   async createOrder(dto: Partial<OrderDto>): Promise<OrderCrm> {
@@ -164,8 +169,11 @@ export class OrdersApiService {
     return tags.data;
   }
 
-  async getSource(): Promise<OrderAssociations[]> {
-    return await this.fetchDataAndMap('source', { limit: 50 });
+  async getSource() {
+    // return await this.fetchDataAndMap('source', { limit: 50 });
+    const result = await this.apiService.get(`${this.baseUrl}/source`,{ limit: 50 });
+    
+    return result.data;
   }
 
   async getCustomField(): Promise<OrderAssociations[]> {

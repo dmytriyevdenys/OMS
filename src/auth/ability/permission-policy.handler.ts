@@ -1,8 +1,6 @@
-import { Injectable } from '@nestjs/common';
 import { Actions, AppAbility, Subjects } from './casl-ability.factory';
 import { IPolicyHandler } from './policies.guard';
 
-@Injectable()
  class PermissionPolicyHandler implements IPolicyHandler {
   private readonly actions: Actions[];
   private readonly subject: Subjects;
